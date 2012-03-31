@@ -1,0 +1,105 @@
+.coloredborder
+{
+	background:url(../images/fillbgtop.png) repeat-x;
+	padding-top:10px;
+	padding-bottom:10px;
+	border-bottom:1px solid #cacaca;
+	margin-bottom:10px;
+} 
+.desc
+{
+	font-size:14px;
+	font-weight:bold;
+	color:#94705a;
+	padding:10px;
+}
+h3{
+	color:#93705a;
+	font-weight:bold;
+}
+label
+{
+	color:#93705a;
+	font-weight:bold;
+}
+.green
+{
+	color:#99ca3b;
+}
+a{
+	color:#33a9d1;
+}
+footer{
+	text-align:center;
+}
+.navbar-inner
+{
+	background-color: white;
+	background-image: -moz-linear-gradient(center top , #ffffff, #eeeeee) !important;
+	background-image: -webkit-linear-gradient(top,  #ffffff, #eeeeee);
+	background-image: -o-linear-gradient(top,  #ffffff, #eeeeee);
+	background-image: linear-gradient(top,  #ffffff, #eeeeee);
+}
+#maincontainer
+{
+	padding-top:75px;
+}
+.menuitem
+{
+	cursor:pointer;
+	color:#33a9d1;
+}
+.postrow
+{
+	padding-top:8px;
+	padding-bottom:10px;
+	margin-top:10px;
+	margin-bottom:10px;
+	border: 1px solid #E1E1E8;
+	background-color: #F7F7F9;
+	box-shadow: 40px 0 0 #FBFBFC inset;
+}
+.postBody
+{
+	padding-top:10px;
+	padding-bottom:10px;
+}
+.profile-image
+{
+	margin-left:3px;
+	cursor: pointer;
+}
+.image-loading
+{
+	padding:10px;
+}
+.yui3-autoloadtagsplugin
+{
+	background-color:white;
+	border:1px solid black;
+	position: absolute;
+    z-index: 1;
+}
+.yui3-autoloadtagsplugin-list
+{
+	list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+.yui3-autoloadtagsplugin-item
+{
+	cursor: pointer;
+    list-style: none outside none;
+    padding: 2px 5px;
+}
+.yui3-autoloadtagsplugin-item-hover
+{
+	color:white;
+	background-color:blue;
+}
+.yui3-autoloadtagsplugin-aria
+{
+	display:none;
+}
+.yui3-autoloadtagsplugin-hidden { visibility: hidden; }
