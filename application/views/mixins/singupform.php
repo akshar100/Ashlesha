@@ -10,28 +10,28 @@
 	          <div class="control-group">
 	            <label class="control-label"  for="username">Username</label>
 	            <div class="controls">
-	              <input type="text"  name="username" id="username" class="span8">
+	              <input type="text"  name="username" id="username" >
 	              <span class="help-inline"></span>
 	            </div>
 	          </div><!-- /control-group -->
 	          <div class="control-group">
 	            <label class="control-label"  for="password" >Password</label>
 	            <div class="controls">
-	              <input type="password"  name="password" id="password" class="span8">
+	              <input type="password"  name="password" id="password" >
 	              <span class="help-inline"></span>
 	            </div>
 	          </div><!-- /control-group -->
 	          <div class="control-group">
 	            <label class="control-label"  for="email">Email</label>
 	            <div class="controls">
-	              <input type="text" name="email" id="email" class="span8">
+	              <input type="text" name="email" id="email" >
 	              <span class="help-inline"></span>
 	            </div>
 	          </div><!-- /control-group -->
 	          <div class="control-group">
 	            <label class="control-label"  for="fullname">Full Name</label>
 	            <div class="controls">
-	              <input type="text" name="fullname" id="fullname" class="span8">
+	              <input type="text" name="fullname" id="fullname">
 	              <span class="help-inline"></span>
 	            </div>
 	          </div><!-- /control-group -->

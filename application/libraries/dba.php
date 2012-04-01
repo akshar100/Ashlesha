@@ -613,4 +613,15 @@ class DBA
 		}
 	
 	}
+	
+	function create_group($data)
+	{
+		
+		$response = $this->chill->post($data);
+		
+		return (array(
+			"success"=>true,
+			"data"=>$this->chill->get($response["_id"])
+		));
+	}
 }

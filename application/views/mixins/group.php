@@ -29,13 +29,13 @@
 								<div class="control-group">
 									<div class="controls">
 										<label class="radio">
-							                <input type="radio" checked="" value="true"  name="visibility">
-							               		Open Group
+							                <input type="radio" checked="" value="open"  name="visibility">
+							               		Open Board
 							            </label>
 							            
 							            <label class="radio">
-							                <input type="radio" value="false"  name="visibility">
-							                	Closed Group
+							                <input type="radio" value="closed"  name="visibility">
+							                	Closed Board
 							            </label>
 										<p class="help-block">If you set your group as closed then you will have to manually pass the group link to others.</p>
 									</div>
@@ -43,38 +43,16 @@
 			
 								<div class="control-group">
 									<div class="controls">
-										<textarea rows="3" name="post"  class="span12" placeholder="Description......"></textarea>
+										<textarea rows="3" name="description"  class="span12" placeholder="Description......"></textarea>
 										<p class="help-block">
 								            Mention the purpose of the board, who can join, what activity is expected and so on.
-								        </p>
-							        </div>
-							    </div>
-							    <div class="control-group">
-									<div class="controls">
-										<p><label>You may add a pre-requisite for joining the group</label></p>
-											<div class='row-fluid'>
-												<div class="span6">
-													<select name="prereq" class="span12">
-													<option value="">-None-</option>
-													<option value="question">Question</option>
-													
-													</select>
-												</div>
-												<div class="span1">
-													<button type="button" class='btn btn-primary'>Add</button>
-												</div>
-												
-												
-											</div>
-										<p class="help-block">
-								            Before joining the group the user has to perform the tasks you define here. 
 								        </p>
 							        </div>
 							    </div>
 							    <div class="contol-group">
 							    	<div class="pull-right">
 							    			
-							    			<button class="btn btn-small btn-primary">Create Group</button>  
+							    			<button type="button" class="btn btn-small btn-primary">Create Group</button>  
 							    	</div>
 							    </div>
 							</fieldset>
@@ -85,3 +63,4 @@
 	
 </div>	
 </script>
+<?php $this->load->view("mixins/question");?>

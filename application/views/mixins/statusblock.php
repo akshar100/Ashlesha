@@ -1,120 +1,68 @@
 <script type="text/x-template" id="statusblock-unauthenticated">
-	<div>Painpoint</div>
+	<div></div>
 	
 </script>
 <script type="text/x-template" id="statusblock-authenticated">
 	<ul class="pills nav nav-pills pills-status">
-    <li><a  href="#" rel="painpoint">Painpoint</a></li>
+    <li><a  href="#" rel="painpoint"><?php echo $this->lang->line('main_post_title');?></a></li>
     <li><a href="#" rel="surveys">Surveys</a></li>
     <li class="hide"><a href="#" rel="images">Images</a></li>
-    <li><a href="#" rel="first" >1st Exp.</a></li>
-    <li><a href="#" rel="last">Last Exp.</a></li>
+   <!-- <li><a href="#" rel="first" >1st Exp.</a></li>-->
+   <!--  <li><a href="#" rel="last">Last Exp.</a></li> -->
+   <li><a href="#" rel="question">Question</a></li>
     <li><a href="#" rel="event">Event</a></li>
     </ul>
-    <div class="row-fluid shadow hide">
+    <div class="row-fluid">
     	
-	   	 <div class="span9">
-	   	 	<div class="forms">
-				<div id="painpoint-form" class="hide form">
-					<fieldset>
-						<legend>Painpoint</legend>
-					<div class="control-group">
-						<div class="controls">
-							<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
-							<input type="hidden" name="category" value="painpoint"/>
-							
-							<p class="help-block"></p>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="controls">
-							<textarea rows="3" name="post"  class="span12"></textarea>
-							<p class="help-block span8">
-					                Explain your painpoint in few words. Be specific and precise.  
-					        </p>
-					        
-				        </div>
-				    </div>
-				    <div class="contol-group">
-				    	<div class="pull-right">
-				    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
-				    			<button class="btn btn-small btn-primary">Post</button>  
-				    	</div>
-				    </div>
-					</fieldset>
-				</div>
-				<div id="first-form" class="hide form">
-					
-					<fieldset>
-						<legend>First Experience</legend>
-					<div class="control-group">
-						<div class="controls">
-							<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
-							<input type="hidden" name="category" value="firstexp"/>
-							
-							<p class="help-block"></p>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="controls">
-							<textarea rows="3" name="post"  class="span12"></textarea>
-							<p class="help-block span8">
-					                First time you had used this brand/product/service.  
-					        </p>
-					        
-				        </div>
-				    </div>
-				    <div class="contol-group">
-				    	<div class="span12">
-				    		<div class="pull-right">
-				    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
-				    			<button class="btn btn-small btn-primary">Post</button>  
-				    		</div>
-				    	</div>
-				    </div>
-					</fieldset>
-			        
-			        
-				</div>
-				<div id="last-form" class="hide form">
-					
-					<fieldset>
-						<legend>Last Experience</legend>
-					<div class="control-group">
-						<div class="controls">
-							<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
-							<input type="hidden" name="category" value="lastexp"/>
-							
-							<p class="help-block"></p>
-						</div>
-					</div>
-					<div class="control-group">
-						<div class="controls">
-							<textarea rows="3" name="post"  class="span12"></textarea>
-							<p class="help-block span8">
-					                Last experience means you wont use that product/brand/service anymore. 
-					        </p>
-					        
-				        </div>
-				    </div>
-				    <div class="contol-group">
-				    	<div class="span12">
-				    		<div class="pull-right">
-				    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
-				    			<button class="btn btn-small btn-primary">Post</button>  
-				    		</div>
-				    	</div>
-				    </div>
-					</fieldset>
-			        
-				</div>
+	   	<div class="span9">
+	   	 <div class="forms">
+				
+				
+			
+	   	 </div>
+		</div>
+	<div id="upload_status"></div>
+</script>
+<script type="text/x-template" id="create-post">
+	<div id="painpoint-form" class="form span8">
+		<fieldset>
+			<h3><?php echo $this->lang->line('main_post_title');?></h3>
+		<div class="control-group">
+			<div class="controls">
+				<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
+				<input type="hidden" name="category" value="painpoint"/>
+				
+				<p class="help-block"></p>
 			</div>
-			<div id="event-form" class="hide form">
+		</div>
+		<div class="control-group">
+			<div class="controls">
+				<textarea rows="3" name="post"  class="span12"></textarea>
+				<p class="help-block span8">
+		                Explain your <?php echo $this->lang->line('main_post_title');?> in few words. Be specific and precise.  
+		        </p>
+		        
+	        </div>
+	    </div>
+	    <div class="contol-group">
+	    	<div class="pull-right">
+	    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
+	    			<button class="btn btn-small btn-primary">Post</button>  
+	    	</div>
+	    </div>
+		</fieldset>
+	</div>
+	<div class="span4 image_preview">
+		
+	</div>
+</script>
+<script type="text/x-template" id="create-event">
+	<div id="event-form" class="form span8">
 					<fieldset>
-						<legend>Create an Event</legend>
+						<h3>Create an Event</h3>
 					<div class="control-group">
 						<div class="controls">
-							<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
+							<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
 							<input type="hidden" name="category" value="event"/>
 							<p class="help-block"></p>
 						</div>
@@ -191,15 +139,9 @@
 				    </div>
 					</fieldset>
 				</div>
-	   	 </div>
-	   	 <div class="span3">
-	   	 	<div class="image_preview">
-	   	 		
-	   	 	</div>
-	   	 </div>
-	   	 
-	</div>
-	<div id="upload_status"></div>
-	<hr/>
+				<div class="span4 image_preview">
+					
+				</div>
 </script>
 <?php $this->load->view("mixins/imageuploader");?>
+<?php $this->load->view("mixins/question");?>

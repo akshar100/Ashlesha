@@ -242,6 +242,18 @@ class IO extends CI_Controller {
 				)
 		));
 	}
+	
+	function create_group()
+	{
+		$data = $this->input->post();
+		
+		unset($data['_id']);
+		unset($data['id']);
+		$data['author_id'] = $this->user->get_current();
+		$data['created_at'] = time();
+		$data['type'] = 'group';
+		echo json_encode($this->dba->create_group($data));	
+	}
 }
 
 /* End of file welcome.php */

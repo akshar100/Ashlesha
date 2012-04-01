@@ -32,9 +32,10 @@
 	<div class="span11 post-zone"> 
 		<form>
 		<div class="row-fluid"><div class="span1"></div><div class="tagzone span10">
-			<input type="text" placeholder="Brand, Product , Service Name" name="tags" value="{TAGS}" class="span12 autocomplete">
-		</div><div class="span1 wall-post-admin"><button class='btn btn-danger delete-btn'><i class="icon-trash"></i></button></div></div>
-		<div class="row-fluid"><div class="span1"></div><div class="textzone span11 postBody"><textarea rows="3" name="post"  class="span12">{TEXT}</textarea></div></div>
+			<div class="row-fluid"><input type="text" placeholder="Brand, Product , Service Name" name="tags" value="{TAGS}" class="span12 autocomplete"></div>
+		</div>
+		<div class="span1 wall-post-admin"><button class='btn btn-danger delete-btn'><i class="icon-trash"></i></button></div></div>
+		<div class="row-fluid"><div class="span1"></div><div class="textzone span11 postBody"><div class="row-fluid"><textarea rows="3" name="post"  class="span12">{TEXT}</textarea></div></div></div>
 		<div class="row-fluid"><div class="span8">&nbsp;</div><div class="span3"><button type='button' class="btn btn-primary pull-right save-btn">Save Changes</button></span></div>
 		</form>
 	</div>
@@ -43,7 +44,7 @@
 
 <script type="text/x-template" id="post-comments">
 	<div class="row-fluid">
-		<div class="span1"><img class="thumbnail profile-image" src="{IMG}" alt=""></div>
+		<div class="span1"><img class="thumbnail profile-image span1" src="{IMG}" alt=""></div>
 		<div class="span11">
 			
 			<blockquote><p>{TEXT}</p><small>{AUTHOR}</small></blockquote></div>
@@ -81,7 +82,7 @@
 <script type="text/x-template" id="embedded-image">
 	<div class="row">
 		<div class="span9">
-			<img src="{IMG}" class="span12 thumbnail"/> 
+			<div class="row-fluid"><img src="{IMG}" class="span6 thumbnail"/></div> 
 		</div>
 	</div>
 </script>
@@ -120,10 +121,10 @@
 
 
 <script id='wall-event-joined' type="text/x-template">
-	<span class="label label-info">You are attending!</span> <button class='btn btn-danger undo-btn'>Undo</button>
+	<span class="label label-info">You are attending!</span> <button class='btn btn-danger undo-btn btn-mini'>Undo</button>
 </script>
 <script id='wall-event-ignored' type="text/x-template">
-	<span class="label label-info">You are attending!</span> <button class='btn btn-danger undo-btn'>Undo</button>
+	<span class="label label-info">You are NOT attending!</span> <button class='btn btn-danger undo-btn btn-mini'>Undo</button>
 </script>
 <script id='wall-event-actions' type="text/x-template">
 	<button class='btn btn-primary btn-mini join-btn'>Join</button>

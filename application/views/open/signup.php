@@ -55,7 +55,7 @@ $this->load->view("common/header");
   		Y.BABE.loadTemplate("singupform",function(){ 
   			var signup = new Y.BABE.SignUpView();
  
-  			Y.one("#signup").setContent(signup.render().container);
+  			Y.one("#signup").setContent(signup.render().get('container'));
   			signup.setData(data);
   		});
   	});

@@ -103,3 +103,8 @@ footer{
 	display:none;
 }
 .yui3-autoloadtagsplugin-hidden { visibility: hidden; }
+
+img.profile-image
+{
+	width:48px;
+}

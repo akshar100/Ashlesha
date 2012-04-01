@@ -1,5 +1,5 @@
 <script type="text/x-template" id="sidebar-unauthenticated">
-	<div class="row">
+	<div class="row-fluid">
 		<div class="span1"
 		<a href="#">
             <img alt="" src="http://placehold.it/40x40}" class="thumbnail">
@@ -27,7 +27,7 @@
 
 </script>
 <script type="text/x-template" id="menu-section">
-	<div class="row menuSection" >
+	<div class="row-fluid menuSection" >
 		<div class="span12">
 			<div class="row-fluid">
 				<div class="span12"><ul class="nav nav-list"><li class="nav-header">{LABEL}</li></ul></div>
