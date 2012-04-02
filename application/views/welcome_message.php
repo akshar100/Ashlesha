@@ -44,8 +44,8 @@ $this->load->view("common/header");
 	var baseURL = "<?php echo base_url();?>";
 	YUI().use('babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
 		Y.user = new Y.Model({ authenticated:false , user_id:null, name:null });
-		var cache = new Y.CacheOffline({max:200});
-		cache.flush();
+	
+		
 		Y.hs = new Y.History();
 		 Y.on('io:failure', function(){
 		 	Y.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");

@@ -73,6 +73,11 @@ footer{
 {
 	padding:10px;
 }
+.yui3-autoloadtagsplugin-item-active
+{
+	color:white;
+	background-color:blue;
+}
 .yui3-autoloadtagsplugin
 {
 	background-color:white;
@@ -108,3 +113,38 @@ img.profile-image
 {
 	width:48px;
 }
+.yui3-aclist-item-active
+{
+	color:white;
+	background-color:blue;
+}
+.yui3-aclist
+{
+	background-color:white;
+	border:1px solid black;
+	position: absolute;
+    z-index: 1;
+}
+.yui3-aclist-list
+{
+	list-style: none outside none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+.yui3-aclist-item
+{
+	cursor: pointer;
+    list-style: none outside none;
+    padding: 2px 5px;
+}
+.yui3-aclist-item-hover
+{
+	color:white;
+	background-color:blue;
+}
+.yui3-aclist-aria
+{
+	display:none;
+}
+.yui3-aclist-hidden { visibility: hidden; }

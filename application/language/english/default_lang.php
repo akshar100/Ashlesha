@@ -6,4 +6,7 @@ $lang["site_copyright"] = "&copy; ".date("Y",time())." ".$lang["site_name"]; //a
 $lang["sign_up_pitch"] = "Brand A Brand Now!";
 $lang["main_post_title"] = "Painpoint";
 $lang["tags"] = "Brand, Product, Services";
+$lang["categorization"] = "Sector/Industry";
+$lang["post"] = "Painpoint";
+$lang["group"] = "Board";
 

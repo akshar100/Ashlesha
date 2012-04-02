@@ -845,6 +845,20 @@ YUI.add('babe', function (Y) {
 		 		{
 		 			return "Provide only 4 brand,product,service names";
 		 		}
+		 		if(!attributes.sector)
+		 		{
+		 			return "You need to enter a valid sector.";
+		 		}
+		 		else
+		 		{
+		 			if(cache.retrieve("all_sectors"))
+		 			{
+		 				if(!Array.indexOf(cache.retrieve("all_sectors"),attributes.sector))
+		 				{
+		 					return "Please select a valid sector. The one you have provided is incorrect.";
+		 				}
+		 			}
+		 		}
 		 	}
 		 },{
 		 	ATTRS:{
@@ -895,6 +909,9 @@ YUI.add('babe', function (Y) {
 		 		_id:
 		 		{
 		 			value:0
+		 		},
+		 		sector:{
+		 			value:''
 		 		}
 		 		
 		 	}
@@ -1465,26 +1482,92 @@ YUI.add('babe', function (Y) {
 				return this;
 			}
 		});
-		
-	var AutoLoadTagsPlugin = function(config){
-		AutoLoadTagsPlugin.superclass.constructor.apply(this, arguments);
-	};
-	AutoLoadTagsPlugin.NAME = "AutoLoadTagsPlugin";
-	AutoLoadTagsPlugin.NS="autoloadtags";
-	AutoLoadTagsPlugin.ATTRS = {
-
-	   
-	};
-	Y.extend(AutoLoadTagsPlugin, Y.Plugin.AutoComplete, {
-	    initializer: function(config) {
-	       
-	       AutoLoadTagsPlugin.superclass.constructor.apply(this,arguments);
-	       
-	       
-	    }
-
-
-	});
+	
+	var TagBoxConfig = {
+						activateFirstItem: true, 
+					    allowTrailingDelimiter: true,
+					    alwaysShowList: false,
+					    enableCache: true,
+					    minQueryLength: 3,
+					    queryDelay: 100,
+					    queryDelimiter: ',',
+					    maxResults: 5,
+					    resultHighlighter: 'startsWith',
+					    resultTextLocator: 'name',
+					    source: new Y.DataSource.Get({
+							    source: baseURL+'in/tag?'
+								}),
+					    requestTemplate: '&q={query}',
+					    resultListLocator: function (response) {
+					      var results = response[0].query.results &&
+					            response[0].query.results.tags;
+					
+					      if (results && !Y.Lang.isArray(results)) {
+					        results = [results];
+					      }
+					
+					      return results || [];
+					    },
+					    resultFilters: ['startsWith', function (query, results) {
+					     
+					      var selected = this.get('value').split(/\s*,\s*/);
+					
+					     
+					      selected.pop();
+					
+					      // Convert the array into a hash for faster lookups.
+					      selected = Y.Array.hash(selected);
+					
+					      
+					      return Y.Array.filter(results, function (result) {
+					        return !selected.hasOwnProperty(result.name);
+					      });
+					    }]
+					    
+					 }; 
+	var TagBoxForcedConfig = {
+						activateFirstItem: true, 
+					    allowTrailingDelimiter: true,
+					    alwaysShowList: false,
+					    enableCache: true,
+					    minQueryLength: 3,
+					    queryDelay: 0,
+					    queryDelimiter: ',',
+					    maxResults: 5,
+					    resultHighlighter: 'startsWith',
+					    resultTextLocator: 'name',
+					    source: new Y.DataSource.Get({
+							    source: baseURL+'in/tag?'
+								}),
+					    requestTemplate: '&q={query}',
+					    resultListLocator: function (response) {
+					      var results = response[0].query.results &&
+					            response[0].query.results.tags;
+					
+					      if (results && !Y.Lang.isArray(results)) {
+					        results = [results];
+					      }
+					
+					      return results || [];
+					    },
+					    resultFilters: ['startsWith', function (query, results) {
+					     
+					      var selected = this.get('value').split(/\s*,\s*/);
+					
+					     
+					      selected.pop();
+					
+					      // Convert the array into a hash for faster lookups.
+					      selected = Y.Array.hash(selected);
+					
+					      
+					      return Y.Array.filter(results, function (result) {
+					        return !selected.hasOwnProperty(result.name);
+					      });
+					    }]
+					    
+					 }; 
+	var AutoLoadTagsPlugin = Y.Plugin.AutoComplete;
 	
 	var GroupModel = Y.Base.create('groupModel',PostModel,[],{
 		sync:modelSync
@@ -1550,7 +1633,7 @@ YUI.add('babe', function (Y) {
 								{
 									Y.showAlert("Done!","Your post has been published successfully.");
 									
-									c.destroy();
+									c.setContent('');
 								}
 							
 							});
@@ -1612,7 +1695,7 @@ YUI.add('babe', function (Y) {
 								{
 									Y.showAlert("Done!","Your post has been published successfully.");
 									
-									c.destroy();
+									c.setContent('');
 								}
 							
 							});
@@ -1634,7 +1717,83 @@ YUI.add('babe', function (Y) {
 								display:"#"+this.get('container').one('.image_preview').generateID()
 							}));
 			},this);
-			this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin,Y.BABE.TagBoxConfig);	
+			var lastValue;
+			this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin,TagBoxConfig);
+			
+			var inputNode = this.get('container').one(".ac-sector");
+			inputNode.on('blur',function(){
+				if(inputNode.get('value').trim().length<4)
+				{
+					inputNode.set("value",'');
+				}
+			})
+			if(!cache.retrieve("all_sectors"))
+			{
+				Y.io(baseURL+'in/all_sectors',{
+					method:'POST',
+					on:{
+						 success:function(i,o,a){
+						 	var tags = Y.JSON.parse(o.responseText);
+						 	cache.add('all_sectors',tags);
+						 	inputNode.plug(Y.Plugin.AutoComplete,
+							{		activateFirstItem: true,
+							        minQueryLength: 3,
+							        queryDelay: 0,
+							        source: tags,
+							        maxResults: 10,
+							        resultHighlighter: 'subWordMatch',
+							        resultFilters: ['subWordMatch']
+							});
+							inputNode.removeAttribute("disabled");
+							inputNode.on('focus', function () {
+						        inputNode.ac.sendRequest('');
+						    });
+						     inputNode.ac.on('results', function (e) {
+						        if (e.results.length) {
+						            lastValue = inputNode.ac.get('value');
+						        } else {
+						            inputNode.set('value', lastValue);
+						        }
+						    });
+						    inputNode.ac.after('select', function (e) {
+						        lastValue = e.result.text;
+						    });
+						 }
+					}
+				});
+			}
+			else
+			{
+				inputNode.plug(Y.Plugin.AutoComplete,
+							{		activateFirstItem: true,
+							        minQueryLength: 3,
+							        queryDelay: 0,
+							        source: cache.retrieve("all_sectors"), 
+							        maxResults: 10,
+							        resultHighlighter: 'subWordMatch',
+							        resultFilters: ['subWordMatch']
+							});
+							inputNode.removeAttribute("disabled");
+							
+							inputNode.on('focus', function () {
+						        inputNode.ac.sendRequest('');
+						    });
+						     inputNode.ac.on('results', function (e) {
+						        if (e.results.length) {
+						            lastValue = inputNode.ac.get('value');
+						        } else {
+						            inputNode.set('value', lastValue);
+						        }
+						    });
+						    inputNode.ac.after('select', function (e) {
+						        lastValue = e.result.text;
+						    });
+			}
+			
+			
+			
+			
+		    
 			this.get('container').one("button.btn-primary").on("click",function(){
 							
 							var post =  new Y.BABE.PostModel({
@@ -1643,7 +1802,8 @@ YUI.add('babe', function (Y) {
 								category:'painpoint',
 								images:this.get('img') && this.get('img').image && Y.JSON.stringify([
 									this.get('img').image
-								])
+								]),
+								sector:this.get('container').one("[name=sector]").get("value")
 									
 								
 							});
@@ -1659,7 +1819,7 @@ YUI.add('babe', function (Y) {
 								{
 									Y.showAlert("Done!","Your post has been published successfully.");
 									
-									c.destroy();
+									c.setContent('');
 								}
 							
 							});
@@ -1715,7 +1875,7 @@ YUI.add('babe', function (Y) {
 							else
 							{
 								Y.showAlert("Done!","Your post has been published successfully.");
-								c.destroy();
+								c.setContent('');
 							}
 						
 						});
@@ -1750,47 +1910,7 @@ YUI.add('babe', function (Y) {
     Y.BABE = {
     	male_image:baseURL+'static/images/male_profile.png',
     	female_image:baseURL+'static/images/female_profile.png',
-    	TagBoxConfig:{
-						activateFirstItem: true, 
-					    allowTrailingDelimiter: true,
-					    alwaysShowList: false,
-					    minQueryLength: 3,
-					    queryDelay: 0,
-					    queryDelimiter: ',',
-					    maxResults: 5,
-					    resultHighlighter: 'startsWith',
-					    resultTextLocator: 'name',
-					    source: new Y.DataSource.Get({
-							    source: baseURL+'in/tag?'
-								}),
-					    requestTemplate: '&q={query}',
-					    resultListLocator: function (response) {
-					      var results = response[0].query.results &&
-					            response[0].query.results.tags;
-					
-					      if (results && !Y.Lang.isArray(results)) {
-					        results = [results];
-					      }
-					
-					      return results || [];
-					    },
-					    resultFilters: ['startsWith', function (query, results) {
-					     
-					      var selected = this.get('value').split(/\s*,\s*/);
-					
-					     
-					      selected.pop();
-					
-					      // Convert the array into a hash for faster lookups.
-					      selected = Y.Array.hash(selected);
-					
-					      
-					      return Y.Array.filter(results, function (result) {
-					        return !selected.hasOwnProperty(result.name);
-					      });
-					    }]
-					    
-					 },
+    	TagBoxConfig:TagBoxConfig,
     	AutoLoadTagsPlugin:AutoLoadTagsPlugin,
     	autoExpand : autoExpand,
         requestList: function(config){

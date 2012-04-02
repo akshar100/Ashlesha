@@ -5,7 +5,6 @@ class DBA
 	{
 		$this->ci = &get_instance();
 		
-		$this->db = $this->ci->db;
 		$this->ci->load->library('chill');
 		$this->chill = $this->ci->chill; 
 	}
@@ -623,5 +622,17 @@ class DBA
 			"success"=>true,
 			"data"=>$this->chill->get($response["_id"])
 		));
+	}
+	
+	function all_sector_list()
+	{
+		$result = $this->chill->getView("posts","all_sectors",null);
+		$response =array();
+		foreach($result['rows'] as $v)
+		{
+			$response[]=$v['key'];
+		} 
+
+		return $response;
 	}
 }

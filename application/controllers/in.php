@@ -64,17 +64,39 @@ class In extends CI_Controller {
 	
 	function menu()
 	{
+		$menu_sections  =  array(
+			array("id"=>1,"label"=>"Create","name"=>"post"),
+			array("id"=>2,"label"=>"Participate","name"=>"participate"),
+			array("id"=>3,"label"=>"Profile","name"=>"profile")
+		);
+		$menu_items = array(
+			array("id"=>1,"parent_id"=>1,"name"=>$this->lang->line("post"),"label"=>$this->lang->line("post"),"view"=>"painpoint" ),
+			array("id"=>2,"parent_id"=>1,"name"=>"survey","label"=>"Survey","view"=>"survey" ),
+			array("id"=>3,"parent_id"=>1,"name"=>"Question","label"=>"Question","view"=>"question" ),
+			array("id"=>4,"parent_id"=>1,"name"=>'group',"label"=>$this->lang->line("group"),"view"=>"createGroup" ),
+			array("id"=>5,"parent_id"=>2,"name"=>'all',"label"=>"My Stream","view"=>"wallposts" ),
+			array("id"=>6,"parent_id"=>2,"name"=>'myposts',"label"=>"My Posts","view"=>"myposts" ),
+			array("id"=>7,"parent_id"=>3,"name"=>'profile',"label"=>"Profile","view"=>"profile" )
+		);
 		$option = $this->input->post('option');
 		switch($option)
 		{
 			case "menuitemlist":
 				$section_id = $this->input->post("section");
-				echo $this->jsonfeed->get_menuitems($section_id); 
+				$response = array();
+				foreach($menu_items as $v)
+				{
+					if("".$v['parent_id'] =="".$section_id)
+					{
+						$response[]= $v;
+					}
+				}
+				echo json_encode($response);
 				return;
 			
 			case "menusectionlist":
 				
-				echo $this->jsonfeed->get_menusections(); 
+				echo json_encode($menu_sections);
 				
 				return;
 			
@@ -202,6 +224,10 @@ class In extends CI_Controller {
 		redirect($this->dba->get_profile_pic($id));
 	}
 	
+	function all_sectors()
+	{
+		echo json_encode($this->dba->all_sector_list());
+	}
 	
 }
 

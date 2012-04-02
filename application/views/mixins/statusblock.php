@@ -28,6 +28,7 @@
 		<fieldset>
 			<h3><?php echo $this->lang->line('main_post_title');?></h3>
 		<div class="control-group">
+			
 			<div class="controls">
 				<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
 				<input type="hidden" name="category" value="painpoint"/>
@@ -37,8 +38,14 @@
 		</div>
 		<div class="control-group">
 			<div class="controls">
+				<input type="text" placeholder="<?php echo $this->lang->line('categorization');?>" name="sector"  class="span12 ac-sector" disabled="">
+				<p class="help-block"></p>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="controls">
 				<textarea rows="3" name="post"  class="span12"></textarea>
-				<p class="help-block span8">
+				<p class="help-block span8"> 
 		                Explain your <?php echo $this->lang->line('main_post_title');?> in few words. Be specific and precise.  
 		        </p>
 		        
@@ -60,6 +67,7 @@
 	<div id="event-form" class="form span8">
 					<fieldset>
 						<h3>Create an Event</h3>
+					
 					<div class="control-group">
 						<div class="controls">
 							<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">

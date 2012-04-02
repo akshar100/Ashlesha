@@ -6,7 +6,6 @@ class User
 	{
 		$this->ci = &get_instance();
 		$this->ci->load->library("dba");
-		$this->db = $this->ci->db;
 	}
 	
 	function get_current()
