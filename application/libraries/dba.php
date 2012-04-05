@@ -635,4 +635,26 @@ class DBA
 
 		return $response;
 	}
+
+	function get_user_groups($user_id)
+	{
+		$results = $this->chill->getView("posts","user_groups",null,array(
+			"key"=>$user_id
+		));
+		if(isset($results['total_rows']) && $results['total_rows']>0)
+		{
+			$response = array();
+			foreach($results['rows'] as $v)
+			{
+				$response[]=$v['value'];
+			}
+			return $response;
+		}
+		else
+		{
+			return array();
+		}
+	
+		
+	}
 }

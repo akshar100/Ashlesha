@@ -1,7 +1,7 @@
 YUI.add('babe', function (Y) {
 	window.Y = Y;
    var cache = new Y.CacheOffline({max:200});
-	cache.flush();
+   cache.flush();
 	function listSync(action,options,callback){
 			
 			if(options.name=="commentlist" && action=="read")
@@ -88,6 +88,21 @@ YUI.add('babe', function (Y) {
 						}
 					});
 					return;	
+			}
+			
+			if(options.name=="groupList" && action=="read")
+			{
+				
+				
+				Y.io(baseURL+'in/user_groups',{
+						method:'POST',
+						on:{
+							success:function(i,o,a){
+								var data = Y.JSON.parse(o.responseText)
+								callback(null,data);
+							}
+						}
+					});
 			}
 			
 			
@@ -1609,6 +1624,12 @@ YUI.add('babe', function (Y) {
 		}
 	});
 	
+	var GroupList = Y.Base.create('groupList',Y.ModelList,[],{
+		model:GroupModel,
+		sync:listSync
+	});
+	
+	
 	var CreateGroupView = Y.Base.create('createGroupView',Y.View,[],{
 		containerTemplate:'<div class="row-fluid"/>' 
 		,initializer:function(){
@@ -1768,7 +1789,7 @@ YUI.add('babe', function (Y) {
 							{		activateFirstItem: true,
 							        minQueryLength: 3,
 							        queryDelay: 0,
-							        source: cache.retrieve("all_sectors"), 
+							        source: cache.retrieve("all_sectors").response, 
 							        maxResults: 10,
 							        resultHighlighter: 'subWordMatch',
 							        resultFilters: ['subWordMatch']
@@ -1914,14 +1935,6 @@ YUI.add('babe', function (Y) {
     	AutoLoadTagsPlugin:AutoLoadTagsPlugin,
     	autoExpand : autoExpand,
         requestList: function(config){
-			
-			var key = (Y.JSON.stringify(config)); 
-			
-			if(cache.retrieve(key))
-			{
-				config.callback(null,Y.JSON.parse(cache.retrieve(key).response));
-				return;
-			}
 			Y.io(baseURL+'in/menu',{
 					method:'POST',
 					data:config.data,
@@ -1938,7 +1951,6 @@ YUI.add('babe', function (Y) {
 							else
 							{
 								config.callback(null,response);
-								cache.add(key,o.responseText);
 							}
 
 						}
@@ -1947,34 +1959,37 @@ YUI.add('babe', function (Y) {
 			});
 		}
    	   ,loadTemplate:function(template,callback){
-			var key = "template"+template;
-			if(cache.retrieve(key))
+			
+			
+			if(template)
 			{
-				
-				Y.one(document.body).append(cache.retrieve(key).response);
-				callback();
-				return;
-				
-			}
-			if(template && !cache.retrieve(template))
-			{
-				Y.io(baseURL+'welcome/template',{
+				if(cache.retrieve('template='+template))
+				{
+					var data = cache.retrieve('template='+template).response;
+					Y.one(document.body).append(data);
+					callback(); 
+					
+				}
+				else
+				{
+					Y.io(baseURL+'welcome/template',{
 					method:'POST',
 					data:'template='+template,
 					on:{
 						complete:function(i,o,a){
-							cache.add(template,true);
-							var data = o.responseText;
-							Y.one(document.body).append(data);
-							if(callback && typeof callback=="function" )
-							{
-								cache.add(key,data);
-								callback();
+								var data = o.responseText;
+								Y.one(document.body).append(data);
+								if(callback && typeof callback=="function" )
+								{
+									cache.add('template='+template,data);
+									callback(); 
+								}
+								
 							}
-							
 						}
-					}
-				});
+					});
+				}
+				
 			}
 			else
 			{
@@ -2031,10 +2046,11 @@ YUI.add('babe', function (Y) {
 	    ,CreateQuestionView:CreateQuestionView
 	    ,CreatePostView:CreatePostView
 	    ,CreateEventView:CreateEventView
+	    ,GroupList:GroupList
    
    };
 }, '0.0.1', { 
-    requires: ['autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','datatype-date','app-base', 'app-transitions','node', 'event','json','cache','model','model-list','querystring-stringify-simple','view','querystring-stringify-simple','io-upload-iframe','io-form','io-base']
+    requires: ['router','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','datatype-date','app-base', 'app-transitions','node', 'event','json','cache','model','model-list','querystring-stringify-simple','view','querystring-stringify-simple','io-upload-iframe','io-form','io-base']
 });
 
 

@@ -57,8 +57,8 @@
 		<div class="span1"></div>
 		<div class="span11">
 			<hr/>
-			<div class="input">
-	              <textarea rows="1" class="commentText span11"></textarea>
+			<div class="input row-fluid">
+	              <textarea rows="1" class="commentText span12"></textarea>
 	              <span class="help-block">
 	                
 	              </span>

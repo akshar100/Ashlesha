@@ -86,7 +86,7 @@
 	          <div class="control-group">
 	            <label class="control-label"  for="email" >Email Address</label>
 	            <div class="controls">
-	              <input type="text"  name="email" id="email" class="span8">
+	              <input type="text"  name="email" id="email" >
 	              <span class="help-inline"></span>
 	            </div>
 	          </div><!-- /control-group -->

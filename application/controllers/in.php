@@ -62,12 +62,24 @@ class In extends CI_Controller {
 		
 	}
 	
+	function user_groups()
+	{
+		$user_groups = $this->dba->get_user_groups($this->user->get_current());
+		foreach($user_groups as &$row)
+		{
+			$row['label'] = $row['title'];
+		}
+		echo json_encode($user_groups);
+	}
+	
 	function menu()
 	{
+		
 		$menu_sections  =  array(
 			array("id"=>1,"label"=>"Create","name"=>"post"),
 			array("id"=>2,"label"=>"Participate","name"=>"participate"),
-			array("id"=>3,"label"=>"Profile","name"=>"profile")
+			array("id"=>3,"label"=>"Profile","name"=>"profile"),
+			array("id"=>4,"label"=>"Boards","name"=>"group")
 		);
 		$menu_items = array(
 			array("id"=>1,"parent_id"=>1,"name"=>$this->lang->line("post"),"label"=>$this->lang->line("post"),"view"=>"painpoint" ),

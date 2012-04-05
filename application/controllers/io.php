@@ -107,7 +107,8 @@ class IO extends CI_Controller {
 			"get_by_type"=>array("map"=>read_file("./application/views/json/get_by_type.js")),
 			"get_connections"=>array("map"=>read_file("./application/views/json/get_connections.js")),
 			"tags"=>array("map"=>read_file("./application/views/json/tags_map.js"),"reduce"=>read_file("./application/views/json/tags_reduce.js")),
-			"all_sectors"=>array("map"=>read_file("./application/views/json/all_sector.js"))
+			"all_sectors"=>array("map"=>read_file("./application/views/json/all_sector.js")),
+			"user_groups"=>array("map"=>read_file("./application/views/json/user_groups.js")),
 		);
 		$this->chill->post($doc); 
 		echo "updated";
