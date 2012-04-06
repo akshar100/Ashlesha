@@ -96,7 +96,7 @@ $this->load->view("common/header");
 				});
 				
 				this.get('container').one("a.logout").on('click',function(){
-					window.location = baseURL+'?option=logout&seed='+Math.random();
+					window.location = baseURL+'in/logout?seed='+Math.random();
 				});
 				
 				jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
@@ -688,6 +688,35 @@ $this->load->view("common/header");
 		    }
 		});
 		
+		Y.CreateGroupMainView = Y.Base.create('CreateGroupMainView', Y.View, [], {
+			containerTemplate:'<div class="the-app"/>',
+		    render: function () {
+		    	var that= this;
+		    	var con = this.get('container');
+		        con.setHTML(Y.one("#outer").getHTML());
+		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				Y.loadTemplate("topbar",function(){ 
+					
+					var topbar= new Y.TopBarView();
+					con.one(".topbar").setHTML(topbar.render().get('container'));
+					
+ 				});
+				Y.loadTemplate("sidebar",function(){ 
+					var sidebar = new Y.SideBarView();
+					con.one(".leftbar").setHTML(sidebar.render().get('container'));
+				 });
+				 
+				Y.loadTemplate("group",function(){ 
+					var group = new Y.BABE.GroupModel({
+						author_id:window.current_user
+					});
+					var creategroup =  new Y.BABE.CreateGroupView({model:group});
+					con.one(".centercolumn").setContent(creategroup.render().get('container'));
+				});
+		        return this;
+		    }
+		});
+		
 		
 		window.Y = Y;
 		
@@ -748,7 +777,8 @@ $this->load->view("common/header");
 		    views: {
 		        homepage: {type: 'MainAppView', preserve:true },
 		        profile:  {type:'MainProfileView'},
-		        userpage: {type:'UserPageView',preserve:true }
+		        userpage: {type:'UserPageView',preserve:true },
+		        create_group: {type:'CreateGroupMainView',preserve:true}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -797,6 +827,10 @@ $this->load->view("common/header");
 			this.showView('userpage',{user_id:req.params.user_id},{callback:function(v){
 				
 			}});
+		});
+		
+		AppUI.route('/group/new',function(req){
+			this.showView('create_group');
 		});
 		
 		AppUI.render().dispatch(); //.save('/');
