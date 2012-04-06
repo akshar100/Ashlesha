@@ -18,9 +18,9 @@
 			          <a class="btn btn-primary" href="#"><i class="icon-user icon-white"></i> <?php echo $this->user->get_username(); ?></a>
 			          <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
 			          <ul class="dropdown-menu">
-			            <li><a id="edit-profile" href="#"><i class="icon-pencil"></i> Edit</a></li>
+			            <li><a id="edit-profile" href="/me"><i class="icon-pencil"></i> Edit</a></li>
 			            <li class="divider"></li>
-			            <li><a href="<?php echo base_url();?>welcome/logout"><i class="i"></i> Sign out</a></li>
+			            <li><a class='logout' href="<?php echo base_url();?>welcome/logout"><i class="i"></i> Sign out</a></li>
 			          </ul>
 			  		</div>
 	          </div>

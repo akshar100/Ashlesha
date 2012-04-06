@@ -2,7 +2,7 @@ YUI.add('babe', function (Y) {
 	window.Y = Y;
    var cache = new Y.CacheOffline({max:200});
    cache.flush();
-	function listSync(action,options,callback){
+   function listSync(action,options,callback){
 			
 			if(options.name=="commentlist" && action=="read")
 			{
@@ -509,9 +509,7 @@ YUI.add('babe', function (Y) {
     			this.connection.save();
     		},this);
     		
-    		var user_wall = new Y.WallView({loadCommand:'myposts'});
-    		
-    		//this.get('container').one("#user_page").append(user_wall.render().get('container'));
+    		var user_wall = new Y.WallView({loadCommand:'myposts'}); 
     		
     		
     	},
@@ -701,15 +699,15 @@ YUI.add('babe', function (Y) {
 								if(this.get('model').get("profile_pic") && this.get('model').get("profile_pic")!="false" && this.get('model').get("profile_pic")!="undefined")
 								{
 									
-									this.get('container').one(".image_preview").setContent("<img src="+this.get('model').get("profile_pic")+" class='span12 thumbnail'/>");
+									this.get('container').one(".image_preview").setContent("<img src="+this.get('model').get("profile_pic")+" class='thumbnail'/>");
 								}
 								else if(this.get('model').get("gender")=="male")
 								{
-									this.get('container').one(".image_preview").setContent("<img src="+Y.BABE.male_image+" class='span12 thumbnail'/>");
+									this.get('container').one(".image_preview").setContent("<img src="+Y.BABE.male_image+" class='thumbnail'/>");
 								}
 								else
 								{
-									this.get('container').one(".image_preview").setContent("<img src="+Y.BABE.female_image+" class='span12 thumbnail'/>");
+									this.get('container').one(".image_preview").setContent("<img src="+Y.BABE.female_image+" class='thumbnail'/>");
 								}
 							}
 						},
@@ -732,8 +730,8 @@ YUI.add('babe', function (Y) {
 								viewObj.img = new Y.BABE.ImageUploadView({
 									display:".image_preview",
 									uploadedCallback:function(url){
-										viewObj.model.set("profile_pic",url);
-										viewObj.model.save();
+										viewObj.get('model').set("profile_pic",url);
+										viewObj.get('model').save();
 									}
 								});
 								
@@ -748,8 +746,8 @@ YUI.add('babe', function (Y) {
 													var r = Y.JSON.parse(o.responseText);
 													if(r.success)
 													{
-														viewObj.model.set("profile_pic",r.image_url);
-														viewObj.model.save();
+														viewObj.get('model').set("profile_pic",r.image_url);
+														viewObj.get('model').save(); 
 													}
 													
 												}

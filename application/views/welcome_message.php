@@ -1,13 +1,17 @@
 <?php
 $this->load->view("common/header"); 
 ?>
-<div class="topbar">
 
-</div>
 
-    <div id="maincontainer" class="container-fluid">
+<script type="text/x-template" id="outer">
+	<div class="topbar">
+
+	</div>
+
+	<div id="maincontainer" class="container-fluid">
 		
-    </div> <!-- /container -->
+	</div> <!-- /container -->
+</script>
     
  <script type="text/x-template" id="main">
 	      <div class="content">
@@ -22,7 +26,10 @@ $this->load->view("common/header");
 	            
 	          </div>
 	          <div class="span9 centercolumn">
-	            
+	            <div class='status-bar-area'></div>
+	            <div class="row-fluid wallcontainer">
+	            	
+	            </div>
 	          </div>
 	        </div>
 	      </div>
@@ -39,7 +46,7 @@ $this->load->view("common/header");
 	</div>
 </script>
 <?php $this->load->view("mixins/wall"); ?> 
-<script src="./static/js/framework.js"></script>    
+<script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>    
 <script>
 
 	var baseURL = "<?php echo base_url();?>";
@@ -64,7 +71,7 @@ $this->load->view("common/header");
 		Y.wall = new Y.BABE.PostList();	
 
 		Y.TopBarView= Y.Base.create('topbarview', Y.View, [], {
-			containerTemplate:'',
+			containerTemplate:'<div/>',
 			initializer:function()
 			{
 				
@@ -72,31 +79,28 @@ $this->load->view("common/header");
 			render:function()
 			{
 
-				Y.one(".topbar").setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(),{
-					user_name:Y.user.get("name"),
-					user_id:Y.user.get("user_id")
+				this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(),{
+					user_name:Y.userModel.get("fullname"),
+					user_id:Y.userModel.get("user_id")
 				}));
-				Y.one(".topbar").one("#notification-btn").on("click",function(){
+				this.get('container').one("#notification-btn").on("click",function(){
 					
 				});
-				
-				Y.one(".topbar").one("#edit-profile").on("click",function(e){
+				this.get('container').one("a.brand").on("click",function(e){
+					AppUI.navigate("/");
 					e.preventDefault();
-					Y.App.showProfile();
 				});
-				if(Y.one("#signup"))
-				{
-					Y.one("#signup").on("click",function(){
-						Y.App.signup();
-					});
-				}
-				Y.one(".topbar").setStyle("opacity",0);
-				Y.one('.topbar').transition({
-				    easing: 'ease-out',
-				    duration: 0.8, 
-				    opacity:1.0
+				this.get('container').one("#edit-profile").on("click",function(e){
+					AppUI.navigate("/me");
+					e.preventDefault();
 				});
-				jQuery('.dropdown').dropdown();
+				
+				this.get('container').one("a.logout").on('click',function(){
+					window.location = baseURL+'?option=logout&seed='+Math.random();
+				});
+				
+				jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
+				return this;
 			}
 		});
 		
@@ -151,10 +155,8 @@ $this->load->view("common/header");
 				},this);
 				this.get('container').on("click",function(e){
 					var view = this.get('model').get("view");
-					if(Y.App[view] && typeof Y.App[view]=="function")
-					{
-						Y.App[view]();
-					}
+					AppUI.navigate(view);
+					e.halt();
 				},this); 
 			},
 			render:function(){
@@ -288,44 +290,33 @@ $this->load->view("common/header");
 		
 		
 		Y.SideBarView = Y.Base.create('sidebarview', Y.View, [], {
-			
+			containerTemplate:"<div/>",
 			initializer:function(){
 				
-				this.render();
-				Y.user.after("change",this.render);
-				Y.userModel.on('change',this.render);
 			},
 			hide:function(){
-				Y.one('.leftbar').hide(true);
+				this.get('container').hide(true);
 			},
 			show:function(){
-				Y.one('.leftbar').show(true);
+				this.get('container').show(true);
 			},
 			render:function(){
 				
-				var template_id="#sidebar-authenticated";
-				var template = Y.Lang.sub(Y.one(template_id).getContent(),{
+				if(!this.get('container'))
+				{
+					this.set('container',Y.Node.create('<div/>'));
+				}
+				var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(),{
 					IMG:Y.userModel.get("profile_pic"),
 					FULLNAME:Y.userModel.get("fullname")
 				});
-					
-				
-				
-				
-				Y.one(".leftbar").setContent(Y.Lang.sub(template,{
-					user_name:Y.user.get("name"),
-					user_id:Y.user.get("user_id")
+				this.get('container').setHTML(Y.Lang.sub(template,{
+					user_name:Y.userModel.get("fullname"),
+					user_id:Y.userModel.get("_id")
 				}));
 				
-				Y.one(".leftbar").append(new Y.SideBarMenuView().render().get('container'));
-				Y.one(".leftbar").setStyle("opacity",0);
-				Y.one('.leftbar').transition({
-				    easing: 'ease-out',
-				    duration: 0.8, 
-				    opacity:1.0
-				});
-				
-				
+				this.get('container').append(new Y.SideBarMenuView().render().get('container'));
+				return this;
 				
 			}
 		}) ; 
@@ -334,42 +325,17 @@ $this->load->view("common/header");
 			containerTemplate:'<div id="statusblock"/>',
 			initializer:function(){
 				
-				this.render();
-				Y.user.after("change",this.render);
+				
+				
 			},
 			hide:function(){
-				Y.one('#statusblock').hide(true);
+				this.get('container').hide(true);
 			},
 			show:function(){
-				Y.one('#statusblock').show(true);
+				this.get('container').show(true);
 			},
-			render:function(){
-				
-				
-				
-				this.template_id="#statusblock-authenticated";
-
-				
-				this.template = Y.one(this.template_id).getContent();
-				if(Y.one('#statusblock')) {
-					 Y.one('#statusblock').remove();
-				}
-				this.set('container',Y.Node.create('<div id="statusblock"/>'));
-				
-				this.get('container').setContent(Y.Lang.sub(this.template,{
-					user_name:Y.user.get("name"),
-					user_id:Y.user.get("user_id")
-				}));
-				
-				this.get('container').setStyle("opacity",0);
-				
-				
-				
-					this.get('container').one(".pills-status").all("a").on("click",function(e){
-						
-						var val = Y.one(e.target).get("rel");
-						
-						if(val=="question"){
+			expandForm:function(val){
+				if(val=="question"){
 							
 							var q = new Y.BABE.CreateQuestionView();
 							this.get('container').one(".forms").setContent(q.render().get('container'));
@@ -387,23 +353,42 @@ $this->load->view("common/header");
 							this.get('container').one(".forms").setContent(q.render().get('container'));
 							
 						}
+			},
+			render:function(){
+				
+				
+				
+				this.template_id="#statusblock-authenticated";
+
+				
+				this.template = Y.one(this.template_id).getContent();
+				this.set('container',Y.Node.create('<div id="statusblock"/>'));
+				
+				this.get('container').setContent(Y.Lang.sub(this.template,{
+					user_name:Y.user.get("name"),
+					user_id:Y.user.get("user_id")
+				}));
+				
+				
+				
+				
+				
+				this.get('container').one(".pills-status").all("a").on("click",function(e){
+						
+						var val = Y.one(e.target).get("rel");
+						
+						this.expandForm(val);
 							
 						
 					
 						
 						
 					},this);
-					
-			if(Y.one(".centercolumn")){
-					Y.one(".centercolumn").prepend(this.get('container')); 
-					
-					Y.one('#statusblock').transition({
-					    easing: 'ease-out',
-					    duration: 0.8, 
-					    opacity:1.0
-					});
-			}
-			return this.get('container');
+				if(this.get('expand'))
+				{
+					this.expandForm(this.get('expand'));
+				}
+				return this;
 			}
 		});
 		Y.showAlert = function(head,body){
@@ -595,18 +580,25 @@ $this->load->view("common/header");
 			}
 		}); 
 		Y.WallView = Y.Base.create('wall',Y.View,[],{
-			containerTemplate:Y.one("#wall").getContent(),
+			containerTemplate:'<div/>',
 			events:{
 				'#loadMore':{
 					click: 'loadNext'
 				}
+			}
+			,loadWall:function(){
+				this.get('wall').load({
+					name:this.get('loadCommand')
+				});
 			}
 			,loadNext:function(){
 				this.wall.next(this.get('loadCommand'));
 			}
 			,initializer:function()
 			{
-				var wall = this.wall = new Y.BABE.PostList();
+				this.get('container').setHTML(Y.one('#wall').getHTML());
+				var wall = new Y.BABE.PostList();
+				this.set('wall',wall);
 				wall.after('add',this.prepend,this);
 				wall.after(['load'],this.render, this);
 				wall.load({
@@ -639,19 +631,14 @@ $this->load->view("common/header");
 				}
 				
 
-				post.setStyle("opacity",0);
-				post.transition({ 
-				    easing: 'ease',
-				    duration: 1.0, 
-				    opacity:1.0
-				});
+				
 				
 				
 			},
 			render:function()
 			{
 				
-				this.wall.each(function(item,index){
+				this.get('wall').each(function(item,index){
 					this.prepend({
 						model:item
 					});
@@ -664,9 +651,91 @@ $this->load->view("common/header");
 		
 		Y.SignUpView =  Y.BABE.SignUpView;
 		
+		Y.MainAppView = Y.Base.create('MainAppView', Y.View, [], {
+			containerTemplate:'<div class="the-app"/>',
+			expand:false,
+			expandForm:function(val){
+				if(this.get('statusbar'))
+				{
+					this.get('statusbar').expandForm(val); //expand the CreateX form
+				}
+				
+			},
+		    render: function () {
+		    	var that = this;
+		    	var expand = this.get('expand');
+		    	var con = this.get('container');
+		        con.setHTML(Y.one("#outer").getHTML());
+		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				Y.loadTemplate("topbar",function(){ 
+					
+					var topbar= new Y.TopBarView();
+					con.one(".topbar").setHTML(topbar.render().get('container'));
+					
+ 				});
+				Y.loadTemplate("sidebar",function(){ 
+					var sidebar = new Y.SideBarView();
+					con.one(".leftbar").setHTML(sidebar.render().get('container'));
+				 });
+				
+				Y.loadTemplate("statusblock",function(){
+					var statusblock = new Y.StatusBlockView({expand:expand}); 
+					con.one('.status-bar-area').setHTML(statusblock.render().get('container'));
+					that.set('statusbar',statusblock); 
+					if(that.get('expand'))
+					{
+						that.expandForm(that.get('expand'));
+					}
+				
+				});
+				Y.loadTemplate("wall",function(){ 
+					var wall = new Y.WallView({loadCommand:'wallposts'}); 
+					con.one('.wallcontainer').setHTML(wall.render().get('container'));
+					
+				});
+		        return this;
+		    }
+		});
+		
+		Y.MainProfileView = Y.Base.create('MainProfileView', Y.View, [], {
+			containerTemplate:'<div class="the-app"/>',
+		    render: function () {
+		    	var con = this.get('container');
+		        con.setHTML(Y.one("#outer").getHTML());
+		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				Y.loadTemplate("topbar",function(){ 
+					
+					var topbar= new Y.TopBarView();
+					con.one(".topbar").setHTML(topbar.render().get('container'));
+					
+ 				});
+				Y.loadTemplate("sidebar",function(){ 
+					var sidebar = new Y.SideBarView();
+					con.one(".leftbar").setHTML(sidebar.render().get('container'));
+				 });
+				Y.loadTemplate("profile",function(){ 
+					var user = new Y.BABE.UserModel({
+						'_id':window.current_user
+					});
+					
+					
+					user.load({
+					},function(){
+						var current = new Y.ProfileView({model:user});
+						con.one('.centercolumn').setContent(current.render().get('container'));
+					});
+				
+				});
+		        return this;
+		    }
+		});
+		
+		
+		
+		
 		window.Y = Y;
 		
-		Y.App = { views:{} };
+		/**Y.App = { views:{} };
 		Y.App.load_wall = function(command){
 			Y.loadTemplate("wall",function(){ 
 			
@@ -734,50 +803,10 @@ $this->load->view("common/header");
 				Y.one(".centercolumn").setContent(Y.App.views.current.render().get('container'));
 			});
 		};
-		Y.App.showProfile = function(model){
-			Y.BABE.sanitizeUI();
-			Y.loadTemplate("profile",function(){ 
-				var user = Y.userModel;
-				user.set("id",Y.user.get("user_id"));
-				user.set("_id",Y.user.get("user_id"));
-				
-				user.load({
-					'_id':Y.user.get("user_id")
-				},function(){
-					Y.App.views.current = new Y.ProfileView({model:user});
-					Y.one(".centercolumn").setContent(Y.App.views.current.render().get('container'));
-				});
-				
-			});
-		}; 
-		Y.App.painpoint = function(){
-			Y.loadTemplate("statusblock",function(){ Y.App.views.statusblock = new Y.StatusBlockView(); 
-			Y.one("a[rel=painpoint]").simulate('click');
-		});
-		};
-		Y.App.firstexp = function(){
-			Y.loadTemplate("statusblock",function(){ Y.App.views.statusblock = new Y.StatusBlockView(); 
-			Y.one("a[rel=first]").simulate('click');
-		});
-		};
-		Y.App.lastexp = function(){
-			Y.loadTemplate("statusblock",function(){ Y.App.views.statusblock = new Y.StatusBlockView(); 
-			Y.one("a[rel=last]").simulate('click');
-		});
-		};
-		Y.App.profile = function() {
-			Y.App.showProfile();
-		};
-		Y.App.survey = function(){
-			Y.loadTemplate("statusblock",function(){ Y.App.views.statusblock = new Y.StatusBlockView(); 
-			Y.one("a[rel=surveys]").simulate('click');
-		});
-		};
-		Y.App.images = function(){
-			Y.loadTemplate("statusblock",function(){ Y.App.views.statusblock = new Y.StatusBlockView(); 
-			Y.one("a[rel=images]").simulate('click');
-		});
-		};
+		
+		
+		
+		
 		Y.App.createGroup = function(){
 			
 			Y.BABE.sanitizeUI();
@@ -789,7 +818,7 @@ $this->load->view("common/header");
 				Y.one(".centercolumn").setContent(Y.App.views.current.render().get('container'));
 			});
 		};
-		
+		**/
 		
 		<?php
 			$current_user = $this->user->get_current();
@@ -804,7 +833,47 @@ $this->load->view("common/header");
 				<?php
 			}
 		?>
-		Y.App.homepage();
+		//Y.App.homepage();
+		
+		var AppUI =  new Y.App({
+		    views: {
+		        homepage: {type: 'MainAppView', preserve:true },
+		        profile:  {type:'MainProfileView'}
+		    },
+		    transitions: {
+		        navigate: 'fade',
+		        toChild : 'fade',
+		        toParent: 'fade'
+		    }
+		});
+		
+		AppUI.route('/', function (req) {
+		    this.showView('homepage');
+		});
+		
+		AppUI.route('/me', function (req) {
+		    this.showView('profile');
+		});
+		
+		AppUI.route('/post/new',function(req){
+			this.showView('homepage',{expand:'painpoint'},{callback:function(v){
+				v.expandForm('painpoint');
+			}});
+		});
+		
+		AppUI.route('/event/new',function(req){
+			this.showView('homepage',{expand:'event'},{callback:function(v){
+				v.expandForm('event');
+			}});
+		});
+		
+		AppUI.route('/question/new',function(req){
+			this.showView('homepage',{expand:'question'},{callback:function(v){
+				v.expandForm('question');
+			}});
+		});
+		
+		AppUI.render().dispatch(); //.save('/');
 		Y.user.after("authenticatedChange",Y.App.homepage);
 		Y.loadTemplate("messagebox",function(){}); 
 		

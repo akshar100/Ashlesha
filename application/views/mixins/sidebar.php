@@ -21,7 +21,7 @@
        </div>
        <div class="row-fluid">
         <div class="span9 hidden-tablet hidden-phone">
-        	<h5>{FULLNAME}</h5>
+        	<h5 class="hidden-tablet hidden-phone">{FULLNAME}</h5>
         </div>
 	</div>
 

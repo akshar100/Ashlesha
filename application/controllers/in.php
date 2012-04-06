@@ -82,13 +82,14 @@ class In extends CI_Controller {
 			array("id"=>4,"label"=>"Boards","name"=>"group")
 		);
 		$menu_items = array(
-			array("id"=>1,"parent_id"=>1,"name"=>$this->lang->line("post"),"label"=>$this->lang->line("post"),"view"=>"painpoint" ),
-			array("id"=>2,"parent_id"=>1,"name"=>"survey","label"=>"Survey","view"=>"survey" ),
-			array("id"=>3,"parent_id"=>1,"name"=>"Question","label"=>"Question","view"=>"question" ),
+			array("id"=>1,"parent_id"=>1,"name"=>$this->lang->line("post"),"label"=>$this->lang->line("post"),"view"=>"/post/new" ),
+			array("id"=>2,"parent_id"=>1,"name"=>"survey","label"=>"Survey","view"=>"/survey/new" ),
+			array("id"=>3,"parent_id"=>1,"name"=>"Question","label"=>"Question","view"=>"/question/new" ),
+			array("id"=>4,"parent_id"=>1,"name"=>"Event","label"=>"Event","view"=>"/event/new" ),
 			array("id"=>4,"parent_id"=>1,"name"=>'group',"label"=>$this->lang->line("group"),"view"=>"createGroup" ),
 			array("id"=>5,"parent_id"=>2,"name"=>'all',"label"=>"My Stream","view"=>"wallposts" ),
 			array("id"=>6,"parent_id"=>2,"name"=>'myposts',"label"=>"My Posts","view"=>"myposts" ),
-			array("id"=>7,"parent_id"=>3,"name"=>'profile',"label"=>"Profile","view"=>"profile" )
+			array("id"=>7,"parent_id"=>3,"name"=>'profile',"label"=>"Profile","view"=>"/me" )
 		);
 		$option = $this->input->post('option');
 		switch($option)

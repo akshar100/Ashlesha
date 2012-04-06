@@ -5,14 +5,18 @@
 				<h3>Create a Question</h3>
 					<div class="control-group">
 						<div class="controls">
-							<input type="text" placeholder="Type your question here" name="question" class="span12">
-							<p class="help-block"></p>
+							<div class="row-fluid">
+								<input type="text" placeholder="Type your question here" name="question" class="span12">
+								<p class="help-block"></p>
+							</div>
 						</div>
 					</div>
 					<div class="control-group">
 						<div class="controls">
-							<textarea class="span12" name="description" placeholder="Optional Description"></textarea>
-							<p class="help-block"></p>
+							<div class="row-fluid">
+								<textarea class="span12" name="description" placeholder="Optional Description"></textarea>
+								<p class="help-block"></p>
+							</div>
 						</div>
 					</div>
 					<div class="contol-group">

@@ -24,31 +24,38 @@
 	<div id="upload_status"></div>
 </script>
 <script type="text/x-template" id="create-post">
-	<div id="painpoint-form" class="form span8">
-		<fieldset>
+	<div id="painpoint-form" class="form span12">
+		<form >
+		
 			<h3><?php echo $this->lang->line('main_post_title');?></h3>
 		<div class="control-group">
 			
-			<div class="controls">
-				<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
-				<input type="hidden" name="category" value="painpoint"/>
+			<div class="controls docs-input-sizes">
+				<div class="row-fluid">
+					<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
+					<input type="hidden" name="category" value="painpoint"/>
 				
-				<p class="help-block"></p>
+					<p class="help-block"></p>
+				</div>
+				
 			</div>
 		</div>
 		<div class="control-group">
-			<div class="controls">
+			<div class="controls docs-input-sizes">
+				<div class="row-fluid">
 				<input type="text" placeholder="<?php echo $this->lang->line('categorization');?>" name="sector"  class="span12 ac-sector" disabled="">
 				<p class="help-block"></p>
+				</div>
 			</div>
 		</div>
 		<div class="control-group">
-			<div class="controls">
+			<div class="controls docs-input-sizes">
+				<div class="row-fluid">
 				<textarea rows="3" name="post"  class="span12"></textarea>
 				<p class="help-block span8"> 
 		                Explain your <?php echo $this->lang->line('main_post_title');?> in few words. Be specific and precise.  
 		        </p>
-		        
+		       </div>
 	        </div>
 	    </div>
 	    <div class="contol-group">
@@ -57,34 +64,41 @@
 	    			<button class="btn btn-small btn-primary">Post</button>  
 	    	</div>
 	    </div>
-		</fieldset>
+
+		</form>
 	</div>
 	<div class="span4 image_preview">
 		
 	</div>
 </script>
 <script type="text/x-template" id="create-event">
-	<div id="event-form" class="form span8">
-					<fieldset>
+	<div id="event-form" class="form span12">
+					
 						<h3>Create an Event</h3>
 					
 					<div class="control-group">
 						<div class="controls">
+							<div class="row-fluid">
 							<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
 							<input type="hidden" name="category" value="event"/>
 							<p class="help-block"></p>
+							</div>
 						</div>
 					</div>
 					<div class="control-group">
 						<div class="controls">
+							<div class="row-fluid">
 							<input type="text" placeholder="Add a title" name="title"  class="span12">
 							
 							
 							<p class="help-block"></p>
+							</div>
 						</div>
 					</div>
 					<div class="control-group">
 						<div class="controls">
+							<div class="row-fluid">
+								<div class="span12">
 							<span>Start Time:</span> 
 							<select class="span1" name="start_time_hours">
 				               <?php 
@@ -128,15 +142,18 @@
 							<input type="text" placeholder="Start Date dd/mm/yyyy" name="start_date"  class="span3">
 							<input type="text" placeholder="End Date dd/mm/yyyy" name="end_date"  class="span3">
 							<p class="help-block"></p>
+							</div>
+							</div>
 						</div>
 					</div>
 					<div class="control-group">
 						<div class="controls">
+							<div class="row-fluid">
 							<textarea rows="3" name="post"  class="span12"></textarea>
 							<p class="help-block span8">
 					                In details of the event you are supposed to mention location and other stuff. 
 					        </p>
-					        
+					       </div>
 				        </div>
 				    </div>
 				    <div class="contol-group">
@@ -145,7 +162,7 @@
 				    			<button class="btn btn-small btn-primary">Post</button>  
 				    	</div>
 				    </div>
-					</fieldset>
+					
 				</div>
 				<div class="span4 image_preview">
 					
