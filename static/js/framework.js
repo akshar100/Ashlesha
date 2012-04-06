@@ -1,7 +1,7 @@
 YUI.add('babe', function (Y) {
 	window.Y = Y;
    var cache = new Y.CacheOffline({max:200});
-   cache.flush();
+   //cache.flush();
    function listSync(action,options,callback){
 			
 			if(options.name=="commentlist" && action=="read")

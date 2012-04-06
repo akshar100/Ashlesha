@@ -586,24 +586,31 @@ $this->load->view("common/header");
 					click: 'loadNext'
 				}
 			}
-			,loadWall:function(){
+			,loadWall:function(command){
+				if(command=='my'){
+					command='myposts';
+				}
+				if(command=='stream'){
+					command=null;
+				}
 				this.get('wall').load({
-					name:this.get('loadCommand')
+					name:command || this.get('loadCommand')
 				});
 			}
 			,loadNext:function(){
-				this.wall.next(this.get('loadCommand'));
+				this.get('wall').next(this.get('loadCommand'));
 			}
 			,initializer:function()
 			{
 				this.get('container').setHTML(Y.one('#wall').getHTML());
 				var wall = new Y.BABE.PostList();
-				this.set('wall',wall);
+				
 				wall.after('add',this.prepend,this);
-				wall.after(['load'],this.render, this);
+				wall.after('load',this.render, this);
 				wall.load({
 					name:this.get('loadCommand')
 				});
+				this.set('wall',wall);
 				
 			},
 			prepend:function(e){
@@ -638,6 +645,7 @@ $this->load->view("common/header");
 			render:function()
 			{
 				
+				this.get('container').setHTML(Y.one('#wall').getHTML());
 				this.get('wall').each(function(item,index){
 					this.prepend({
 						model:item
@@ -660,6 +668,12 @@ $this->load->view("common/header");
 					this.get('statusbar').expandForm(val); //expand the CreateX form
 				}
 				
+			},
+			loadStream:function(command){
+				if(this.get('wall'))
+				{
+					this.get('wall').loadWall(command); 
+				}
 			},
 		    render: function () {
 		    	var that = this;
@@ -691,7 +705,7 @@ $this->load->view("common/header");
 				Y.loadTemplate("wall",function(){ 
 					var wall = new Y.WallView({loadCommand:'wallposts'}); 
 					con.one('.wallcontainer').setHTML(wall.render().get('container'));
-					
+					that.set('wall',wall);
 				});
 		        return this;
 		    }
@@ -848,7 +862,7 @@ $this->load->view("common/header");
 		});
 		
 		AppUI.route('/', function (req) {
-		    this.showView('homepage');
+		    this.showView('homepage',{expand:false,loadCommand:'stream'});
 		});
 		
 		AppUI.route('/me', function (req) {
@@ -870,6 +884,17 @@ $this->load->view("common/header");
 		AppUI.route('/question/new',function(req){
 			this.showView('homepage',{expand:'question'},{callback:function(v){
 				v.expandForm('question');
+			}});
+		});
+		
+		AppUI.route('/my',function(req){
+			this.showView('homepage',{},{callback:function(v){
+				v.loadStream('my');
+			}});
+		});
+		AppUI.route('/stream',function(req){
+			this.showView('homepage',{},{callback:function(v){
+				v.loadStream('stream');
 			}});
 		});
 		
