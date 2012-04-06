@@ -1,7 +1,7 @@
 <?php $this->load->view("mixins/wall");?>
 <script type="text/x-template" id="user_page">
 	<div class="row-fluid" id="user_details">
-		<div class="span1"><img class="thumbnail span10" src='<?php echo base_url();?>in/profile_pic/{USERID}'/></div>
+		<div class="span1"><div class="row-fluid"><img class="thumbnail span10" src='<?php echo base_url();?>in/profile_pic/{USERID}'/></div></div>
 		<div class="span3">
 			<h4>{FULLNAME}</h4>
 		</div>

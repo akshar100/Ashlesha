@@ -109,7 +109,7 @@ $query[] = $k . '=' . $v;
 }
 
 $url = '_design/'.$design.'/_view/'.$view.'?'.implode('&', $query);
-//echo $url;
+// /echo $url;
 if(is_array($key))
 {
 $rtn = $this->getViewByPost($url, $key);

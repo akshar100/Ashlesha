@@ -29,18 +29,10 @@ class DBA
 		$response = $this->chill->getView("posts","myposts",NULL,array(
 			"descending"=>true,
 			"limit"=>$size,
-			"startkey"=>$user.time()
+			"key"=>$user
 		));
 		
 		$output = array();
-		if(!isset($response['rows']))
-		{
-			print_r(array(
-				"descending"=>true,
-				"limit"=>$size,
-				"key"=>$user
-			));
-		}
 		foreach($response['rows'] as $row)
 		{
 			
@@ -567,8 +559,8 @@ class DBA
 		$source_user = $this->ci->user->get_user($data['source_user']);
 		$target_user = $this->ci->user->get_user($data['target_user']);
 		
-		if(!isset($source_user['connections'])) { $source_user['connections'] = array(); }
-		if(!isset($target_user['connections'])) { $target_user['connections'] = array(); }
+		if(!isset($source_user['connections']) || !is_array($source_user['connections'])) { $source_user['connections'] = array(); }
+		if(!isset($target_user['connections']) || !is_array($target_user['connections']) ) { $target_user['connections'] = array(); }
 		
 		$source_user['connections'][$target_user['_id']]=array(
 			'follows'=>$data['source_follows_target'],
@@ -594,8 +586,8 @@ class DBA
 		$source_user = $this->ci->user->get_user($data['source_user']);
 		$target_user = $this->ci->user->get_user($data['target_user']);
 		
-		if(!isset($source_user['connections'])) { $source_user['connections'] = array(); }
-		if(!isset($target_user['connections'])) { $target_user['connections'] = array(); }
+		if(!isset($source_user['connections']) || !is_array($source_user['connections'])) { $source_user['connections'] = array(); }
+		if(!isset($target_user['connections']) || !is_array($target_user['connections']) ) { $target_user['connections'] = array(); }
 		
 		if(!isset($source_user['connections'][$target_user['_id']]))
 		{
@@ -603,6 +595,7 @@ class DBA
 		}
 		else
 		{
+			//print_r($source_user);
 			echo json_encode(array(
 				'source_follows_target'=>$source_user['connections'][$target_user['_id']]['follows'],
 				'source_connects_target'=>$source_user['connections'][$target_user['_id']]['connects'],

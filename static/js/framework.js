@@ -1,7 +1,7 @@
 YUI.add('babe', function (Y) {
 	window.Y = Y;
    var cache = new Y.CacheOffline({max:200});
-   //cache.flush();
+   cache.flush();
    function listSync(action,options,callback){
 			
 			if(options.name=="commentlist" && action=="read")
@@ -446,16 +446,96 @@ YUI.add('babe', function (Y) {
     		}
 
 	});
-    
+    var WallView = Y.Base.create('wall',Y.View,[],{
+			containerTemplate:'<div/>',
+			user_id:window.current_user,
+			events:{
+				'#loadMore':{
+					click: 'loadNext'
+				}
+			}
+			,loadWall:function(command){
+				if(command=='my'){
+					command='myposts';
+				}
+				if(command=='stream'){
+					command=null;
+				}
+				this.get('wall').load({
+					name:command || this.get('loadCommand'),
+					user_id:this.get('user_id') || window.current_user
+				});
+			}
+			,loadNext:function(){
+				this.get('wall').next(this.get('loadCommand'),(this.get('user_id') || window.current_user));
+			}
+			,initializer:function()
+			{
+				this.get('container').setHTML(Y.one('#wall').getHTML());
+				var wall = new Y.BABE.PostList();
+				
+				wall.after('add',this.prepend,this);
+				wall.after('load',this.render, this);
+				wall.load({
+					name:this.get('loadCommand'),
+					user_id:this.get('user_id') || window.current_user
+				});
+				
+				this.set('wall',wall);
+				
+			},
+			prepend:function(e){
+				
+				var view;
+				if(e.model.get('category')=='event')
+				{
+					view = new Y.EventView({model:e.model});
+				}
+				else
+				{
+					view = new Y.PostView({model:e.model});
+				}
+				var post = view.render().get('container'); 
+				if(!this.get('container').one("#"+e.model.get("_id")))
+				{
+					if(this.get('container').one(".left").all(".postrow").size() > this.get('container').one(".right").all(".postrow").size())
+					{
+						this.get('container').one(".right").append(post);
+					}
+					else
+					{
+						this.get('container').one(".left").append(post);
+					}
+				}
+
+			},
+			render:function()
+			{
+				
+				this.get('container').setHTML(Y.one('#wall').getHTML());
+				this.get('wall').each(function(item,index){
+					this.prepend({
+						model:item
+					});
+				},this);
+				
+				return this;
+			}
+			
+		});
     var UserView = Y.Base.create('UserView',Y.View,[],{
     	containerTemplate:'<div/>',
-    	template:'#user_page',
     	updateContainer:function(){
+    		
     		this.get('container').setContent(
-    			Y.Lang.sub(Y.one(this.template).getContent(),{
+    			Y.Lang.sub(Y.one('#user_page').getHTML(),{
     				USERID:this.get('model').get('_id'),
     				FULLNAME:this.get('model').get('fullname'),
     		}));
+    		if(this.get('wall'))
+    		{
+    			this.get('container').one('#user_wall').setHTML(this.get('wall').render().get('container'));
+    		}
     		
     		if(this.connection.get('source_follows_target'))
     		{
@@ -509,11 +589,10 @@ YUI.add('babe', function (Y) {
     			this.connection.save();
     		},this);
     		
-    		var user_wall = new Y.WallView({loadCommand:'myposts'}); 
-    		
     		
     	},
     	initializer:function(config){
+    		   		
     		var that = this;
     		if(config && config.user_id)
     		{
@@ -534,6 +613,9 @@ YUI.add('babe', function (Y) {
     			this.get('model').load({},function(){
     				that.updateContainer.call(that); //change the context of the function
     			});
+    			var wall = new WallView({loadCommand:'myposts',user_id:config.user_id});
+    			this.set('wall',wall);
+    			
     		}
     	},
     	render:function(){
@@ -541,16 +623,9 @@ YUI.add('babe', function (Y) {
     		return this;
     	}
     });
-    var userPage = function(user_id){
-    	Y.BABE.sanitizeUI();
-    	Y.BABE.loadTemplate('user_page',function(){
-    		var UserView = new Y.BABE.UserView({user_id:user_id});
-    		Y.one(".centercolumn").setContent(UserView.render().get('container'));
-
-					
-
-    	});
-    };
+    
+    
+		
     var ImageUploadView = Y.Base.create('ImageUploadView',Y.View,[],{
     	containerTemplate:'<div/>',
     	display:'',
@@ -1189,7 +1264,8 @@ YUI.add('babe', function (Y) {
 				if(c.one(".profile-image"))
 				{
 					c.one(".profile-image").on("click",function(e){
-						Y.BABE.userPage(m.get("author_id"));
+						Y.AppUI.navigate('/user/'+m.get("author_id"));
+						e.halt();
 					});
 				}
 				
@@ -2007,11 +2083,12 @@ YUI.add('babe', function (Y) {
 		 	comparator: function (model) {
 			    return parseInt(model.get('created_at'),10)*-1;
 			},
-		 	next:function(name){
+		 	next:function(name,user){
 		 		
 		 		this.load({
 		 			count:this.size()+8,
-		 			name:name
+		 			name:name,
+		 			user_id:user
 		 		});
 		 	}
 		 	
@@ -2032,7 +2109,6 @@ YUI.add('babe', function (Y) {
 		,ProfileView:ProfileView
 		,ImageUploadView:ImageUploadView
 		,UserView:UserView
-		,userPage:userPage
 		,sanitizeUI:sanitizeUI
 		,ConnectionModel:ConnectionModel
 	    ,RelationshipModel:RelationshipModel
@@ -2045,6 +2121,7 @@ YUI.add('babe', function (Y) {
 	    ,CreatePostView:CreatePostView
 	    ,CreateEventView:CreateEventView
 	    ,GroupList:GroupList
+	    ,WallView:WallView
    
    };
 }, '0.0.1', { 
