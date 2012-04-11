@@ -64,3 +64,55 @@
 </div>	
 </script>
 <?php $this->load->view("mixins/question");?>
+
+<script type="text/x-template" id="group-page-sidebar">
+	<div class="row-fluid">
+		
+		<img src="" class='thumbnail span6'>
+		
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<button type="button" id='invite' class="btn btn-success"><i class='icon-magnet icon-white'></i> Invite People</button>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<H5>Members {MEMBERS_COUNT}</H5>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="group-page-main">
+	<div class="row-fluid">
+		<div class="span9">
+			<h2>{GROUP_TITLE}</h2>
+			<h3><small>{GROUP_DESCRIPTION}</small></h3>
+		</div>
+		<div class="span3">
+			<div class="group-join">
+				<button type="button" class="btn btn-primary"><i class="icon-plus icon-white"></i> Join</button>
+				<button type="button" class="btn btn-danger hide"><i class="icon-minus icon-white"></i> Leave</button>
+			</div>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<hr/>
+		</div>
+	</div>
+</script>

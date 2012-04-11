@@ -6,7 +6,7 @@
 					<div class="control-group">
 						<div class="controls">
 							<div class="row-fluid">
-								<input type="text" placeholder="Type your question here" name="question" class="span12">
+								<input type="text" placeholder="Type your question here" name="question" class="span9">
 								<p class="help-block"></p>
 							</div>
 						</div>
@@ -14,16 +14,18 @@
 					<div class="control-group">
 						<div class="controls">
 							<div class="row-fluid">
-								<textarea class="span12" name="description" placeholder="Optional Description"></textarea>
+								<textarea class="span9" name="description" placeholder="Optional Description"></textarea>
 								<p class="help-block"></p>
 							</div>
 						</div>
 					</div>
 					<div class="contol-group">
-				    	<div class="span12">
-				    		<div class="pull-right">
-				    			<button class="btn btn-small btn-primary">Create</button>  
-				    		</div>
+						<div class="row-fluid">
+					    	<div class="span9">
+					    		<div class="pull-right">
+					    			<button class="btn btn-small btn-primary">Create</button>  
+					    		</div>
+					    	</div>
 				    	</div>
 				    </div>
 				

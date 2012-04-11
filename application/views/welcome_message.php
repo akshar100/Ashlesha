@@ -37,6 +37,7 @@ $this->load->view("common/header");
 	    <?php $this->load->view("common/footer");?>
 </script> 
 <?php $this->load->view('mixins/topbar'); ?>
+<?php $this->load->view('mixins/group'); ?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
@@ -689,7 +690,7 @@ $this->load->view("common/header");
 		});
 		
 		Y.CreateGroupMainView = Y.Base.create('CreateGroupMainView', Y.View, [], {
-			containerTemplate:'<div class="the-app"/>',
+			containerTemplate:'<div/>',
 		    render: function () {
 		    	var that= this;
 		    	var con = this.get('container');
@@ -717,46 +718,54 @@ $this->load->view("common/header");
 		    }
 		});
 		
+		Y.GroupPageView = Y.Base.create('GroupPage',Y.View,[],{
+			containerTemplate:'<div/>',
+			initializer:function(){
+				this.get('container').setHTML(Y.one('#group-page-main').getHTML('#group-page-main'));
+				
+			},
+			render:function(){
+				
+				return this;
+			}
+		});
+		
+		Y.GroupPageMainView = Y.Base.create('GroupPageMainView', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var that= this;
+		    	var con = this.get('container');
+		        con.setHTML(Y.one("#outer").getHTML());
+		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				Y.loadTemplate("topbar",function(){ 
+					
+					var topbar= new Y.TopBarView();
+					con.one(".topbar").setHTML(topbar.render().get('container'));
+					
+ 				});
+				Y.loadTemplate("sidebar",function(){ 
+					var sidebar = new Y.SideBarView();
+					con.one(".leftbar").setHTML(Y.one('#group-page-sidebar').getHTML());
+				});
+				 
+				Y.loadTemplate("group",function(){ 
+					var group = new Y.BABE.GroupModel({
+						"_id":that.get("group_id")
+					});
+					var creategroup =  new Y.GroupPageView({model:group});
+					con.one(".centercolumn").setContent(creategroup.render().get('container'));
+				});
+				
+		        return this;
+		    }
+		});
+		
 		
 		window.Y = Y;
 		
-		/**Y.App = { views:{} };
-		
-		
-		
-		Y.App.showPost = function(model){
-			Y.one("#maincontainer").setContent(Y.one("#main").getContent()); 
-			Y.loadTemplate("topbar",function(){ Y.App.views.topbar = new Y.TopBarView(); Y.App.views.topbar.render(); });
-			Y.loadTemplate("sidebar",function(){ Y.App.views.sidebar = new Y.SideBarView(); });
-			Y.loadTemplate("wall",function(){ 
-				if(model.get("category")=="event")
-				{
-					Y.App.views.current = new Y.EventView({model:model , expandComments:true});
-				}
-				else
-				{
-					Y.App.views.current = new Y.PostView({model:model , expandComments:true});
-				}
 				
-				Y.one(".centercolumn").setContent(Y.App.views.current.render().get('container'));
-			});
-		};
 		
 		
-		
-		
-		Y.App.createGroup = function(){
-			
-			Y.BABE.sanitizeUI();
-			Y.loadTemplate("group",function(){ 
-				var group = new Y.BABE.GroupModel({
-					author_id:window.current_user
-				});
-				Y.App.views.current = new Y.BABE.CreateGroupView({model:group});
-				Y.one(".centercolumn").setContent(Y.App.views.current.render().get('container'));
-			});
-		};
-		**/
 		
 		<?php
 			$current_user = $this->user->get_current();
@@ -771,14 +780,15 @@ $this->load->view("common/header");
 				<?php
 			}
 		?>
-		//Y.App.homepage();
+		
 		
 		var AppUI =  new Y.App({
 		    views: {
 		        homepage: {type: 'MainAppView', preserve:true },
 		        profile:  {type:'MainProfileView'},
 		        userpage: {type:'UserPageView',preserve:true },
-		        create_group: {type:'CreateGroupMainView',preserve:true}
+		        create_group: {type:'CreateGroupMainView',preserve:true},
+		        grouppage:{type:'GroupPageMainView',preserve:true},
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -833,8 +843,11 @@ $this->load->view("common/header");
 			this.showView('create_group');
 		});
 		
+		AppUI.route('/group/:group_title/:group_id',function(req){
+		 	this.showView('grouppage',{group_id:req.params.group_id});
+		});
+		
 		AppUI.render().dispatch(); //.save('/');
-		Y.user.after("authenticatedChange",Y.App.homepage);
 		Y.loadTemplate("messagebox",function(){}); 
 		
 

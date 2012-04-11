@@ -512,7 +512,7 @@ YUI.add('babe', function (Y) {
 			render:function()
 			{
 				
-				this.get('container').setHTML(Y.one('#wall').getHTML());
+				
 				this.get('wall').each(function(item,index){
 					this.prepend({
 						model:item
@@ -1399,11 +1399,11 @@ YUI.add('babe', function (Y) {
 		 		
 		 		if(attributes.end_date.trim() && attributes.start_date.trim())
 		 		{
-		 			if(Y.DataType.Date.isGreater(checkdate(attributes.start_date),checkdate(attributes.end_date)))
+		 			if(checkdate(attributes.start_date)>checkdate(attributes.end_date))
 		 			{
 		 				return {
 		 					'field':'start_date',
-		 					'error':'Ending date is sooner than Start Date.'
+		 					'error':'Ending date is sooner than Start Date.' 
 		 				};
 		 			}
 		 		}
@@ -1726,9 +1726,8 @@ YUI.add('babe', function (Y) {
 								}
 								else
 								{
-									Y.showAlert("Done!","Your post has been published successfully.");
-									
-									c.setContent('');
+									Y.showAlert("Done!","Your group is created!");
+								
 								}
 							
 							});
@@ -2125,7 +2124,7 @@ YUI.add('babe', function (Y) {
    
    };
 }, '0.0.1', { 
-    requires: ['router','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','datatype-date','app-base', 'app-transitions','node', 'event','json','cache','model','model-list','querystring-stringify-simple','view','querystring-stringify-simple','io-upload-iframe','io-form','io-base']
+    requires: ['router','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','datatype-date','app-base', 'app-transitions','node', 'event','json','cache','model','model-list','querystring-stringify-simple','view','querystring-stringify-simple','io-upload-iframe','io-form','io-base','sortable']
 });
 
 

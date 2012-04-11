@@ -68,6 +68,7 @@ class In extends CI_Controller {
 		foreach($user_groups as &$row)
 		{
 			$row['label'] = $row['title'];
+			$row['view'] = "/group/".$row['title']."/".$row['_id']; 
 		}
 		echo json_encode($user_groups);
 	}
@@ -179,7 +180,7 @@ class In extends CI_Controller {
 			
 			$user_profile = $this->facebook->api('/me','GET');
        		$user = $this->user->get_by_email($user_profile['email']);
-			if(!empty($user) && !empty($user['_id']))
+			if(!empty($user) && !empty($user['_id']) && isset($user_profile['email'])) //Make sure the FB profile has email in it.
 			{
 				$this->user->force_sign_in($user['_id']);
 				redirect("");

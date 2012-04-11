@@ -3,15 +3,16 @@
 	
 </script>
 <script type="text/x-template" id="statusblock-authenticated">
-	<ul class="pills nav nav-pills pills-status">
-    <li><a  href="#" rel="painpoint"><?php echo $this->lang->line('main_post_title');?></a></li>
-    <li><a href="#" rel="surveys">Surveys</a></li>
-    <li class="hide"><a href="#" rel="images">Images</a></li>
-   <!-- <li><a href="#" rel="first" >1st Exp.</a></li>-->
-   <!--  <li><a href="#" rel="last">Last Exp.</a></li> -->
-   <li><a href="#" rel="question">Question</a></li>
-    <li><a href="#" rel="event">Event</a></li>
-    </ul>
+	<div class="row-fluid">
+		<div class="span12 pills-status">
+				<a  href="#" rel="painpoint"><i class="icon-pencil"></i> <?php echo $this->lang->line('main_post_title');?></a>
+    			<a  href="#" rel="surveys">Surveys</a>
+   				<a  href="#" rel="question"><i class="icon-question-sign"></i> Question</a>
+    			<a  href="#" rel="event"><i class="icon-calendar"></i> Event</a>
+		</div>
+	</div>
+	
+    
     <div class="row-fluid">
     	
 	   	<div class="span9">

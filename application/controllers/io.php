@@ -256,6 +256,14 @@ class IO extends CI_Controller {
 		$data['type'] = 'group';
 		echo json_encode($this->dba->create_group($data));	
 	}
+	
+	function scaffold()
+	{
+		$this->load->helper('file');
+		$json = read_file("./application/views/scaffold/def1.json");
+		echo $json;
+	}
+	
 }
 
 /* End of file welcome.php */

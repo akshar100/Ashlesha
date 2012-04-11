@@ -156,3 +156,15 @@ img.profile-image
 	display:none;
 }
 .yui3-aclist-hidden { visibility: hidden; }
+.pills-status a
+{
+	padding-left:10px;
+}
+.pills-status a:hover
+{
+	text-decoration: none;
+}
+.pills-status
+{
+	padding:10px;
+}
