@@ -307,7 +307,7 @@ class DBA
 			return ($output);
 			
 		}
-		
+		$data['password'] = do_hash($data['password']);
 		$response = $this->chill->post($data);
 		$data = $this->chill->get($response['_id']);
 		$data['id'] = $data['_id'];
@@ -521,6 +521,10 @@ class DBA
 			
 		}
 		$id = $data['_id'];
+		if(isset($data['password']))
+		{
+			$data['password'] = do_hash($data['password']);
+		}
 		$response = $this->chill->put($id,$data);
 		$data = $this->chill->get($response['_id']);
 		$data['id'] = $data['_id'];
@@ -649,5 +653,37 @@ class DBA
 		}
 	
 		
+	}
+
+	function update($data)
+	{
+		return $this->chill->put($data['_id'],$data);
+	}
+	
+	function get_user_by_otp($otp)
+	{
+		if(empty($otp))
+		{
+			
+			return null;
+			
+		}
+		else
+		{
+			$response = $this->chill->getView("posts","users_by_otp", NULL,array(
+				"key"=>$otp
+			));
+			
+			if(!empty($response["rows"]) AND isset($response["rows"][0]))
+			{
+				return $response["rows"][0]["value"];
+			}
+			else
+			{
+				return null;
+			}
+				
+			
+		}
 	}
 }

@@ -26,7 +26,7 @@ $config['base_url']	= 'http://yoururl/<folder if any>';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = ''; //make this index.php if you dont have .htaccess file in the root 
+$config['index_page'] = ''; //make this index.php if you dont have .htaccess file in the root
 
 /*
 |--------------------------------------------------------------------------
@@ -366,6 +366,14 @@ $config['couchdb_host'] = 'localhost';
 $config['couchdb_database'] = 'database_name';
 
 $config['language_pack'] = 'default'; //do not change this
+
+$config['open_id_yahoo'] = FALSE;
+$config['open_id_google'] = FALSE;
+$config['open_id_facebook'] = TRUE;
+
+$config['password_salt'] = '$%^#$%^SDFSATWET4352rfqw34523634tgfdsgvs';
+$config['from_email'] = 'admin@localhost';
+$config['from_name'] = 'My Website'; 
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */

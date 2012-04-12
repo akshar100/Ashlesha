@@ -109,6 +109,7 @@ class IO extends CI_Controller {
 			"tags"=>array("map"=>read_file("./application/views/json/tags_map.js"),"reduce"=>read_file("./application/views/json/tags_reduce.js")),
 			"all_sectors"=>array("map"=>read_file("./application/views/json/all_sector.js")),
 			"user_groups"=>array("map"=>read_file("./application/views/json/user_groups.js")),
+			"users_by_otp"=>array("map"=>read_file("./application/views/json/user_by_otp.js")), 
 		);
 		$this->chill->post($doc); 
 		echo "updated";

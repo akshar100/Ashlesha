@@ -64,7 +64,7 @@ $autoload['libraries'] = array('dba','user','session','chill');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('html','url');
+$autoload['helper'] = array('html','url','security');
 
 
 /*

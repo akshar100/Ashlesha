@@ -769,6 +769,7 @@ YUI.add('babe', function (Y) {
 											node.set("checked","true");
 										}
 									}
+									
 								},this);
 								
 								if(this.get('model').get("profile_pic") && this.get('model').get("profile_pic")!="false" && this.get('model').get("profile_pic")!="undefined")
@@ -844,6 +845,10 @@ YUI.add('babe', function (Y) {
 									container.all("input").each(function(node){
 										
 										if(node.get("type")=="text")
+										{
+											this.get('model').set(node.get("name"),node.get("value"));
+										}
+										else if(node.get("type")=="password" && node.get("value"))
 										{
 											this.get('model').set(node.get("name"),node.get("value"));
 										}

@@ -119,5 +119,26 @@ class User
 		
 		
 	}
+	
+	function generate_otp($user_id)
+	{
+		$user = $this->get_user($user_id);
+		$user['otp'] = sha1(crypt(md5(rand().$user_id)));
+		$this->ci->dba->update($user);
+		return $user['otp'];
+	}
+	
+	
+	function get_by_otp($otp)
+	{
+		return $this->ci->dba->get_user_by_otp($otp); 
+	}
+	
+	function destroy_otp($user)
+	{
+		$user= $this->get_user($user);
+		$user['otp']='';
+		$this->ci->dba->update($user);
+	}
 
 }

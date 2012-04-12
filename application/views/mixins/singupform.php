@@ -74,27 +74,32 @@
 </script>
 
 <script type="text/x-template" id="forgot-password">
-	<div id="forgotpassword">
-		<div class="alert alert-block alert-error fade in hide">
-            <h4 class="alert-heading"></h4>
-            <p class="error-content"></p>
-         </div>
-		<form id="forgotpassword-form" class="form-horizontal" style="padding-left:0px;">
-	        <fieldset>
-	          <legend><h3>Recover Password</h3></legend>
-	          <hr/>
-	          <div class="control-group">
-	            <label class="control-label"  for="email" >Email Address</label>
-	            <div class="controls">
-	              <input type="text"  name="email" id="email" >
-	              <span class="help-inline"></span>
-	            </div>
-	          </div><!-- /control-group -->
-	          
-	          <div class="form-actions">
-	            <button id="forgot-password-btn" type="submit" value="Recover" class="btn btn-primary">Recover</button> <button class="btn cancel-btn" type="button">Back</button>
-	          </div>
-	        </fieldset>
-	    </form>
+	<div class="row-fluid">
+		<div class="span12">
+			<div id="forgotpassword">
+				<div class="alert alert-block alert-error fade in hide">
+		            <h4 class="alert-heading"></h4>
+		            <p class="error-content"></p>
+		         </div>
+				<form id="forgotpassword-form" class="form-vertical" style="padding-left:0px;">
+			        <fieldset>
+			          <legend><h3>Recover Password</h3></legend>
+			          <hr/>
+			          <div class="control-group">
+			            <label class="control-label"  for="email" >Email Address</label>
+			            <div class="controls">
+			              <input type="text"  name="email" id="email" >
+			              <span class="help-inline"></span>
+			            </div>
+			          </div><!-- /control-group -->
+			          
+			          <div class="form-actions">
+			            <button id="forgot-password-btn" type="submit" value="Recover" class="btn btn-primary">Recover</button>
+			            <button class="btn cancel-btn" type="button">Back</button>
+			          </div>
+			        </fieldset>
+			    </form>
+			</div>
+		</div>
 	</div>
 </script>

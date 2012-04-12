@@ -157,6 +157,24 @@ class In extends CI_Controller {
 			}
 			else
 			{
+				//Generate and OTP for the user
+				$otp = $this->user->generate_otp($user['_id']);
+				
+				$url = base_url().'welcome/otp/'.$otp;
+				
+				$this->load->library('email');
+
+				$this->email->from($this->config->item('from_email'),$this->config->item('from_name'));
+				$this->email->to($user['email']);
+				$this->email->subject('Forgot password link');
+				$this->email->message($this->load->view('email/forgot_password',array(
+					'url'=>$url
+				),TRUE));
+				
+				$this->email->send();
+				
+				
+				
 				echo json_encode(array(
 					"success"=>TRUE,
 					"message"=>"An email is sent to you. Please check your inbox for instructions."

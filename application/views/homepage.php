@@ -57,7 +57,9 @@ $this->load->view("common/header");
           		</div>
           		<div class="row-fluid">
           			<div class="span7"><button class="btn btn-primary" type="submit">SignIn</button>
-          				&nbsp; <?php echo anchor('in/facebook_login',img(array("src"=>'static/images/facebook16.png')),array());?> &nbsp;<?php echo anchor('in/google_login',img(array("src"=>'static/images/google16.png')),array());?>&nbsp;<?php echo anchor('in/yahoo_login',img(array("src"=>'static/images/yahoo16.png')),array());?> 
+          				&nbsp; <?php  if($this->config->item('open_id_facebook')) { echo anchor('in/facebook_login',img(array("src"=>'static/images/facebook16.png')),array()); } ?> &nbsp;
+          				<?php if($this->config->item('open_id_google')) { echo anchor('in/google_login',img(array("src"=>'static/images/google16.png')),array()); } ?>&nbsp;
+          				<?php if($this->config->item('open_id_yahoo')) { echo anchor('in/yahoo_login',img(array("src"=>'static/images/yahoo16.png')),array()); } ?> 
           				</div><div class="span4"> <a id="forgot-password-link" href="#">Forgot Password?</a></div>
           		</div>
           		

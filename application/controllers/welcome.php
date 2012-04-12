@@ -60,7 +60,7 @@ class Welcome extends CI_Controller {
 			{
 				$this->session->set_userdata("form_error","Wrong username password.");
 			}
-			else if($user['password'] !== trim($password))
+			else if(!isset($user['password']) || $user['password'] !== do_hash($password))
 			{
 				$this->session->set_userdata("form_error","Wrong username password.");
 			}
@@ -69,8 +69,23 @@ class Welcome extends CI_Controller {
 				$this->user->force_sign_in($user['_id']);
 				redirect("");
 			}
+			redirect("");
 		}	
 		
+	}
+	
+	
+	public function otp($otp)
+	{
+		$user = $this->user->get_by_otp($otp);
+		if(empty($user))
+		{
+			$this->session->set_userdata("form_error","It appears that you tried to reset your password. We request you to try again as the link you used has expired.");
+			redirect("");
+		}
+		$this->user->destroy_otp($user['_id']);
+		$this->user->force_sign_in($user['_id']);
+		redirect(base_url()."me");
 	}
 	
 	public function logout()
