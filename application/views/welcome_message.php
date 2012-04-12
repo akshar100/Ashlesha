@@ -84,6 +84,10 @@ $this->load->view("common/header");
 					user_name:Y.userModel.get("fullname"),
 					user_id:Y.userModel.get("user_id")
 				}));
+				if(Y.APPCONFIG.notifications_enabled)
+				{
+					this.get('container').one("#notification-btn").addClass('hide');
+				}
 				this.get('container').one("#notification-btn").on("click",function(){
 					
 				});
@@ -154,6 +158,22 @@ $this->load->view("common/header");
 						this.get('container').removeClass('show').addClass('hide');
 					}
 				},this);
+				if(this.get('model').get('name').toLowerCase()=='group' && !Y.APPCONFIG.group_enabled ){
+					this.get('container').addClass('hide');
+				}
+				if(this.get('model').get('name').toLowerCase()=='painpoint' && !Y.APPCONFIG.post_enabled ){
+					this.get('container').addClass('hide');
+				}
+				if(this.get('model').get('name').toLowerCase()=='question' && !Y.APPCONFIG.question_enabled ){
+					this.get('container').addClass('hide');
+				}
+				if(this.get('model').get('name').toLowerCase()=='event' && !Y.APPCONFIG.event_enabled ){
+					this.get('container').addClass('hide');
+				}
+				if(this.get('model').get('name').toLowerCase()=='survey' && !Y.APPCONFIG.survey_enabled ){
+					this.get('container').addClass('hide');
+				}
+				
 				this.get('container').on("click",function(e){
 					var view = this.get('model').get("view");
 					AppUI.navigate(view);
@@ -180,6 +200,10 @@ $this->load->view("common/header");
 				this.template=Y.one("#menu-section").getContent();
 			},
 			render:function(){
+				if(this.get('model').get('name')=='group' && !Y.APPCONFIG.group_enabled)
+				{
+					this.get('container').addClass('hide');
+				}
 				this.get('container').setContent(Y.Lang.sub(this.template,{
 					LABEL:this.get('model').get("label")
 				}));
@@ -353,31 +377,37 @@ $this->load->view("common/header");
 			render:function(){
 				
 				
-				
-				this.template_id="#statusblock-authenticated";
-
-				
-				this.template = Y.one(this.template_id).getContent();
 				this.set('container',Y.Node.create('<div id="statusblock"/>'));
 				
-				this.get('container').setContent(Y.Lang.sub(this.template,{
+				this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(),{
 					user_name:Y.user.get("name"),
 					user_id:Y.user.get("user_id")
 				}));
-				
-				
-				
-				
-				
+				if(Y.config)
+				{
+					if(!Y.APPCONFIG.post_enabled)
+					{
+						this.get('container').one('a.post').addClass('hide');
+					}
+					if(!Y.APPCONFIG.event_enabled)
+					{
+						this.get('container').one('a.event').addClass('hide');
+					}
+					if(!Y.APPCONFIG.survey_enabled)
+					{
+						this.get('container').one('a.survey').addClass('hide');
+					}
+					if(!Y.APPCONFIG.question_enabled)
+					{
+						this.get('container').one('a.question').addClass('hide');
+					}
+				}
+	
 				this.get('container').one(".pills-status").all("a").on("click",function(e){
 						
 						var val = Y.one(e.target).get("rel");
 						
-						this.expandForm(val);
-							
-						
-					
-						
+						this.expandForm(val);	
 						
 					},this);
 				if(this.get('expand'))
@@ -777,6 +807,7 @@ $this->load->view("common/header");
 				Y.userModel.load();
 				Y.user.set("authenticated",true);
 				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
+				Y.APPCONFIG =  <?php echo json_encode($config);?>;
 				<?php
 			}
 		?>

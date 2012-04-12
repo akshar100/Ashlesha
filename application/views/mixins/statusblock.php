@@ -1,14 +1,10 @@
-<script type="text/x-template" id="statusblock-unauthenticated">
-	<div></div>
-	
-</script>
 <script type="text/x-template" id="statusblock-authenticated">
 	<div class="row-fluid">
 		<div class="span12 pills-status">
-				<a  href="#" rel="painpoint"><i class="icon-pencil"></i> <?php echo $this->lang->line('main_post_title');?></a>
-    			<a  href="#" rel="surveys">Surveys</a>
-   				<a  href="#" rel="question"><i class="icon-question-sign"></i> Question</a>
-    			<a  href="#" rel="event"><i class="icon-calendar"></i> Event</a>
+				<a class='post'  href="#" rel="painpoint"><i class="icon-pencil"></i> <?php echo $this->lang->line('main_post_title');?></a>
+    			<a class='survey' href="#" rel="surveys">Surveys</a>
+   				<a class='question' href="#" rel="question"><i class="icon-question-sign"></i> Question</a>
+    			<a class='event' href="#" rel="event"><i class="icon-calendar"></i> Event</a>
 		</div>
 	</div>
 	

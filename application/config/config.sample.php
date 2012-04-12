@@ -375,5 +375,14 @@ $config['password_salt'] = '$%^#$%^SDFSATWET4352rfqw34523634tgfdsgvs';
 $config['from_email'] = 'admin@localhost';
 $config['from_name'] = 'My Website'; 
 
+$config['groups_enabaled'] = TRUE;
+$config['events_enabled'] = TRUE;
+$config['surveys_enabled'] = FALSE;
+
+$config['post_enabled'] = TRUE;
+$config['post_sector_enabled'] = TRUE; 
+
+$config['notifications_enabled'] = TRUE; 
+
 /* End of file config.php */
 /* Location: ./application/config/config.php */

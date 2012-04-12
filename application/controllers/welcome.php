@@ -33,7 +33,17 @@ class Welcome extends CI_Controller {
 		}
 		else
 		{
-			$this->load->view('welcome_message');
+			$config = array(
+				'group_enabaled'=> $this->config->item('groups_enabaled'),
+				'event_enabled' => $this->config->item('events_enabled'),
+				'survey_enabled'=> $this->config->item('surveys_enabled'),
+				'post_enabled' => $this->config->item('post_enabled'),
+				'post_sector_enabled' =>$this->config->item('post_sector_enabled'), 
+				'notifications_enabled' =>$this->config->item('notifications_enabled')
+			);
+			$this->load->view('welcome_message',array(
+				'config'=>$config
+			));
 	
 		}
 		
