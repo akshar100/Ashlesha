@@ -61,15 +61,17 @@
 	    </div>
 	    <div class="contol-group">
 	    	<div class="pull-right">
-	    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
-	    			<button class="btn btn-small btn-primary">Post</button>  
+	    			<button type="button" class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
+	    			<button type="button" class="btn btn-small btn-primary">Post</button>  
 	    	</div>
 	    </div>
 
 		</form>
 	</div>
-	<div class="span4 image_preview">
-		
+	<div class="span4">
+		<div class="row-fluid image_preview">
+			
+		</div>
 	</div>
 </script>
 <script type="text/x-template" id="create-event">
@@ -159,14 +161,16 @@
 				    </div>
 				    <div class="contol-group">
 				    	<div class="pull-right">
-				    			<button class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
-				    			<button class="btn btn-small btn-primary">Post</button>  
+				    			<button type="button" class="btn btn-small img-upload"><i class="icon-picture"></i> Add Image</button>
+				    			<button type="button" class="btn btn-small btn-primary">Post</button>  
 				    	</div>
 				    </div>
 					
 				</div>
-				<div class="span4 image_preview">
-					
+				<div class="span4">
+					<div class="row-fluid image_preview">
+						
+					</div>
 				</div>
 </script>
 <?php $this->load->view("mixins/imageuploader");?>

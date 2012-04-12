@@ -23,7 +23,7 @@
 						<div class="row-fluid">
 					    	<div class="span9">
 					    		<div class="pull-right">
-					    			<button class="btn btn-small btn-primary">Create</button>  
+					    			<button type="button" class="btn btn-small btn-primary">Create</button>  
 					    		</div>
 					    	</div>
 				    	</div>
