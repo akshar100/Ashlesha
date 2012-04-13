@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://yoururl/<folder if any>';
+$config['base_url']	= 'http://dev.forbash.com/';
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ $config['base_url']	= 'http://yoururl/<folder if any>';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = ''; //make this index.php if you dont have .htaccess file in the root
+$config['index_page'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -359,24 +359,23 @@ $config['proxy_ips'] = '';
 
 $config['global_xss_filtering'] = TRUE;
 
-$config['facebook_appid'] = '';
-$config['facebook_appsecret'] = "";
+$config['facebook_appid'] = '200557333320700';
+$config['facebook_appsecret'] = "8b5678e03253095e77f58253c0c524cc";
 
-$config['couchdb_host'] = 'localhost';
-$config['couchdb_database'] = 'database_name';
+$config['couchdb_host'] = 'www.forbash.com'; //Do not provide any port here.
+$config['couchdb_database'] = 'brandabrand';
 
-$config['language_pack'] = 'default'; //do not change this
+$config['language_pack'] = 'default';
 
 $config['open_id_yahoo'] = FALSE;
 $config['open_id_google'] = FALSE;
-$config['open_id_facebook'] = TRUE;
-
+$config['open_id_facebook'] = TRUE; 
 $config['password_salt'] = '$%^#$%^SDFSATWET4352rfqw34523634tgfdsgvs';
-$config['from_email'] = 'admin@localhost';
-$config['from_name'] = 'My Website'; 
+$config['from_email'] = 'admin@forbash.com';
+$config['from_name'] = 'BrandAbrand.com'; 
 
 $config['group_enabled'] = TRUE;
-$config['event_enabled'] = TRUE;
+$config['event_enabled'] = FALSE; 
 $config['survey_enabled'] = TRUE;
 $config['question_enabled'] = TRUE;
 
@@ -384,6 +383,7 @@ $config['post_enabled'] = TRUE;
 $config['post_sector_enabled'] = TRUE; 
 
 $config['notifications_enabled'] = TRUE; 
+
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */

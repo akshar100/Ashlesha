@@ -34,9 +34,10 @@ class Welcome extends CI_Controller {
 		else
 		{
 			$config = array(
-				'group_enabaled'=> $this->config->item('groups_enabaled'),
-				'event_enabled' => $this->config->item('events_enabled'),
-				'survey_enabled'=> $this->config->item('surveys_enabled'),
+				'group_enabled'=> $this->config->item('group_enabled'),
+				'question_enabled'=> $this->config->item('question_enabled'),
+				'event_enabled' => $this->config->item('event_enabled'),
+				'survey_enabled'=> $this->config->item('survey_enabled'),
 				'post_enabled' => $this->config->item('post_enabled'),
 				'post_sector_enabled' =>$this->config->item('post_sector_enabled'), 
 				'notifications_enabled' =>$this->config->item('notifications_enabled')
@@ -64,8 +65,7 @@ class Welcome extends CI_Controller {
 		else
 		{
 			
-			$user = $this->user->get_by_username_or_email(trim($username));
-			
+			$user = $this->user->get_by_username_or_email(trim($username));			
 			if(empty($user))
 			{
 				$this->session->set_userdata("form_error","Wrong username password.");

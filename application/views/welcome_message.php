@@ -84,7 +84,7 @@ $this->load->view("common/header");
 					user_name:Y.userModel.get("fullname"),
 					user_id:Y.userModel.get("user_id")
 				}));
-				if(Y.APPCONFIG.notifications_enabled)
+				if(!Y.APPCONFIG.notifications_enabled)
 				{
 					this.get('container').one("#notification-btn").addClass('hide');
 				}
@@ -158,21 +158,25 @@ $this->load->view("common/header");
 						this.get('container').removeClass('show').addClass('hide');
 					}
 				},this);
-				if(this.get('model').get('name').toLowerCase()=='group' && !Y.APPCONFIG.group_enabled ){
+				if(this.get('model').get('name'))
+				{
+					if(this.get('model').get('name').toLowerCase()=='group' && !Y.APPCONFIG.group_enabled ){
 					this.get('container').addClass('hide');
+					}
+					if(this.get('model').get('name').toLowerCase()=='painpoint' && !Y.APPCONFIG.post_enabled ){
+						this.get('container').addClass('hide');
+					}
+					if(this.get('model').get('name').toLowerCase()=='question' && !Y.APPCONFIG.question_enabled ){
+						this.get('container').addClass('hide');
+					}
+					if(this.get('model').get('name').toLowerCase()=='event' && !Y.APPCONFIG.event_enabled ){
+						this.get('container').addClass('hide');
+					}
+					if(this.get('model').get('name').toLowerCase()=='survey' && !Y.APPCONFIG.survey_enabled ){
+						this.get('container').addClass('hide');
+					}
 				}
-				if(this.get('model').get('name').toLowerCase()=='painpoint' && !Y.APPCONFIG.post_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='question' && !Y.APPCONFIG.question_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='event' && !Y.APPCONFIG.event_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='survey' && !Y.APPCONFIG.survey_enabled ){
-					this.get('container').addClass('hide');
-				}
+				
 				
 				this.get('container').on("click",function(e){
 					var view = this.get('model').get("view");

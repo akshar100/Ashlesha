@@ -1,7 +1,7 @@
 <?php
 $lang["site_title"] = "Brand A Brand! ";
 $lang["site_name"] = "BrandABrand.com";
-$lang["site_description"] = "The Privy Council of the United Kingdom is a formal body of advisers to the British monarchy. Its membership is mostly made up of senior politicians who are, or have been, members of either the House of Commons or the House of Lords. The Council by itself also has a delegated authority to issue Orders of Council, which are mostly used to regulate certain public institutions."; 
+$lang["site_description"] = "BrandABrand.com is a portal for people to share their thoughts and views about various brands products and services they use. While the portal gives voice to consumers it can also be liveraged by the brands to understand their standing in the market. BrandABrand also is a SaaS model platform which means anyone can own their own custamized instance of this platform and control it's behaviour."; 
 $lang["site_copyright"] = "&copy; ".date("Y",time())." ".$lang["site_name"]; //add year authomatically
 $lang["sign_up_pitch"] = "Brand A Brand Now!";
 $lang["main_post_title"] = "Painpoint";

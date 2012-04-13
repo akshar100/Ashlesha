@@ -487,6 +487,10 @@ YUI.add('babe', function (Y) {
 			prepend:function(e){
 				
 				var view;
+				if(e.model.get('category')=='event' && !Y.APPCONFIG.event_enabled)
+				{
+					return true;
+				}
 				if(e.model.get('category')=='event')
 				{
 					view = new Y.EventView({model:e.model});
@@ -1818,7 +1822,9 @@ YUI.add('babe', function (Y) {
 			},this);
 			var lastValue;
 			this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin,TagBoxConfig);
-			
+			if(!Y.APPCONFIG.post_sector_enabled){
+				inputNode.setClass('hide');
+			}
 			var inputNode = this.get('container').one(".ac-sector");
 			inputNode.on('blur',function(){
 				if(inputNode.get('value').trim().length<4)
@@ -1895,6 +1901,10 @@ YUI.add('babe', function (Y) {
 		    
 			this.get('container').one("button.btn-primary").on("click",function(){
 							
+							var sector=null;
+							if(!Y.APPCONFIG.post_sector_enabled){
+								sector = 'other';
+							}
 							var post =  new Y.BABE.PostModel({
 								text:this.get('container').one("textarea").get("value"),
 								tags:this.get('container').one("[name=tags]").get("value"),
@@ -1902,7 +1912,7 @@ YUI.add('babe', function (Y) {
 								images:this.get('img') && this.get('img').image && Y.JSON.stringify([
 									this.get('img').image
 								]),
-								sector:this.get('container').one("[name=sector]").get("value")
+								sector:sector || this.get('container').one("[name=sector]").get("value")
 									
 								
 							});
