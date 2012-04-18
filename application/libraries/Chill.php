@@ -266,7 +266,7 @@ return $response;
 public function post(array $doc)
 {
 	//print_r($doc); 
-	if(empty($doc['_id'])) { unset($doc['_id']);}  
+	if(empty($doc['_id']) || ($doc['_id'])=="null") { unset($doc['_id']);}  
 $context = array('http' => array());
 
 $context['http']['method'] = 'POST';

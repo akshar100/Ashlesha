@@ -453,6 +453,9 @@ YUI.add('babe', function (Y) {
 				'#loadMore':{
 					click: 'loadNext'
 				}
+			},
+			clearWall:function(){
+				this.get('container').setHTML(Y.one('#wall').getHTML());
 			}
 			,loadWall:function(command){
 				if(command=='my'){
@@ -1244,9 +1247,8 @@ YUI.add('babe', function (Y) {
 					this.showComments();
 					e.halt();
 				},this);
-				c.one('.share').on("click",function(e){
-					
-					Y.App.showPost(this.get('model'));
+				c.one('a.share').on("click",function(e){
+					Y.AppUI.navigate("/post/"+this.get('model').get('category')+"/"+this.get('model').get('_id'));
 					e.halt();
 				},this);
 			},

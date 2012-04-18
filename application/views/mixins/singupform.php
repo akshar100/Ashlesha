@@ -58,7 +58,7 @@
 		          	</div>
 	          	</div>
 	          </div>
-	          <div class="form-actions span5">
+	          <div class="form-actions">
 	            <button id="signup-form" type="submit" value="Sign Up" class="btn btn-primary">Sign Up</button>
 	          </div>
 	        </fieldset>

@@ -625,6 +625,7 @@ $this->load->view("common/header");
 			loadStream:function(command){
 				if(this.get('wall'))
 				{
+					this.get('wall').clearWall();
 					this.get('wall').loadWall(command); 
 				}
 			},
@@ -860,7 +861,7 @@ $this->load->view("common/header");
 		
 		AppUI.route('/my',function(req){
 			this.showView('homepage',{},{callback:function(v){
-				v.loadStream('my');
+				setTimeout(function(){v.loadStream('my');},1000);
 			}});
 		});
 		AppUI.route('/stream',function(req){
@@ -880,6 +881,10 @@ $this->load->view("common/header");
 		
 		AppUI.route('/group/:group_title/:group_id',function(req){
 		 	this.showView('grouppage',{group_id:req.params.group_id});
+		});
+		
+		AppUI.route('/post/:post_tags/:post_id',function(req){
+		 	this.showView('postpage',{group_id:req.params.post_id});
 		});
 		
 		AppUI.render().dispatch(); //.save('/');
