@@ -115,6 +115,7 @@ YUI.add('babe', function (Y) {
 				action = "create";
 				
 			}
+			
 			if(this.name=="postModel" || this.name=="eventModel" || this.name=="questionModel")
 			{
 				if(action=="create")
@@ -162,6 +163,49 @@ YUI.add('babe', function (Y) {
 					 
 					return;
 				}
+				if(action=='read')
+				{
+					var model = this;
+					var data = this.toJSON()
+					Y.io(baseURL+'io/get_model/',{
+						method:'POST',
+						data:{'_id':data['_id']},
+						on:{
+							success:function(i,o,a){
+								var response = Y.JSON.parse(o.responseText);
+								if(response)
+								{
+									model.setAttrs(response);
+								}
+								
+								callback(null,model.toJSON());
+								
+							}
+						}
+					});
+				}
+				if(action=='delete')
+				{
+					var model = this;
+					var data = this.toJSON()
+					Y.io(baseURL+'io/delete_model/',{
+						method:'POST',
+						data:{'_id':data['_id']},
+						on:{
+							success:function(i,o,a){
+								var response = Y.JSON.parse(o.responseText);
+								if(response)
+								{
+									model.setAttrs(response);
+								}
+								
+								callback(null,model.toJSON());
+								
+							}
+						}
+					});
+				}
+			
 			}
 			if(this.name=="groupModel")
 			{
@@ -1032,6 +1076,9 @@ YUI.add('babe', function (Y) {
 				);
 
 				this.get('model').after("change",this.render,this);
+				this.get('model').on('destroy',function(){
+					this.get('container').addClass('hide');
+				},this);
 			},
 			processURLs:function(text){
 				
@@ -1113,8 +1160,9 @@ YUI.add('babe', function (Y) {
 				}));
 				Y.BABE.autoExpand(this.get("container").one("textarea"));
 				this.get('container').all(".autocomplete").plug(Y.Plugin.AutoComplete, Y.BABE.TagBoxConfig);
-				this.get('container').one(".delete-btn").on("click",function(){
-					this.get('container').setHTML("<div class='alert alert-success'>This post was deleted</div>");
+				this.get('container').one(".delete-btn").on("click",function(e){
+					this.get('model').destroy({remove:true});
+					e.halt();
 				},this);
 				
 				this.get('container').one(".save-btn").on("click",function(){

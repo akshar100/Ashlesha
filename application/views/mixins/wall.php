@@ -64,11 +64,10 @@
 	              </span>
 	        </div>
 	        <div class="row-fluid">
-	        	<div class="span1"></div>
+	        	<div class="span1">&nbsp;</div>
 	        	<div class="span11">
 	        	
 		        	<div class="pull-right">
-		        	</br>
 						<a class="btn default small submitComment" href="#">Comment</a>
 					</div>
 	        	</div>

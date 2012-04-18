@@ -796,6 +796,51 @@ $this->load->view("common/header");
 		});
 		
 		
+		Y.PostPage = Y.Base.create('PostPage', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var that= this;
+		    	var con = this.get('container');
+		        con.setHTML(Y.one("#outer").getHTML());
+		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				Y.loadTemplate("topbar",function(){ 
+					
+					var topbar= new Y.TopBarView();
+					con.one(".topbar").setHTML(topbar.render().get('container'));
+					
+ 				});
+				Y.loadTemplate("sidebar",function(){ 
+					var sidebar = new Y.SideBarView();
+					con.one(".leftbar").setHTML(sidebar.render().get('container'));
+				});
+				Y.loadTemplate("wall",function(){ 
+					
+					var id = that.get('post_id');
+					Y.log(id);
+					var postModel = new Y.BABE.PostModel({
+						'_id':id
+					});
+					postModel.on('load',function(){
+						if(postModel.get('category')=='event')
+						{
+							var view = new Y.EventView({model:postModel,expandComments:true});
+						}
+						else
+						{
+							var view = new Y.PostView({model:postModel,expandComments:true});
+						}
+						con.one(".centercolumn").setHTML(view.render().get('container'));
+					},that);
+					postModel.load();
+					
+					
+				});
+				
+		        return this;
+		    }
+		});
+		
+		
 		window.Y = Y;
 		
 				
@@ -825,6 +870,7 @@ $this->load->view("common/header");
 		        userpage: {type:'UserPageView',preserve:true },
 		        create_group: {type:'CreateGroupMainView',preserve:true},
 		        grouppage:{type:'GroupPageMainView',preserve:true},
+		        postpage:{type:'PostPage',preserve:false}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -884,7 +930,7 @@ $this->load->view("common/header");
 		});
 		
 		AppUI.route('/post/:post_tags/:post_id',function(req){
-		 	this.showView('postpage',{group_id:req.params.post_id});
+		 	this.showView('postpage',{post_id:req.params.post_id});
 		});
 		
 		AppUI.render().dispatch(); //.save('/');

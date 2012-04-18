@@ -660,6 +660,17 @@ class DBA
 		return $this->chill->put($data['_id'],$data);
 	}
 	
+	function get($id)
+	{
+		return $this->chill->get($id);
+	}
+	
+	function delete($id)
+	{
+		$item = $this->get($id);
+		return $this->chill->delete($id,$item['_rev']);
+	}
+	
 	function get_user_by_otp($otp)
 	{
 		if(empty($otp))

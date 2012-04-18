@@ -265,6 +265,16 @@ class IO extends CI_Controller {
 		echo $json;
 	}
 	
+	function get_model()
+	{
+		echo json_encode($this->dba->get($this->input->post('_id')));
+	}
+	
+	function delete_model()
+	{
+		echo json_encode($this->dba->delete($this->input->post('_id')));
+	}
+	
 }
 
 /* End of file welcome.php */
