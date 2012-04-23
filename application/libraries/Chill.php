@@ -249,7 +249,7 @@ throw new Chill_Response_Exception('PUT /' . $id . ' - Unknown response status.'
 
 if(isset($response['id']))
 {
-return array('_id' => $response['id'], '_rev' => $response['rev']);
+return @array('_id' => $response['id'], '_rev' => $response['rev']);
 }
 else
 {

@@ -4,7 +4,7 @@
 		<div class="span9">
 			<div class="alert alert-info">
 		        <a data-dismiss="alert" class="close">×</a>
-		        <strong>Heads up!</strong> This alert needs your attention, but it's not super important.
+		        <strong>Heads up!</strong> You are creating a board. Boards are created for focussed discussion generally around certain people or topics.
 		     </div>
 		</div>
 	</div>
@@ -52,7 +52,7 @@
 							    <div class="contol-group">
 							    	<div class="pull-right">
 							    			
-							    			<button type="button" class="btn btn-small btn-primary">Create Group</button>  
+							    			<button type="button" class="btn btn-small btn-primary">Create</button>  
 							    	</div>
 							    </div>
 							</fieldset>
@@ -68,7 +68,7 @@
 <script type="text/x-template" id="group-page-sidebar">
 	<div class="row-fluid">
 		
-		<img src="" class='thumbnail span6'>
+		<img src="{GROUP_IMAGE}" class='thumbnail span6'>
 		
 	</div>
 	<div class="row-fluid">
@@ -78,7 +78,7 @@
 	</div>
 	<div class="row-fluid">
 		<div class="span12">
-			<button type="button" id='invite' class="btn btn-success"><i class='icon-magnet icon-white'></i> Invite People</button>
+			<button type="button" id='invite' class="btn btn-success"><i class='icon-magnet icon-white'></i> Invite</button>
 		</div>
 	</div>
 	<div class="row-fluid">
@@ -105,8 +105,8 @@
 		</div>
 		<div class="span3">
 			<div class="group-join">
-				<button type="button" class="btn btn-primary"><i class="icon-plus icon-white"></i> Join</button>
-				<button type="button" class="btn btn-danger hide"><i class="icon-minus icon-white"></i> Leave</button>
+				<button type="button" class="btn btn-primary join-btn"><i class="icon-plus icon-white"></i> Join</button>
+				<button type="button" class="btn btn-danger unjoin-btn hide"><i class="icon-minus icon-white"></i> Leave</button>
 			</div>
 		</div>
 	</div>

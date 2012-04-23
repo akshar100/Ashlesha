@@ -756,8 +756,70 @@ $this->load->view("common/header");
 		Y.GroupPageView = Y.Base.create('GroupPage',Y.View,[],{
 			containerTemplate:'<div/>',
 			initializer:function(){
-				this.get('container').setHTML(Y.one('#group-page-main').getHTML('#group-page-main'));
 				
+				this.set('sidebar',Y.Node.create('<div/>')); 
+				this.set('relation',new Y.BABE.RelationshipModel());
+				var r = this.get('relation'),m=this.get('model');
+				
+				
+				this.get('model').on(['load','save'],function(){
+					this.get('container').setHTML(Y.Lang.sub(Y.one('#group-page-main').getHTML('#group-page-main'),{
+						'GROUP_TITLE':m.get('title'),
+						'GROUP_DESCRIPTION':m.get('description'),
+						'MEMBERS_COUNT':m.get('count') || '0',
+						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100'
+						
+					}));
+					this.get('sidebar').setHTML(Y.Lang.sub(Y.one('#group-page-sidebar').getHTML('#group-page-sidebar'),{
+						'GROUP_TITLE':m.get('title'),
+						'GROUP_DESCRIPTION':m.get('description'),
+						'MEMBERS_COUNT':m.get('count') || '0',
+						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100'
+						
+					}));
+					this.get('container').one('.join-btn').on('click',function(){
+							r.set('relationship','member');
+							r.save();
+						},this);
+						this.get('container').one('.unjoin-btn').on('click',function(){
+							r.set('relationship','');
+							r.save();
+						},this);
+					
+					},this);
+				this.get('relation').on(['load','save'],function(){
+						if(this.get('relation').get('relationship')==="")
+						{
+							this.get('container').one('.join-btn').removeClass('hide');
+							this.get('container').one('.unjoin-btn').addClass('hide');
+						}
+						else if(this.get('relation').get('relationship')==="member")
+						{
+							this.get('container').one('.join-btn').addClass('hide');
+							this.get('container').one('.unjoin-btn').removeClass('hide');
+						}
+						/*if(this.get('model').get('author_id')===window.current_user)
+						{
+							this.get('container').one('.join-btn').addClass('hide');
+							this.get('container').one('.unjoin-btn').addClass('hide');
+						}*/
+						
+						
+						
+					},this);
+				r.set('resource_id',m.get("_id"));
+				r.set('owner_id',window.current_user);
+				this.get('model').load({},function(){
+					r.load({
+						resource_id:m.get("_id")
+					});
+				});
+				
+				
+			},
+			getSidebar:function(){
+				
+				return this.get('sidebar');
 			},
 			render:function(){
 				
@@ -770,6 +832,9 @@ $this->load->view("common/header");
 		    render: function () {
 		    	var that= this;
 		    	var con = this.get('container');
+		    	var group = new Y.BABE.GroupModel({
+						"_id":that.get("group_id")
+					});
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				Y.loadTemplate("topbar",function(){ 
@@ -778,17 +843,16 @@ $this->load->view("common/header");
 					con.one(".topbar").setHTML(topbar.render().get('container'));
 					
  				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
-					con.one(".leftbar").setHTML(Y.one('#group-page-sidebar').getHTML());
-				});
+				
+					
+				
+			
 				 
 				Y.loadTemplate("group",function(){ 
-					var group = new Y.BABE.GroupModel({
-						"_id":that.get("group_id")
-					});
-					var creategroup =  new Y.GroupPageView({model:group});
-					con.one(".centercolumn").setContent(creategroup.render().get('container'));
+					
+					var grp =  new Y.GroupPageView({model:group});
+					con.one(".centercolumn").setContent(grp.render().get('container'));
+					con.one(".leftbar").setHTML(grp.getSidebar());
 				});
 				
 		        return this;
