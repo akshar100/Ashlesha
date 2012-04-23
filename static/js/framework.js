@@ -470,6 +470,15 @@ YUI.add('babe', function (Y) {
     			return false;
     		}
     	}
+    	,requestPending:function(){
+    		if(!this.get('target_connects_source') && this.get('source_connects_target')){
+    			return true;
+    		}
+    		else
+    		{
+    			return false;
+    		}
+    	}
     	,isFollowing:function(){
     		if(this.get('source_follows_target'))
     		{
@@ -609,6 +618,8 @@ YUI.add('babe', function (Y) {
 	    		});
     		}
     		
+    		
+    		
     		if(this.connection.isFriend())
     		{
     			this.get('container').one("#connect_user").set("innerHTML",'<i class="icon-white icon-minus"></i> Disconnect');
@@ -625,6 +636,15 @@ YUI.add('babe', function (Y) {
     			this.get('container').one("#connect_user").set("data-content","This user has sent you a connection request. You want to accept it ?");
     			this.get('container').one("#connect_user").set("data-original-title","Accept Connection");
     			this.get('container').one("#connect_user").removeClass("btn-warning").addClass("btn-success");
+    			$(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+	    			placement:'bottom'
+	    		});
+    		}else if(this.connection.requestPending())
+    		{
+    			this.get('container').one("#connect_user").set("innerHTML",'<i class="icon-white icon-minus"></i> Withdraw Request');
+    			this.get('container').one("#connect_user").set("data-content","This person has not yet accepted your Connect Request");
+    			this.get('container').one("#connect_user").set("data-original-title","Disconnect");
+    			this.get('container').one("#connect_user").removeClass("btn-success").addClass("btn-warning");
     			$(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
 	    			placement:'bottom'
 	    		});
@@ -997,7 +1017,7 @@ YUI.add('babe', function (Y) {
 		 		{
 		 			if(cache.retrieve("all_sectors"))
 		 			{
-		 				if(!Array.indexOf(cache.retrieve("all_sectors"),attributes.sector))
+		 				if(!Y.Array.indexOf(cache.retrieve("all_sectors"),attributes.sector))
 		 				{
 		 					return "Please select a valid sector. The one you have provided is incorrect.";
 		 				}
