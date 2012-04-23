@@ -1159,7 +1159,7 @@ YUI.add('babe', function (Y) {
 								 
 								}
 								img.src = baseURL+images[i];
-	
+								break; //Let us add only one image to the view
 							}
 							
 						}
@@ -1193,6 +1193,7 @@ YUI.add('babe', function (Y) {
 									
 								if(err)
 								{
+									Y.log(err);
 									Y.showAlert("Ooops!",err.error);
 								}
 								else

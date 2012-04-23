@@ -36,7 +36,7 @@
 		</div>
 		<div class="span1 wall-post-admin"><button class='btn btn-danger delete-btn'><i class="icon-trash"></i></button></div></div>
 		<div class="row-fluid"><div class="span1"></div><div class="textzone span11 postBody"><div class="row-fluid"><textarea rows="3" name="post"  class="span12">{TEXT}</textarea></div></div></div>
-		<div class="row-fluid"><div class="span8">&nbsp;</div><div class="span3"><button type='button' class="btn btn-primary pull-right save-btn">Save Changes</button></span></div>
+		<div class="row-fluid"><div class="span8">&nbsp;</div><div class="span3"><button type='button' class="btn btn-primary pull-right save-btn">Save</button></span></div>
 		</form>
 	</div>
 </script>
