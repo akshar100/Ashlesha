@@ -65,286 +65,12 @@ $this->load->view("common/header");
 		Y.listSync = Y.BABE.listSync;
 		Y.PostModel = Y.BABE.PostModel;
 		Y.ProfileView = Y.BABE.ProfileView;
-		Y.CommentModel = Y.BABE.CommentModel;
-		 
+		Y.CommentModel = Y.BABE.CommentModel; 
 		Y.CommentList = Y.BABE.CommentList;
-		 
-		 
 		Y.wall = new Y.BABE.PostList();	
-
-		Y.TopBarView= Y.Base.create('topbarview', Y.View, [], {
-			containerTemplate:'<div/>',
-			initializer:function()
-			{
-				
-			},
-			render:function()
-			{
-
-				this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(),{
-					user_name:Y.userModel.get("fullname"),
-					user_id:Y.userModel.get("user_id")
-				}));
-				if(!Y.APPCONFIG.notifications_enabled)
-				{
-					this.get('container').one("#notification-btn").addClass('hide');
-				}
-				this.get('container').one("#notification-btn").on("click",function(){
-					
-				});
-				this.get('container').one("a.brand").on("click",function(e){
-					AppUI.navigate("/");
-					e.preventDefault();
-				});
-				this.get('container').one("#edit-profile").on("click",function(e){
-					AppUI.navigate("/me");
-					e.preventDefault();
-				});
-				
-				this.get('container').one("a.logout").on('click',function(){
-					window.location = baseURL+'in/logout?seed='+Math.random();
-				});
-				
-				jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
-				return this;
-			}
-		});
+		Y.TopBarView= Y.BABE.TopBarView;
+		var SideBarView = Y.BABE.SideBarView;
 		
-		Y.MenuItemModel = Y.Base.create('menuitemmodel',Y.Model,[],{},{
-			ATTRS:{
-				label:{value:'unlabled'},
-				view:{value:'myposts'},
-				hide:{value:false}
-			}
-		});
-		
-		Y.MenuItemList = Y.Base.create('menuitemlist', Y.ModelList, [], {
-		 	sync:Y.BABE.listSync,
-		 	model:Y.MenuItemModel
-		 	
-		});
-		
-		Y.MenuSectionModel = Y.Base.create('menusectionmodel',Y.Model,[],{},{
-			ATTRS:{
-				label:{value:'unlabled'}
-				
-			}
-		});
-		
-		Y.MenuSectionList = Y.Base.create('menusectionlist', Y.ModelList, [], {
-		 	sync:Y.BABE.listSync,
-		 	model:Y.MenuSectionModel
-		 	
-		});
-		
-		Y.MenuItemView = Y.Base.create('menuitemview',Y.View,[],{
-			containerTemplate:"<li class='menuitem'/>",
-			hide:function(){
-				this.get('container').addClass('hide');
-			},
-			show:function(){
-				this.get('container').removeClass('hide');
-			},
-			initializer:function(config){
-				
-				this.get('model').on('hideChange',function(e){
-				
-					if(e.newVal==false)
-					{
-						this.get('container').removeClass('hide').addClass('show');
-						
-					}
-					else
-					{
-						this.get('container').removeClass('show').addClass('hide');
-					}
-				},this);
-				if(this.get('model').get('name'))
-				{
-					if(this.get('model').get('name').toLowerCase()=='group' && !Y.APPCONFIG.group_enabled ){
-					this.get('container').addClass('hide');
-					}
-					if(this.get('model').get('name').toLowerCase()=='painpoint' && !Y.APPCONFIG.post_enabled ){
-						this.get('container').addClass('hide');
-					}
-					if(this.get('model').get('name').toLowerCase()=='question' && !Y.APPCONFIG.question_enabled ){
-						this.get('container').addClass('hide');
-					}
-					if(this.get('model').get('name').toLowerCase()=='event' && !Y.APPCONFIG.event_enabled ){
-						this.get('container').addClass('hide');
-					}
-					if(this.get('model').get('name').toLowerCase()=='survey' && !Y.APPCONFIG.survey_enabled ){
-						this.get('container').addClass('hide');
-					}
-				}
-				
-				
-				this.get('container').on("click",function(e){
-					var view = this.get('model').get("view");
-					AppUI.navigate(view);
-					e.halt();
-				},this); 
-			},
-			render:function(){
-				
-				if(this.get('model').get("label").length<=12)
-				{
-					this.get('container').setContent(this.get('model').get("label"));
-				}
-				else
-				{
-					this.get('container').setContent(this.get('model').get("label").substr(0,10)+"..");
-					this.get('container').set("title",this.get('model').get("label"));
-				}
-				return this;
-			}
-		});
-		Y.MenuSectionView = Y.Base.create('menusectionview', Y.View, [], {
-			containerTemplate:'<div />',
-			initializer:function(){
-				this.template=Y.one("#menu-section").getContent();
-			},
-			render:function(){
-				if(this.get('model').get('name')=='group' && !Y.APPCONFIG.group_enabled)
-				{
-					this.get('container').addClass('hide');
-				}
-				this.get('container').setContent(Y.Lang.sub(this.template,{
-					LABEL:this.get('model').get("label")
-				}));
-				return this;
-			}
-		});
-		
-		Y.SideBarMenuView = Y.Base.create('sidebarview', Y.View, [], {
-			containerTemplate:'<div/>',
-			initializer:function(){
-				var items = new Y.BABE.GroupList();
-				this.set('items',items);
-			},
-			toggleList:function(sectionContainer){
-				var max_item = 2;
-				var items = this.get('items');
-				if(items.size()>max_item && (sectionContainer.one("a.more").hasClass('hide') || sectionContainer.one("a.more").hasClass('dropped')))
-				{
-					
-					var hide = 0;
-					items.each(function(item,index){
-						if(hide<max_item)
-						{
-							item.set('hide',false);
-							item.save();
-							hide++;
-						}
-						else
-						{
-							item.set('hide',true);
-							item.save();
-						}
-					
-					});
-					sectionContainer.one("a.more").removeClass('hide');
-					sectionContainer.one("a.more").setHTML("<h4><small>MORE</small></h4>");
-					sectionContainer.one("a.more").removeClass('dropped');
-				}
-				else
-				{
-					
-					items.each(function(item,index){
-						
-							item.set('hide',false);
-							item.save();
-							
-
-					});
-					sectionContainer.one("a.more").addClass('dropped');
-					sectionContainer.one("a.more").setHTML("<h4><small>LESS</small><h4>");
-					
-				}
-			},
-			render:function(){
-				var menuContainer = this.get('container');
-				var sections  = new Y.MenuSectionList(); 
-				var that = this;
-				
-				sections.load({name:'menusectionlist'},function(){
-					sections.each(function(item,index){
-						var section = new Y.MenuSectionView({model:item});
-						
-						if(item.get('name')=='group')
-						{
-							
-							
-							var sectionContainer = section.render().get('container');
-							menuContainer.append(sectionContainer);
-							var items = that.get('items');
-							items.load({
-								name:'groupList'
-							},function(){
-								
-								
-								items.each(function(item,index){
-								
-									sectionContainer.one("ul").append(new Y.MenuItemView({model:item}).render().get('container')); 
-									
-								});
-								
-								
-								that.toggleList(sectionContainer);
-								sectionContainer.one("a.more").on('click',function(){
-									that.toggleList(sectionContainer);
-								});
-								
-							});
-						}
-						else
-						{
-							var items = new Y.MenuItemList();
-							var sectionContainer = section.render().get('container');
-							menuContainer.append(sectionContainer);
-							items.load({name:'menuitemlist',section:item.get("id")},function(){
-								items.each(function(item,index){
-									sectionContainer.one("ul").append(new Y.MenuItemView({model:item}).render().get('container')); 
-								});
-							});
-						}
-						
-						
-						
-					});
-					
-				});
-				return this;
-			}
-		});
-		
-		
-		Y.SideBarView = Y.Base.create('sidebarview', Y.View, [], {
-			containerTemplate:"<div/>",
-			render:function(){
-				
-				var user = new Y.BABE.UserModel({'_id':window.current_user});
-				var that = this;
-				user.load({},function(){
-					
-					var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(),{
-						IMG:user.get("profile_pic"),
-						FULLNAME:user.get("fullname")
-					});
-					that.get('container').setHTML(Y.Lang.sub(template,{
-						user_name:user.get("fullname"),
-						user_id:user.get("_id")
-					}));
-					
-					that.get('container').append(new Y.SideBarMenuView().render().get('container'));
-					
-					
-				});
-				
-				return this;
-				
-			}
-		}) ; 
 		
 		Y.StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
 			containerTemplate:'<div id="statusblock"/>',
@@ -643,7 +369,7 @@ $this->load->view("common/header");
 					
  				});
 				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
+					var sidebar = new SideBarView();
 					con.one(".leftbar").setHTML(sidebar.render().get('container'));
 				 });
 				
@@ -679,7 +405,7 @@ $this->load->view("common/header");
 					
  				});
 				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
+					var sidebar = new SideBarView();
 					con.one(".leftbar").setHTML(sidebar.render().get('container'));
 				 });
 				Y.loadTemplate("profile",function(){ 
@@ -713,7 +439,7 @@ $this->load->view("common/header");
 					
  				});
 				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
+					var sidebar = new SideBarView();
 					con.one(".leftbar").setHTML(sidebar.render().get('container'));
 				 });
 				 
@@ -739,7 +465,7 @@ $this->load->view("common/header");
 					
  				});
 				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
+					var sidebar = new SideBarView();
 					con.one(".leftbar").setHTML(sidebar.render().get('container'));
 				 });
 				 
@@ -799,11 +525,11 @@ $this->load->view("common/header");
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').removeClass('hide');
 						}
-						/*if(this.get('model').get('author_id')===window.current_user)
+						if(this.get('model').get('author_id')===window.current_user)
 						{
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
-						}*/
+						}
 						
 						
 						
@@ -843,12 +569,7 @@ $this->load->view("common/header");
 					var topbar= new Y.TopBarView();
 					con.one(".topbar").setHTML(topbar.render().get('container'));
 					
- 				});
-				
-					
-				
-			
-				 
+ 				});				 
 				Y.loadTemplate("group",function(){ 
 					
 					var grp =  new Y.GroupPageView({model:group});
@@ -875,7 +596,7 @@ $this->load->view("common/header");
 					
  				});
 				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new Y.SideBarView();
+					var sidebar = new SideBarView();
 					con.one(".leftbar").setHTML(sidebar.render().get('container'));
 				});
 				Y.loadTemplate("wall",function(){ 
@@ -933,7 +654,7 @@ $this->load->view("common/header");
 		        homepage: {type: 'MainAppView', preserve:true },
 		        profile:  {type:'MainProfileView'},
 		        userpage: {type:'UserPageView',preserve:true },
-		        create_group: {type:'CreateGroupMainView',preserve:true},
+		        create_group: {type:'CreateGroupMainView',preserve:true}, 
 		        grouppage:{type:'GroupPageMainView',preserve:true},
 		        postpage:{type:'PostPage',preserve:false}
 		    },
@@ -943,7 +664,7 @@ $this->load->view("common/header");
 		        toParent: 'fade'
 		    }
 		});
-		Y.AppUI = AppUI;
+		window.AppUI = AppUI; 
 		AppUI.route('/', function (req) {
 		    this.showView('homepage',{expand:false,loadCommand:'stream'});
 		});

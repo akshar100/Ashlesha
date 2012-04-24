@@ -11,7 +11,7 @@ YUI().use('test-console','babe', function (Y) {
 	    testLogoLoaded : function (){
 	        var Assert = Y.Assert;
 	        this.wait(function(){
-	            Assert.isObject(Y.one(".brand"));
+	            Assert.isObject(Y.one(".brand"),"Logo failed load");
 	        }, 5000);
 	
 	    }
