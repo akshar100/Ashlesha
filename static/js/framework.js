@@ -2354,6 +2354,101 @@ YUI.add('babe', function (Y) {
 				
 			}
 		}) ; 
+    
+    var StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
+			containerTemplate:'<div id="statusblock"/>',
+			initializer:function(){
+				
+				
+				
+			},
+			hide:function(){
+				this.get('container').hide(true);
+			},
+			show:function(){
+				this.get('container').show(true);
+			},
+			expandForm:function(val){
+				if(val=="question"){
+							
+							var q = new Y.BABE.CreateQuestionView();
+							this.get('container').one(".forms").setContent(q.render().get('container'));
+							
+						}
+						if(val=="event"){
+							
+							var q = new Y.BABE.CreateEventView();
+							this.get('container').one(".forms").setContent(q.render().get('container'));
+						
+						}
+						if(val=="painpoint"){
+							
+							var q = new Y.BABE.CreatePostView();
+							this.get('container').one(".forms").setContent(q.render().get('container'));
+							
+						}
+			},
+			render:function(){
+				
+				
+				this.set('container',Y.Node.create('<div id="statusblock"/>'));
+				
+				this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(),{
+					user_name:Y.user.get("name"),
+					user_id:Y.user.get("user_id") 
+				}));
+				if(Y.config)
+				{
+					if(!Y.APPCONFIG.post_enabled)
+					{
+						this.get('container').one('a.post').addClass('hide');
+					}
+					if(!Y.APPCONFIG.event_enabled)
+					{
+						this.get('container').one('a.event').addClass('hide');
+					}
+					if(!Y.APPCONFIG.survey_enabled)
+					{
+						this.get('container').one('a.survey').addClass('hide');
+					}
+					if(!Y.APPCONFIG.question_enabled)
+					{
+						this.get('container').one('a.question').addClass('hide');
+					}
+				}
+	
+				this.get('container').one(".pills-status").all("a").on("click",function(e){
+						
+						var val = Y.one(e.target).get("rel");
+						
+						this.expandForm(val);	
+						
+					},this);
+				if(this.get('expand'))
+				{
+					this.expandForm(this.get('expand'));
+				}
+				return this;
+			}
+		});
+    
+    var InviteView =  Y.Base.create('statusblockview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		var c = this.get('container');
+    		c.setHTML(Y.one('#invite-users-box').getHTML());
+    		
+    		c.one(".nav-tabs").all('a').on('click',function (e) {
+			    e.preventDefault();
+			    Y.log(c.one('.tab-content').all('div.tab-pane'));
+			    c.one('.tab-content').all('div.tab-pane').removeClass('active');
+			    c.one('.tab-content').one("#"+e.target.get('rel')).addClass('active');
+			});
+    	},
+    	render:function(){
+    		return this;
+    	}
+    });
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -2471,7 +2566,9 @@ YUI.add('babe', function (Y) {
         CreateEventView: CreateEventView,
         GroupList: GroupList,
         WallView: WallView,
-        TopBarView:TopBarView
+        TopBarView:TopBarView,
+        StatusBlockView:StatusBlockView,
+        InviteView:InviteView
 
     };
 }, '0.0.1', {

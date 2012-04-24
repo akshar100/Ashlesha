@@ -38,6 +38,8 @@ $this->load->view("common/header");
 </script> 
 <?php $this->load->view('mixins/topbar'); ?>
 <?php $this->load->view('mixins/group'); ?>
+<?php $this->load->view("mixins/statusblock");?>
+<?php $this->load->view("mixins/wall");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
@@ -72,82 +74,7 @@ $this->load->view("common/header");
 		var SideBarView = Y.BABE.SideBarView;
 		
 		
-		Y.StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
-			containerTemplate:'<div id="statusblock"/>',
-			initializer:function(){
-				
-				
-				
-			},
-			hide:function(){
-				this.get('container').hide(true);
-			},
-			show:function(){
-				this.get('container').show(true);
-			},
-			expandForm:function(val){
-				if(val=="question"){
-							
-							var q = new Y.BABE.CreateQuestionView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-							
-						}
-						if(val=="event"){
-							
-							var q = new Y.BABE.CreateEventView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-						
-						}
-						if(val=="painpoint"){
-							
-							var q = new Y.BABE.CreatePostView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-							
-						}
-			},
-			render:function(){
-				
-				
-				this.set('container',Y.Node.create('<div id="statusblock"/>'));
-				
-				this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(),{
-					user_name:Y.user.get("name"),
-					user_id:Y.user.get("user_id")
-				}));
-				if(Y.config)
-				{
-					if(!Y.APPCONFIG.post_enabled)
-					{
-						this.get('container').one('a.post').addClass('hide');
-					}
-					if(!Y.APPCONFIG.event_enabled)
-					{
-						this.get('container').one('a.event').addClass('hide');
-					}
-					if(!Y.APPCONFIG.survey_enabled)
-					{
-						this.get('container').one('a.survey').addClass('hide');
-					}
-					if(!Y.APPCONFIG.question_enabled)
-					{
-						this.get('container').one('a.question').addClass('hide');
-					}
-				}
-	
-				this.get('container').one(".pills-status").all("a").on("click",function(e){
-						
-						var val = Y.one(e.target).get("rel");
-						
-						this.expandForm(val);	
-						
-					},this);
-				if(this.get('expand'))
-				{
-					this.expandForm(this.get('expand'));
-				}
-				return this;
-			}
-		});
+		
 		Y.showAlert = function(head,body){
 			if(Y.one("#modal-from-dom")){ Y.one("#modal-from-dom").remove();}
 			var alertMarkup = Y.Lang.sub(Y.one("#messagebox").getContent(),{ HEADING: head , BODY:body});
@@ -374,7 +301,7 @@ $this->load->view("common/header");
 				 });
 				
 				Y.loadTemplate("statusblock",function(){
-					var statusblock = new Y.StatusBlockView({expand:expand}); 
+					var statusblock = new Y.BABE.StatusBlockView({expand:expand}); 
 					con.one('.status-bar-area').setHTML(statusblock.render().get('container'));
 					that.set('statusbar',statusblock); 
 					if(that.get('expand'))
@@ -486,6 +413,8 @@ $this->load->view("common/header");
 				
 				this.set('sidebar',Y.Node.create('<div/>')); 
 				this.set('relation',new Y.BABE.RelationshipModel());
+				this.set('statusbar',new Y.BABE.StatusBlockView());
+				this.set('wall',new Y.BABE.WallView({loadCommand:'wallposts'}));
 				var r = this.get('relation'),m=this.get('model');
 				
 				
@@ -504,6 +433,18 @@ $this->load->view("common/header");
 						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100'
 						
 					}));
+					this.get('container').one(".status-block").setHTML(this.get('statusbar').render().get('container'));
+					this.get('container').one(".wall").setHTML(this.get('wall').render().get('container'));
+					this.get('sidebar').one('#invite').on('click',function(){
+							if(Y.one('#invite-box')) { Y.one('#invite-box').remove(); }
+							Y.one('body').append(Y.one('#invite-group-members').getHTML());
+						    jQuery('#invite-box').modal('show');
+						    Y.one('#invite-box').one('.modal-body').setHTML(new Y.BABE.InviteView().render().get('container'));
+							Y.one('#invite-box').all('.close').on('click',function(){
+								Y.one('#invite-box').destroy();
+							});
+						
+					},this);
 					this.get('container').one('.join-btn').on('click',function(){
 							r.set('relationship','member');
 							r.save();
@@ -534,6 +475,7 @@ $this->load->view("common/header");
 						
 						
 					},this);
+				
 				r.set('resource_id',m.get("_id"));
 				r.set('owner_id',window.current_user);
 				this.get('model').load({},function(){

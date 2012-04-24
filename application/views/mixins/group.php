@@ -115,4 +115,43 @@
 			<hr/>
 		</div>
 	</div>
+	<div class="row-fluid">
+		<div class="span12 status-block">
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 wall">
+			
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="invite-group-members">
+	    <div class="modal" id="invite-box">
+		    <div class="modal-header">
+		    <button class="close" data-dismiss="modal">×</button>
+		    <h3>Invite Users</h3>
+		    </div>
+		    <div class="modal-body">
+		    </div>
+		    <div class="modal-footer">
+		    <a href="#" class="btn btn-primary">Send Invite</a>
+		    </div>
+    	</div>
+</script>
+<script type="text/x-template" id="invite-users-box">
+	
+	<ul class="nav nav-tabs" id="">
+		<li class="active"><a href="#" rel="email">By Email</a></li>
+		<li><a href="#" rel="connections">Your Connections</a></li>
+		<li><a href="#" rel="fb">Via Facebook</a></li>
+	</ul>
+	 
+	<div class="tab-content">
+		<div class="tab-pane active" id="email">
+			<textarea cols="60" placeholder="enter one email address per line..."></textarea>
+		</div>
+		<div class="tab-pane" id="connections">Connections</div>
+		<div class="tab-pane" id="fb">Facebook</div>
+	</div>
+ 
 </script>

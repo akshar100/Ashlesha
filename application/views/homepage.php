@@ -83,11 +83,8 @@ $this->load->view("common/header");
 
     </div> <!-- /container -->
     <hr/>
-	 <footer>
-        <p>&copy; BrandABrand.com 2012</p>
-
-     </footer>
-  <script src="./static/js/framework.js"> </script>
+  <?php $this->load->view("common/footer"); ?>
+  <script src="<?php echo base_url();?>/static/js/framework.js"> </script>
   <script>
   	var baseURL = "<?php echo base_url();?>";
   	YUI().use('babe',function(Y){
@@ -106,6 +103,7 @@ $this->load->view("common/header");
   		});
   	});
   </script>
+  <?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?>
   </body>
 </html>
 
