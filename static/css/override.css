@@ -168,3 +168,8 @@ img.profile-image
 {
 	padding:10px;
 }
+#log .yui3-console-filter-label
+{
+	display:inline;
+	float:left;
+}

@@ -57,9 +57,9 @@ $this->load->view("common/header");
           		</div>
           		<div class="row-fluid">
           			<div class="span7"><button class="btn btn-primary" type="submit">SignIn</button>
-          				&nbsp; <?php  if($this->config->item('open_id_facebook')) { echo anchor('in/facebook_login',img(array("src"=>'static/images/facebook16.png')),array()); } ?> &nbsp;
-          				<?php if($this->config->item('open_id_google')) { echo anchor('in/google_login',img(array("src"=>'static/images/google16.png')),array()); } ?>&nbsp;
-          				<?php if($this->config->item('open_id_yahoo')) { echo anchor('in/yahoo_login',img(array("src"=>'static/images/yahoo16.png')),array()); } ?> 
+          				&nbsp; <?php  if($this->config->item('open_id_facebook')) { echo anchor('in/facebook_login',img(array("src"=>'static/images/facebook16.png')),array("class"=>'facebook_login')); } ?> &nbsp;
+          				<?php if($this->config->item('open_id_google')) { echo anchor('in/google_login',img(array("src"=>'static/images/google16.png')),array("class"=>'google_login')); } ?>&nbsp;
+          				<?php if($this->config->item('open_id_yahoo')) { echo anchor('in/yahoo_login',img(array("src"=>'static/images/yahoo16.png')),array("class"=>'yahoo_login')); } ?> 
           				</div><div class="span4"> <a id="forgot-password-link" href="#">Forgot Password?</a></div>
           		</div>
           		
@@ -103,7 +103,15 @@ $this->load->view("common/header");
   		});
   	});
   </script>
-  <?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?>
+  <?php if($this->config->item('ui_test_enabled')){?>
+  	<div id="log"></div>
+  	<script>
+  		var facebook_login = <?php echo json_encode($this->config->item('open_id_facebook')); ?>;
+  		var yahoo_login = <?php echo json_encode($this->config->item('open_id_yahoo')); ?>;
+  		var google_login = <?php echo json_encode($this->config->item('open_id_google')); ?>;
+  	</script>
+  	<script src="<?php echo base_url();?>/static/js/test.js?<?php echo rand();?>"></script>
+  <?php }?>
   </body>
 </html>
 
