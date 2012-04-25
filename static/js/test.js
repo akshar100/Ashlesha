@@ -53,8 +53,20 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	    	},1000);
 	    	
 	    	
-	    	
+	    },
+	    testNotificationList:function(){
+	    	var n = new Y.BABE.NotificationList(); 
+	    	n.load({
+	    		name:'notificationlist'
+	    	}); 
+	    	this.wait(function(){
+	    		n.each(function (item, index) {
+	    			Assert.areEqual(window.current_user,item.get('target_user'),"Wrong notifications");
+	    			Assert.isFalse(item.get('read'),"Stale notifications");
+	    		});
+	    	},2000);
 	    }
+	    
 	    
 	
 	});

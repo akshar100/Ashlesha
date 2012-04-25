@@ -595,7 +595,7 @@ $this->load->view("common/header");
 		    views: {
 		        homepage: {type: 'MainAppView', preserve:true },
 		        profile:  {type:'MainProfileView'},
-		        userpage: {type:'UserPageView',preserve:true },
+		        userpage: {type:'UserPageView',preserve:false },
 		        create_group: {type:'CreateGroupMainView',preserve:true}, 
 		        grouppage:{type:'GroupPageMainView',preserve:true},
 		        postpage:{type:'PostPage',preserve:false}

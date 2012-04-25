@@ -578,8 +578,8 @@ class DBA
 			'connect_confirm'=>((isset($source_user['connections'][$target_user['_id']]) && $data['target_connects_source'])?$source_user['connections'][$target_user['_id']]['connects']:false)
 		);
 		
-		$this->ci->dba->update_user($source_user);
-		$this->ci->dba->update_user($target_user);
+		$this->update($source_user);
+		$this->update($target_user);
 		echo json_encode($data);
 	}
 	

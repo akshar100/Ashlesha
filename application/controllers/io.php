@@ -109,7 +109,8 @@ class IO extends CI_Controller {
 			"tags"=>array("map"=>read_file("./application/views/json/tags_map.js"),"reduce"=>read_file("./application/views/json/tags_reduce.js")),
 			"all_sectors"=>array("map"=>read_file("./application/views/json/all_sector.js")),
 			"user_groups"=>array("map"=>read_file("./application/views/json/user_groups.js")),
-			"users_by_otp"=>array("map"=>read_file("./application/views/json/user_by_otp.js")), 
+			"users_by_otp"=>array("map"=>read_file("./application/views/json/user_by_otp.js")),
+			"get_notifications"=>array("map"=>read_file("./application/views/json/get_all_notifications.js")),
 		);
 		$this->chill->post($doc); 
 		echo "updated";
@@ -289,6 +290,22 @@ class IO extends CI_Controller {
 	{
 		$id = $this->input->post('_id');
 		echo json_encode($this->dba->get($id));
+	}
+	
+	function notifications()
+	{
+		$response = $this->chill->getView("posts","get_notifications",NULL,array(
+			"key"=>$this->user->get_current(),
+			"descending"=>true,
+			"limit"=>10,
+		));
+		
+		$output = array();
+		foreach($response['rows'] as $row)
+		{
+			$output[]= $response['rows'];
+		}
+		echo json_encode($output);
 	}
 	
 }

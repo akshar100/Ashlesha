@@ -261,6 +261,7 @@ class In extends CI_Controller {
 		echo json_encode($this->dba->all_sector_list());
 	}
 	
+	
 }
 
 /* End of file welcome.php */

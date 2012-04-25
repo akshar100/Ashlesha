@@ -7,6 +7,21 @@ YUI.add('babe', function (Y) {
 
     function listSync(action, options, callback) {
 
+		if(options.name=="notificationlist" && action=="read")
+		{
+			Y.io(baseURL + 'io/notifications', {
+                method: 'GET',
+                on: {
+                    success: function (i, o, a) {
+                        var data = Y.JSON.parse(o.responseText);
+                        callback(null, data);
+                    }
+                }
+            });
+
+            return;
+		}
+
         if (options.name == "commentlist" && action == "read") {
             Y.io(baseURL + 'in/comments', {
                 method: 'POST',
@@ -291,7 +306,7 @@ YUI.add('babe', function (Y) {
             if (action == "update") {
 
                 var data = this.toJSON();
-
+				delete data.connections;
                 Y.io(baseURL + 'io/update_user', {
                     method: 'POST',
                     data: data,
@@ -2550,7 +2565,23 @@ YUI.add('babe', function (Y) {
     	,linked_resource:{value:''}
     	,type:{value:'notification'}
     	,created_at:{value:''}
+    	,read:{value:false}
     	
+    });
+    var NotificationList = Y.Base.create('notificationlist', Y.ModelList, [], {
+	 	sync:listSync,
+	 	model:NotificationModel
+	 	
+	});
+    
+    var NotificationView = Y.Base.create('notificationview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		
+    	},
+    	render:function(){
+    		return this;
+    	}
     });
     
     Y.BABE = {
@@ -2673,7 +2704,8 @@ YUI.add('babe', function (Y) {
         TopBarView:TopBarView,
         StatusBlockView:StatusBlockView,
         InviteView:InviteView,
-        NotificationModel:NotificationModel
+        NotificationModel:NotificationModel,
+        NotificationList:NotificationList 
 
     };
 }, '0.0.1', {
