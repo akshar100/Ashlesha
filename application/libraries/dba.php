@@ -660,6 +660,11 @@ class DBA
 		return $this->chill->put($data['_id'],$data);
 	}
 	
+	function create($data)
+	{
+		return $this->chill->post($data);
+	}
+	
 	function get($id)
 	{
 		return $this->chill->get($id);

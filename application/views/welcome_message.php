@@ -50,7 +50,7 @@ $this->load->view("common/header");
 </script>
 <?php $this->load->view("mixins/wall"); ?> 
 <script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>
-<?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?>
+
 <script>
 
 	var baseURL = "<?php echo base_url();?>";
@@ -377,7 +377,7 @@ $this->load->view("common/header");
 		        return this;
 		    }
 		});
-		
+
 		Y.CreateGroupMainView = Y.Base.create('CreateGroupMainView', Y.View, [], {
 			containerTemplate:'<div/>',
 		    render: function () {
@@ -670,6 +670,6 @@ $this->load->view("common/header");
     
     
     
-   
+<?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?> 
 </body>
 </html>

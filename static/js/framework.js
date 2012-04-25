@@ -126,7 +126,7 @@ YUI.add('babe', function (Y) {
         var data = this.toJSON();
         if (data._id == 0) {
             action = "create";
-
+			
         }
 
         if (this.name == "postModel" || this.name == "eventModel" || this.name == "questionModel") {
@@ -435,6 +435,63 @@ YUI.add('babe', function (Y) {
                 });
             }
         }
+    	
+    	if(this.name =="notificationModel")
+    	{
+    		var model = this;
+            if (action == "create") {
+
+                var data = this.toJSON();
+
+                Y.io(baseURL + 'io/create_notification', {
+                    method: 'POST', 
+                    data: data,
+                    on: {
+                        success: function (i, o, a) {
+                            var response = Y.JSON.parse(o.responseText);
+                            if (response) {
+                                model.setAttrs(response);
+                                callback(null, response);
+                            } else {
+                                callback(response.error);
+                            }
+                        }
+                    }
+                });
+
+                return;
+            }
+            if (action == "read") {
+                var data = this.toJSON();
+                Y.io(baseURL + 'io/get_notification/', {
+                    method: 'POST',
+                    data: data,
+                    on: {
+                        success: function (i, o, a) {
+                            var response = Y.JSON.parse(o.responseText);
+                            for (var k in response) {
+                                if (response[k] == "false") {
+                                    response[k] = false;
+                                }
+                                if (response[k] == "true") {
+                                    response[k] = true;
+                                }
+                            }
+                            if (response) {
+                                model.setAttrs(response);
+                                callback(null, response);
+                            }
+
+                            
+
+                        }
+                    }
+                });
+                return;
+            }
+    	}
+    
+    
     }
     var sanitizeUI = function () {
             Y.one("#maincontainer").setContent(Y.one("#main").getContent());
@@ -616,27 +673,28 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#follow_user").set("data-content", "You will stop seeing activity of this user on your homepage.");
                 this.get('container').one("#follow_user").set("data-original-title", "Unfollow");
                 this.get('container').one("#follow_user").removeClass("btn-success").addClass("btn-warning");
-                $(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
                     placement: 'bottom'
                 });
+               
+                
+                
             } else if (this.connection.get('target_follows_source')) {
                 this.get('container').one("#follow_user").set("innerHTML", '<i class="icon-white icon-eye-open"></i> Follow Back');
                 this.get('container').one("#follow_user").set("data-content", "This user is already following you. You might want to return the gesture.");
                 this.get('container').one("#follow_user").set("data-original-title", "Follow Back");
                 this.get('container').one("#follow_user").removeClass("btn-warning").addClass("btn-success");
-                $(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
                     placement: 'bottom'
                 });
             }
-
-
 
             if (this.connection.isFriend()) {
                 this.get('container').one("#connect_user").set("innerHTML", '<i class="icon-white icon-minus"></i> Disconnect');
                 this.get('container').one("#connect_user").set("data-content", "You will not be able to share private stuff anymore.");
                 this.get('container').one("#connect_user").set("data-original-title", "Disconnect");
                 this.get('container').one("#connect_user").removeClass("btn-success").addClass("btn-warning");
-                $(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
                     placement: 'bottom'
                 });
             } else if (this.connection.requestedFriend()) {
@@ -644,27 +702,60 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#connect_user").set("data-content", "This user has sent you a connection request. You want to accept it ?");
                 this.get('container').one("#connect_user").set("data-original-title", "Accept Connection");
                 this.get('container').one("#connect_user").removeClass("btn-warning").addClass("btn-success");
-                $(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
                     placement: 'bottom'
                 });
+                
             } else if (this.connection.requestPending()) {
                 this.get('container').one("#connect_user").set("innerHTML", '<i class="icon-white icon-minus"></i> Withdraw Request');
                 this.get('container').one("#connect_user").set("data-content", "This person has not yet accepted your Connect Request");
                 this.get('container').one("#connect_user").set("data-original-title", "Disconnect");
                 this.get('container').one("#connect_user").removeClass("btn-success").addClass("btn-warning");
-                $(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
+                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
                     placement: 'bottom'
                 });
+                
             }
 
             this.get('container').one("#connect_user").on('click', function () {
                 this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
                 this.connection.save();
+                if (this.connection.requestedFriend()) {
+	                var notify = new NotificationModel({
+	                	target_user:this.get('model').get('_id'),
+	                	notification_action:'friend_request',
+	                	linked_resource:''
+	                });
+	                notify.save();
+                }
+                if (this.connection.requestPending()) {
+                	
+            		var notify = new NotificationModel({
+	                	target_user:this.get('model').get('_id'),
+	                	notification_action:'friend',
+	                	linked_resource:''
+                	});
+                	notify.save(); 
+                	
+                	
+                }
+                
+                
             }, this);
 
             this.get('container').one("#follow_user").on('click', function () {
                 this.connection.set('source_follows_target', !this.connection.get('source_follows_target'));
                 this.connection.save();
+                if(!this.connection.get('source_follows_target'))
+                {
+                		var notify = new NotificationModel({
+		                	target_user:this.get('model').get('_id'),
+		                	notification_action:'friend',
+		                	linked_resource:''
+	                	});
+	                	notify.save();
+                }
+                	
             }, this);
 
 
@@ -2432,7 +2523,7 @@ YUI.add('babe', function (Y) {
 			}
 		});
     
-    var InviteView =  Y.Base.create('statusblockview', Y.View, [], {
+    var InviteView =  Y.Base.create('inviteview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){
     		var c = this.get('container');
@@ -2440,7 +2531,6 @@ YUI.add('babe', function (Y) {
     		
     		c.one(".nav-tabs").all('a').on('click',function (e) {
 			    e.preventDefault();
-			    Y.log(c.one('.tab-content').all('div.tab-pane'));
 			    c.one('.tab-content').all('div.tab-pane').removeClass('active');
 			    c.one('.tab-content').one("#"+e.target.get('rel')).addClass('active');
 			});
@@ -2449,6 +2539,20 @@ YUI.add('babe', function (Y) {
     		return this;
     	}
     });
+    
+    var NotificationModel = Y.Base.create('notificationModel',Y.Model,[],{
+    	 sync: modelSync,
+         idAttribute: '_id',
+    },{
+    	source_user:{value:window.current_user}
+    	,target_user:{value:''}
+    	,notification_action:{value:''}
+    	,linked_resource:{value:''}
+    	,type:{value:'notification'}
+    	,created_at:{value:''}
+    	
+    });
+    
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -2568,7 +2672,8 @@ YUI.add('babe', function (Y) {
         WallView: WallView,
         TopBarView:TopBarView,
         StatusBlockView:StatusBlockView,
-        InviteView:InviteView
+        InviteView:InviteView,
+        NotificationModel:NotificationModel
 
     };
 }, '0.0.1', {

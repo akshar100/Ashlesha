@@ -1,6 +1,7 @@
 YUI().use('test-console','babe','event','node-event-simulate', function (Y) { 
     
     Y.namespace("btest.ui");
+    var Assert = Y.Assert;
     Y.btest.ui.HomePage = new Y.Test.Case({
 	    name : "Homepage Test",
 	    setUp : function () {
@@ -9,16 +10,55 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	      
 	    },
 	    testLogoLoaded : function (){
-	        var Assert = Y.Assert;
+	        
 	        this.wait(function(){
 	            Assert.isObject(Y.one(".brand"),"Logo failed load");
-	        }, 5000);
+	        }, 1000);
 	
 	    },
+	    testTopbar:function(){
+	    	 this.wait(function(){
+	            Assert.isObject(Y.one("a#edit-profile").ancestor("div.btn-group").one("a.dropdown-toggle"),"Edit Profile Dropdown Present");
+	            Y.one("a#edit-profile").ancestor("div.btn-group").one("a.dropdown-toggle").simulate('click');
+	            Assert.isObject(Y.one("a#edit-profile"),"Edit profile link present");
+	            //Y.one("a#edit-profile").simulate('click');
+	            Assert.isObject(Y.one("a#notification-btn"),"Edit profile link present");
+	        }, 2000);
+	        
+	    },
+	    testNotifications:function(){
+	    	var target_user = 'testuser',notification_action='friend';
+	    	var notify = new Y.BABE.NotificationModel({
+	    		source_user:window.current_user,
+	    		target_user:target_user,
+	    		notification_action:notification_action
+	    	});
+	    	notify.save();
+	    	this.wait(function(){  
+	    		
+	    		Assert.isNotNull(notify.get('_id'),"Notification may not have saved");
+	    		var id = notify.get('_id');
+	    		var notify2 = new Y.BABE.NotificationModel({
+	    			'_id':id
+	    		});
+	    		notify2.get('_id');
+	    		notify2.load();
+	    		this.wait(function(e){
+	    			console.log(notify2.toJSON());
+	    			Assert.areEqual(target_user,notify2.get('target_user'),"Notification not retrived ");
+	    			Assert.areEqual(notification_action,notify2.get('notification_action'),"Notification not retrived");
+	    		},1000);
+	    		
+	    		
+	    	},1000);
+	    	
+	    	
+	    	
+	    }
 	    
 	
 	});
-	 Y.btest.ui.LandingPage = new Y.Test.Case({
+	Y.btest.ui.LandingPage = new Y.Test.Case({
 	    name : "Landing Page Test",
 	    setUp : function () {
 	    },
@@ -26,14 +66,14 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	      
 	    },
 	    testLogoLoaded : function (){
-	        var Assert = Y.Assert;
+	        
 	        this.wait(function(){
 	            Assert.isObject(Y.one(".brand"),"Logo failed load");
 	        }, 1000);
 	
 	    },
 	    testLoginBox : function (){
-	        var Assert = Y.Assert;
+	        
 	        this.wait(function(){
 	            Assert.isObject(Y.one("#username"),"Username Textbox not present");
 	            Assert.isObject(Y.one("#password"),"Password box not present");
@@ -54,7 +94,7 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	
 	    },
 	    testSignupBox:function (){
-	        var Assert = Y.Assert;
+	        
 	        this.wait(function(){
 	        	var c = Y.one("#signupform");
 	            Assert.isObject(c.one("#username"),"Username Textbox not present");
@@ -81,7 +121,7 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 			            c.one("button[type=submit]").simulate('click');
 			            this.wait(function(){
 			            	Assert.isFalse(c.one("#username").ancestor("div.control-group").hasClass('error'),"Username is empty but no error thrown");
-			            	Assert.isFalse(c.one("#password").ancestor("div.control-group").hasClass('error'),"Password is empty but no error thrown");
+			            	Assert.isFalse(c.one("#password").ancestor("div.control-group").hasClass('error'),"Password is empty but no error thrown.");
 			            	Assert.isTrue(c.one("#email").ancestor("div.control-group").hasClass('error'),"Email is empty but no error thrown");
 			            	Assert.isTrue(c.one("#fullname").ancestor("div.control-group").hasClass('error'),"Fullname is empty but no error thrown");
 			            	c.one('#email').set("value","akshar"+Math.random()+"@akshar.co.in");
@@ -91,14 +131,14 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 				            	Assert.isFalse(c.one("#password").ancestor("div.control-group").hasClass('error'),"Password is empty but no error thrown");
 				            	Assert.isFalse(c.one("#email").ancestor("div.control-group").hasClass('error'),"Email is empty but no error thrown");
 				            	Assert.isTrue(c.one("#fullname").ancestor("div.control-group").hasClass('error'),"Fullname is empty but no error thrown");
-				            },2000);
+				            },2500);
 			            	
 			            	
-			            },2000);
+			            },2500);
 	           		 
-	           		 },2000);
+	           		 },2500);
 	            
-	            },2000);
+	            },2500);
 	           
 	            
 	            
@@ -119,10 +159,14 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 		Y.Test.Runner.add(Y.btest.ui.LandingPage);
 	}
 	
-    new Y.Test.Console({ newestOnTop : true,
+	setTimeout(function(){
+		new Y.Test.Console({ newestOnTop : true,
         filters: {
             pass: true,
             fail: true
-        }}).render('#log');
+     }}).render('#log');
     Y.Test.Runner.run();
+		
+	},3000);
+    
 });

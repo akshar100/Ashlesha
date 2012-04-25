@@ -274,6 +274,22 @@ class IO extends CI_Controller {
 	{
 		echo json_encode($this->dba->delete($this->input->post('_id')));
 	}
+
+	function create_notification()
+	{
+		$post = $this->input->post();
+		$post['type'] = 'notification';
+		$post['created_at'] = time();
+		unset($post['_id']);
+		$response = $this->dba->create($post);
+		echo json_encode($response);
+	}
+	
+	function get_notification()
+	{
+		$id = $this->input->post('_id');
+		echo json_encode($this->dba->get($id));
+	}
 	
 }
 
