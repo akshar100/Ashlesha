@@ -170,6 +170,5 @@ img.profile-image
 }
 #log .yui3-console-filter-label
 {
-	display:inline;
-	float:left;
+	display:none;
 }

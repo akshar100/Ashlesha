@@ -761,7 +761,7 @@ YUI.add('babe', function (Y) {
             this.get('container').one("#follow_user").on('click', function () {
                 this.connection.set('source_follows_target', !this.connection.get('source_follows_target'));
                 this.connection.save();
-                if(!this.connection.get('source_follows_target'))
+                if(this.connection.get('source_follows_target'))
                 {
                 		var notify = new NotificationModel({
 		                	target_user:this.get('model').get('_id'),
@@ -2577,6 +2577,22 @@ YUI.add('babe', function (Y) {
     var NotificationView = Y.Base.create('notificationview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){
+    		var c = this.get('container'),m=this.get('m');
+    		m.on('load',function(){
+    			c.setHTML(Y.Lang.sub(Y.one('#notification-row-'+m.get('notification_action')).getHTML(),{
+    				SOURCE_USER:m.get('source_user')
+    			}));
+    			c.one('.close').on('click',function(){
+    				m.set('read',true);
+    				m.save();
+    			});
+    		},this);
+    		m.on('change',function(){
+    			if(m.get('read'))
+    			{
+    				c.remove();
+    			}
+    		},this);
     		
     	},
     	render:function(){

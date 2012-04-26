@@ -47,10 +47,10 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	    			console.log(notify2.toJSON());
 	    			Assert.areEqual(target_user,notify2.get('target_user'),"Notification not retrived ");
 	    			Assert.areEqual(notification_action,notify2.get('notification_action'),"Notification not retrived");
-	    		},1000);
+	    		},2000);
 	    		
 	    		
-	    	},1000);
+	    	},2000);
 	    	
 	    	
 	    },
