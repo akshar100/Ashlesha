@@ -48,7 +48,7 @@
 		<div class="span11">
 			
 			<blockquote><p>{TEXT}</p><small>{AUTHOR}</small></blockquote></div>
-			
+			<span class='delete-link hide'><a href='#'>Delete</a></span>
 		</div>
 	</div>
 </script>

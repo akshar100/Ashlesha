@@ -40,7 +40,8 @@ class Welcome extends CI_Controller {
 				'survey_enabled'=> $this->config->item('survey_enabled'),
 				'post_enabled' => $this->config->item('post_enabled'),
 				'post_sector_enabled' =>$this->config->item('post_sector_enabled'), 
-				'notifications_enabled' =>$this->config->item('notifications_enabled')
+				'notifications_enabled' =>$this->config->item('notifications_enabled'),
+				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled')
 			);
 			$this->load->view('welcome_message',array(
 				'config'=>$config

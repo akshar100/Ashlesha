@@ -110,13 +110,24 @@ $this->load->view("common/header");
 				var form = null; 
 				if(this.get('container').one(".commentsForm")){form = this.get('container').one(".commentsForm").remove(); }
 				var that = this;
-				
-				that.get('container').append(Y.Lang.sub(that.template,{
+				var c = Y.Node.create('<div/>');
+				c.setHTML(Y.Lang.sub(that.template,{
 					TEXT:e.model.get("comment"),
 					AUTHOR:e.model.get("author"),
 					IMG:baseURL+'in/profile_pic/'+e.model.get("author_id")
 				}));
-				
+				that.get('container').append(c);
+				if(e.model.get("author_id")==window.current_user)
+				{
+					e.model.on('destroy',function(){
+						c.remove();
+					});
+					c.one('.delete-link').removeClass('hide');
+					c.one('.delete-link').on('click',function(ev){
+						ev.halt();
+						e.model.destroy({remove:true});
+					});
+				}
 				
 				if(form){
 					this.get('container').append(form);

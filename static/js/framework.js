@@ -303,6 +303,27 @@ YUI.add('babe', function (Y) {
                 //THIS NEEDS TO BE INSIDE AN AJAX CALL
                 return;
             }
+             if (action == 'delete') {
+                var model = this;
+                var data = this.toJSON()
+                Y.io(baseURL + 'io/delete_model/', {
+                    method: 'POST',
+                    data: {
+                        '_id': data['_id']
+                    },
+                    on: {
+                        success: function (i, o, a) {
+                            var response = Y.JSON.parse(o.responseText);
+                            if (response) {
+                                model.setAttrs(response);
+                            }
+
+                            callback(null, model.toJSON());
+
+                        }
+                    }
+                });
+            }
 
         }
 
@@ -2217,7 +2238,7 @@ YUI.add('babe', function (Y) {
 						 AppUI.navigate('/notifications');
 						 e.preventDefault(); 
 					});
-					if(!window.nl)
+					if(!window.nl && Y.APPCONFIG.push_notifications_enabled)
 					{
 						window.nl = new NotificationList();
 						var sr = setInterval(function(){
