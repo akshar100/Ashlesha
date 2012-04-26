@@ -14,6 +14,11 @@ YUI.add('babe', function (Y) {
                 on: {
                     success: function (i, o, a) {
                         var data = Y.JSON.parse(o.responseText);
+                        for(var i in data)
+                        {
+                        	data[i]['id'] = data[i]['_id'];
+                        
+                        }
                         callback(null, data);
                     }
                 }
@@ -454,7 +459,7 @@ YUI.add('babe', function (Y) {
     	if(this.name =="notificationModel")
     	{
     		var model = this;
-            if (action == "create") {
+            if (action == "create" || action =="update") {
 
                 var data = this.toJSON();
 
@@ -688,9 +693,6 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#follow_user").set("data-content", "You will stop seeing activity of this user on your homepage.");
                 this.get('container').one("#follow_user").set("data-original-title", "Unfollow");
                 this.get('container').one("#follow_user").removeClass("btn-success").addClass("btn-warning");
-                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
-                    placement: 'bottom'
-                });
                
                 
                 
@@ -699,9 +701,7 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#follow_user").set("data-content", "This user is already following you. You might want to return the gesture.");
                 this.get('container').one("#follow_user").set("data-original-title", "Follow Back");
                 this.get('container').one("#follow_user").removeClass("btn-warning").addClass("btn-success");
-                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
-                    placement: 'bottom'
-                });
+               
             }
 
             if (this.connection.isFriend()) {
@@ -717,44 +717,44 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#connect_user").set("data-content", "This user has sent you a connection request. You want to accept it ?");
                 this.get('container').one("#connect_user").set("data-original-title", "Accept Connection");
                 this.get('container').one("#connect_user").removeClass("btn-warning").addClass("btn-success");
-                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
-                    placement: 'bottom'
-                });
+               
                 
             } else if (this.connection.requestPending()) {
                 this.get('container').one("#connect_user").set("innerHTML", '<i class="icon-white icon-minus"></i> Withdraw Request');
                 this.get('container').one("#connect_user").set("data-content", "This person has not yet accepted your Connect Request");
                 this.get('container').one("#connect_user").set("data-original-title", "Disconnect");
                 this.get('container').one("#connect_user").removeClass("btn-success").addClass("btn-warning");
-                jQuery(this.get('container').all('button[rel=popover]').getDOMNodes()).popover({
-                    placement: 'bottom'
-                });
+                
                 
             }
 
             this.get('container').one("#connect_user").on('click', function () {
-                this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
-                this.connection.save();
+                
                 if (this.connection.requestedFriend()) {
 	                var notify = new NotificationModel({
+	                	source_user:window.current_user,
 	                	target_user:this.get('model').get('_id'),
 	                	notification_action:'friend_request',
-	                	linked_resource:''
+	                	linked_resource:'',
+	                	mark_read:''
 	                });
 	                notify.save();
                 }
                 if (this.connection.requestPending()) {
                 	
             		var notify = new NotificationModel({
+            			source_user:window.current_user,
 	                	target_user:this.get('model').get('_id'),
 	                	notification_action:'friend',
-	                	linked_resource:''
+	                	linked_resource:'',
+	                	mark_read:''
                 	});
                 	notify.save(); 
                 	
                 	
                 }
-                
+                this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
+                this.connection.save(); 
                 
             }, this);
 
@@ -764,9 +764,11 @@ YUI.add('babe', function (Y) {
                 if(this.connection.get('source_follows_target'))
                 {
                 		var notify = new NotificationModel({
+                			source_user:window.current_user,
 		                	target_user:this.get('model').get('_id'),
-		                	notification_action:'friend',
-		                	linked_resource:''
+		                	notification_action:'follow',
+		                	linked_resource:'',
+	                		mark_read:'' 
 	                	});
 	                	notify.save();
                 }
@@ -2190,15 +2192,16 @@ YUI.add('babe', function (Y) {
         }
     });
 
-	var TopBarView= Y.Base.create('topbarview', Y.View, [], {
+	var TopBarView = Y.Base.create('topbarview', Y.View, [], {
 			containerTemplate:'<div/>',
 			initializer:function()
 			{
 				
+				
 			},
 			render:function()
 			{
-
+				var that = this;
 				this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(),{
 					user_name:Y.userModel.get("fullname"),
 					user_id:Y.userModel.get("user_id")
@@ -2207,12 +2210,40 @@ YUI.add('babe', function (Y) {
 				{
 					this.get('container').one("#notification-btn").addClass('hide');
 				}
-				this.get('container').one("#notification-btn").on("click",function(){
+				else
+				{
+				
+					this.get('container').one("#notification-btn").on("click",function(e){
+						 AppUI.navigate('/notifications');
+						 e.preventDefault(); 
+					});
+					if(!window.nl)
+					{
+						window.nl = new NotificationList();
+						var sr = setInterval(function(){
+							nl.load({name:'notificationlist'},function(){
+								if(!that.get('container')) { clearInterval(sr); }
+								if(that.get('container').one("#notification-btn").one('.badge'))
+								{ 
+									that.get('container').one("#notification-btn").one('.badge').remove();
+								}
+								if(nl.size()>0)
+								{
+									that.get('container').one("#notification-btn").append(' <span class="badge badge-error">'+nl.size()+'</span>');
+									
+								}
+							});
+						},5000);
+						this.on('destroy',function(){
+							clearInterval(sr);
+						});
+					}
 					
-				});
+					
+				}
 				this.get('container').one("a.brand").on("click",function(e){
 					AppUI.navigate("/");
-					e.preventDefault();
+					e.preventDefault(); 
 				});
 				this.get('container').one("#edit-profile").on("click",function(e){
 					AppUI.navigate("/me");
@@ -2559,13 +2590,14 @@ YUI.add('babe', function (Y) {
     	 sync: modelSync,
          idAttribute: '_id',
     },{
-    	source_user:{value:window.current_user}
+    	'_id':{value:''} 
+    	,source_user:{value:window.current_user}
     	,target_user:{value:''}
     	,notification_action:{value:''}
     	,linked_resource:{value:''}
     	,type:{value:'notification'}
     	,created_at:{value:''}
-    	,read:{value:false}
+    	,mark_read:{value:''}
     	
     });
     var NotificationList = Y.Base.create('notificationlist', Y.ModelList, [], {
@@ -2577,18 +2609,9 @@ YUI.add('babe', function (Y) {
     var NotificationView = Y.Base.create('notificationview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){
-    		var c = this.get('container'),m=this.get('m');
-    		m.on('load',function(){
-    			c.setHTML(Y.Lang.sub(Y.one('#notification-row-'+m.get('notification_action')).getHTML(),{
-    				SOURCE_USER:m.get('source_user')
-    			}));
-    			c.one('.close').on('click',function(){
-    				m.set('read',true);
-    				m.save();
-    			});
-    		},this);
+    		var c = this.get('container'),m=this.get('model');
     		m.on('change',function(){
-    			if(m.get('read'))
+    			if(m.get('mark_read'))
     			{
     				c.remove();
     			}
@@ -2596,6 +2619,27 @@ YUI.add('babe', function (Y) {
     		
     	},
     	render:function(){
+    		
+    		var c = this.get('container'),m=this.get('model');
+    		var u = new UserModel({'id':m.get('source_user')});
+    		u.load({'id':m.get('source_user')},function(){
+    			c.setHTML(Y.Lang.sub(Y.one('#notification-row-'+m.get('notification_action')).getHTML(),{
+    				SOURCE_USER:u.get('fullname')
+	    		}));
+	    		if(m.get('notification_action')=='friend' || m.get('notification_action')=='friend_request' || m.get('notification_action')=='follow')
+	    		{
+	    			c.one('.visit').on('click',function(){
+	    				AppUI.navigate('/user/'+m.get('source_user'));
+	    			});
+	    		}
+    			c.one('.close').on('click',function(){
+					m.set('mark_read','true');
+					m.save();
+				});
+    		});
+    		
+    		
+			
     		return this;
     	}
     });
@@ -2721,7 +2765,8 @@ YUI.add('babe', function (Y) {
         StatusBlockView:StatusBlockView,
         InviteView:InviteView,
         NotificationModel:NotificationModel,
-        NotificationList:NotificationList 
+        NotificationList:NotificationList,
+        NotificationView:NotificationView
 
     };
 }, '0.0.1', {

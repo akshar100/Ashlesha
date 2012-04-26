@@ -40,11 +40,20 @@ $this->load->view("common/header");
 <?php $this->load->view('mixins/group'); ?>
 <?php $this->load->view("mixins/statusblock");?>
 <?php $this->load->view("mixins/wall");?>
+<?php $this->load->view("mixins/notification");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
 	            <h4 class="alert-heading">Oh snap! You got an error!</h4>
 	            <p id='error-text'>{ERROR}</p>
+	           
+	</div>
+</script>
+<script type="text/x-template" id="info-alert">
+	<div class="alert alert-block alert-info">
+	            <a href="#" data-dismiss="alert" class="close">×</a>
+	            <h4 class="alert-heading">Heads Up!</h4>
+	            <p>{MESSAGE}</p>
 	           
 	</div>
 </script>
@@ -69,6 +78,7 @@ $this->load->view("common/header");
 		Y.ProfileView = Y.BABE.ProfileView;
 		Y.CommentModel = Y.BABE.CommentModel; 
 		Y.CommentList = Y.BABE.CommentList;
+		Y.SideBarView = Y.BABE.SideBarView;
 		Y.wall = new Y.BABE.PostList();	
 		Y.TopBarView= Y.BABE.TopBarView;
 		var SideBarView = Y.BABE.SideBarView;
@@ -265,7 +275,7 @@ $this->load->view("common/header");
 		}); 
 		Y.WallView = Y.BABE.WallView;
 		Y.SignUpView =  Y.BABE.SignUpView;
-		
+		Y.TopBarView = Y.BABE.TopBarView;
 		Y.MainAppView = Y.Base.create('MainAppView', Y.View, [], {
 			containerTemplate:'<div class="the-app"/>',
 			expand:false,
@@ -289,16 +299,31 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new SideBarView();
-					con.one(".leftbar").setHTML(sidebar.render().get('container'));
-				 });
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				
 				
 				Y.loadTemplate("statusblock",function(){
 					var statusblock = new Y.BABE.StatusBlockView({expand:expand}); 
@@ -325,16 +350,30 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new SideBarView();
-					con.one(".leftbar").setHTML(sidebar.render().get('container'));
-				 });
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
 				Y.loadTemplate("profile",function(){ 
 					var user = new Y.BABE.UserModel({
 						'_id':window.current_user
@@ -359,16 +398,31 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new SideBarView();
-					con.one(".leftbar").setHTML(sidebar.render().get('container'));
-				 });
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				
 				 
 				Y.BABE.loadTemplate('user_page',function(){
 		    		var UserView = new Y.BABE.UserView({user_id:that.get('user_id')});
@@ -385,16 +439,31 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new SideBarView();
-					con.one(".leftbar").setHTML(sidebar.render().get('container'));
-				 });
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				
 				 
 				Y.loadTemplate("group",function(){ 
 					var group = new Y.BABE.GroupModel({
@@ -506,12 +575,18 @@ $this->load->view("common/header");
 					});
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});				 
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}		 
 				Y.loadTemplate("group",function(){ 
 					
 					var grp =  new Y.GroupPageView({model:group});
@@ -531,16 +606,31 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				Y.loadTemplate("topbar",function(){ 
-					
-					var topbar= new Y.TopBarView();
-					con.one(".topbar").setHTML(topbar.render().get('container'));
-					
- 				});
-				Y.loadTemplate("sidebar",function(){ 
-					var sidebar = new SideBarView();
-					con.one(".leftbar").setHTML(sidebar.render().get('container'));
-				});
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				
 				Y.loadTemplate("wall",function(){ 
 					
 					var id = that.get('post_id');
@@ -567,7 +657,76 @@ $this->load->view("common/header");
 		        return this;
 		    }
 		});
-		
+		Y.NotificationListView = Y.Base.create('PostPage', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var con = this.get('container');
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				
+		    	var nlist = new Y.BABE.NotificationList();
+		    	
+		    	nlist.on('load',function(){
+		    		con.one('.centercolumn').setHTML('');
+		    		if(con.one('.alert'))
+		    		{
+		    			con.one('.alert').remove();
+		    		}
+		    		
+		    		if(nlist.size()===0)
+		    		{
+		    			console.log(Y.one('#info-alert').getHTML());
+		    			con.one('.centercolumn').append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
+		    				MESSAGE:'No new notifications here!'
+		    			}));
+		    		}
+		    		else
+		    		{
+		    			con.one('.centercolumn').append(Y.one('#clear-all-btn').getHTML());
+		    			con.one('.clear').on('click',function(){
+		    				nlist.each(function(item,index){
+				    			item.set('mark_read','true');
+				    			item.save();
+				    		});
+				    		nlist.load({name:'notificationlist'});
+		    			});
+		    		}
+		    		nlist.each(function(item,index){
+		    			con.one('.centercolumn').append(
+		    				new Y.BABE.NotificationView({
+		    					model:item
+		    				}).render().get('container') 
+		    			);
+		    		});
+		    	});
+		    	nlist.load({name:'notificationlist'});
+		    	return this;
+		    }
+		});
 		
 		window.Y = Y;
 		
@@ -598,7 +757,10 @@ $this->load->view("common/header");
 		        userpage: {type:'UserPageView',preserve:false },
 		        create_group: {type:'CreateGroupMainView',preserve:true}, 
 		        grouppage:{type:'GroupPageMainView',preserve:true},
-		        postpage:{type:'PostPage',preserve:false}
+		        postpage:{type:'PostPage',preserve:false},
+		        notificationpage:{type:'NotificationListView',preserve:false},
+		        topbarview:{type:'TopBarView',preserve:true},
+		        sidebarview:{type:'SideBarView',preserve:true}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -610,7 +772,8 @@ $this->load->view("common/header");
 		AppUI.route('/', function (req) {
 		    this.showView('homepage',{expand:false,loadCommand:'stream'});
 		});
-		
+		AppUI.createView('topbarview');
+		AppUI.createView('sidebarview');
 		AppUI.route('/me', function (req) {
 		    this.showView('profile');
 		});
@@ -659,6 +822,9 @@ $this->load->view("common/header");
 		
 		AppUI.route('/post/:post_tags/:post_id',function(req){
 		 	this.showView('postpage',{post_id:req.params.post_id});
+		});
+		AppUI.route('/notifications',function(req){
+			this.showView('notificationpage');
 		});
 		
 		AppUI.render().dispatch(); //.save('/');

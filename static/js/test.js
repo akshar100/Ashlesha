@@ -44,9 +44,22 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	    		notify2.get('_id');
 	    		notify2.load();
 	    		this.wait(function(e){
-	    			console.log(notify2.toJSON());
 	    			Assert.areEqual(target_user,notify2.get('target_user'),"Notification not retrived ");
 	    			Assert.areEqual(notification_action,notify2.get('notification_action'),"Notification not retrived");
+	    			Assert.isNotNull(notify2.get('_id'),"REtrived item id was null");
+	    			notify2.set('mark_read','true');
+	    			notify2.save();
+	    			this.wait(function(){
+	    				var notify3 = new Y.BABE.NotificationModel({
+			    			'_id':id
+			    		});
+			    		notify3.get('_id');
+			    		notify3.load();
+			    		this.wait(function(){
+			    			Assert.areEqual(notify2.get('mark_read'),'true',"Mark_REad not saved");
+			    		},1000);
+	    			},1000);
+	    		
 	    		},2000);
 	    		
 	    		
@@ -62,7 +75,8 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	    	this.wait(function(){
 	    		n.each(function (item, index) {
 	    			Assert.areEqual(window.current_user,item.get('target_user'),"Wrong notifications");
-	    			Assert.isFalse(item.get('read'),"Stale notifications");
+	    			Assert.areEqual(item.get('mark_read'),'true',"Stale notifications");
+	    			Assert.isNotNull(item.get('_id'),"REtrived item id was null");
 	    		});
 	    	},2000);
 	    }

@@ -560,8 +560,8 @@ class DBA
 	function create_connection($data)
 	{
 		$this->ci->load->library('user');
-		$source_user = $this->ci->user->get_user($data['source_user']);
-		$target_user = $this->ci->user->get_user($data['target_user']);
+		$source_user = $this->get($data['source_user']);
+		$target_user = $this->get($data['target_user']);
 		
 		if(!isset($source_user['connections']) || !is_array($source_user['connections'])) { $source_user['connections'] = array(); }
 		if(!isset($target_user['connections']) || !is_array($target_user['connections']) ) { $target_user['connections'] = array(); }
@@ -577,7 +577,6 @@ class DBA
 			'connects'=>$data['target_connects_source'],
 			'connect_confirm'=>((isset($source_user['connections'][$target_user['_id']]) && $data['target_connects_source'])?$source_user['connections'][$target_user['_id']]['connects']:false)
 		);
-		
 		$this->update($source_user);
 		$this->update($target_user);
 		echo json_encode($data);

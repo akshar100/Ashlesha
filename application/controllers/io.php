@@ -281,8 +281,15 @@ class IO extends CI_Controller {
 		$post = $this->input->post();
 		$post['type'] = 'notification';
 		$post['created_at'] = time();
-		unset($post['_id']);
-		$response = $this->dba->create($post);
+		if(empty($post['_id']) or $post['_id']=='null')
+		{
+			unset($post['_id']);
+			$response = $this->dba->create($post);
+		}
+		else
+		{
+			$response = $this->dba->update($post);
+		}
 		echo json_encode($response);
 	}
 	
@@ -303,7 +310,7 @@ class IO extends CI_Controller {
 		$output = array();
 		foreach($response['rows'] as $row)
 		{
-			$output[]= $response['rows'];
+			$output[]= $row['value'];
 		}
 		echo json_encode($output);
 	}
