@@ -75,12 +75,89 @@ YUI().use('test-console','babe','event','node-event-simulate', function (Y) {
 	    	this.wait(function(){
 	    		n.each(function (item, index) {
 	    			Assert.areEqual(window.current_user,item.get('target_user'),"Wrong notifications");
-	    			Assert.areEqual(item.get('mark_read'),'true',"Stale notifications");
-	    			Assert.isNotNull(item.get('_id'),"REtrived item id was null");
+	    			Assert.areSame(item.get('mark_read'),'',"Stale notifications");
+	    			Assert.isNotNull(item.get('_id'),"Retrived item id was null");
 	    		});
 	    	},2000);
+	    },
+	    testStatusBlock:function(){
+	    	AppUI.navigate("/");
+	    	this.wait(function(){
+	    		Assert.isObject(Y.one('#statusblock'),"Statusblock not present");
+	    		if(APPCONFIG.question_enabled)
+	    		{
+	    			Assert.isFalse(Y.one('#statusblock').one("a.question").hasClass('hide'),"Question link not present");
+	    			Y.one('#statusblock').one("a.question").simulate('click');
+	    			this.wait(function(){
+	    				Assert.isObject(Y.one('#question-form'),"Form did not open");
+	    				Y.one('#question-form').one("input[name=title]").set('value',Math.random());
+	    				
+	    				Y.one('#question-form').one("textarea").set('value','Test Question');
+	    				Y.one('#question-form').one('button.btn-primary').simulate('click');
+	    				this.wait(function(){
+	    					Assert.isNull(Y.one('#question-form'),"Form did not get submitted");
+	    					this.wait(function(){
+	    							Assert.isObject(Y.one("#modal-from-dom"),"The message box did not appear or the for did not get submitted");
+	    							Assert.areSame(Y.one("#modal-from-dom").getStyle('display'),"block","The message box did not appear or the for did not get submitted");
+	    							Y.one(".close-dialog").simulate("click");
+	    						
+	    					},2000); 
+	    				
+	    				},1000);
+	    			},500);
+	    		}
+	    		else
+	    		{
+	    			Assert.isTrue(Y.one('#statusblock').one("a.question").hasClass('hide'),"Question link present");
+	    		}
+	    		if(APPCONFIG.event_enabled)
+	    		{
+	    			Assert.isFalse(Y.one('#statusblock').one("a.event").hasClass('hide'),"Event link not present");
+	    		}
+	    		else
+	    		{
+	    			Assert.isTrue(Y.one('#statusblock').one("a.event").hasClass('hide'),"Event link present");
+	    		}
+	    		if(APPCONFIG.survey_enabled)
+	    		{
+	    			Assert.isFalse(Y.one('#statusblock').one("a.survey").hasClass('hide'),"Survey link not present");
+	    		}
+	    		else
+	    		{
+	    			Assert.isTrue(Y.one('#statusblock').one("a.survey").hasClass('hide'),"Survey link present");
+	    		}
+	    		if(APPCONFIG.post_enabled)
+	    		{
+	    			Assert.isFalse(Y.one('#statusblock').one("a.post").hasClass('hide'),"Post link not present");
+	    			Y.one('#statusblock').one("a.post").simulate('click');
+	    			this.wait(function(){
+	    				Assert.isObject(Y.one('#painpoint-form'),"Form did not open");
+	    				Y.one('#painpoint-form').one("input[name=tags]").set('value',Math.random());
+	    				if(APPCONFIG.post_sector_enabled)
+	    				{
+	    					Assert.isFalse(Y.one('#painpoint-form').one("input[name=sector]").hasClass('hide'),"Sector field is hidden");
+	    					Y.one('#painpoint-form').one("input[name=sector]").set('value','banks');
+	    				}
+	    				Y.one('#painpoint-form').one("textarea[name=post]").set('value','Test Painpoint');
+	    				Y.one('#painpoint-form').one('button.btn-primary').simulate('click');
+	    				this.wait(function(){
+	    					Assert.isNull(Y.one('#painpoint-form'),"Form did not get submitted");
+	    					this.wait(function(){
+	    							Assert.isObject(Y.one("#modal-from-dom"),"The message box did not appear or the for did not get submitted");
+	    							Assert.areSame(Y.one("#modal-from-dom").getStyle('display'),"block","The message box did not appear or the for did not get submitted");
+	    							Y.one(".close-dialog").simulate("click");
+	    						
+	    					},2000); 
+	    				
+	    				},1000);
+	    			},500);
+	    		}
+	    		else
+	    		{
+	    			Assert.isTrue(Y.one('#statusblock').one("a.post").hasClass('hide'),"Post link present");
+	    		}
+	    	},2000);
 	    }
-	    
 	    
 	
 	});

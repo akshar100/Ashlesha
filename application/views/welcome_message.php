@@ -739,7 +739,7 @@ $this->load->view("common/header");
 		    }
 		});
 		
-		window.Y = Y;
+		
 		
 				
 		
@@ -756,6 +756,7 @@ $this->load->view("common/header");
 				Y.user.set("authenticated",true);
 				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
 				Y.APPCONFIG =  <?php echo json_encode($config);?>;
+				
 				<?php
 			}
 		?>
@@ -779,7 +780,10 @@ $this->load->view("common/header");
 		        toParent: 'fade'
 		    }
 		});
-		window.AppUI = AppUI; 
+		window.AppUI = AppUI;
+		<?php if($this->config->item('ui_test_enabled')){?>
+				APPCONFIG = Y.APPCONFIG;
+		<?php } ?>
 		AppUI.route('/', function (req) {
 		    this.showView('homepage',{expand:false,loadCommand:'stream'});
 		});
