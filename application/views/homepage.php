@@ -70,7 +70,7 @@ $this->load->view("common/header");
           </div>
         </div>
         <div class="row-fluid">
-          <div class="span7 hidden-phone hidden-tablet">
+          <div class="span7 hidden-phone hidden-tablet chart-area">
             <?php echo img(array("src"=>'static/images/tagcloud.png',"width"=>500)); ?>
           </div>
           <div id="signup" class="span4 well">
@@ -101,6 +101,12 @@ $this->load->view("common/header");
   			});
   			
   		});
+  		var chart = new Y.BABE.BarChartView({
+  			parentNode:Y.one('.chart-area')
+  		}); 
+  		chart.render();
+  		
+  		
   	});
   </script>
   <?php if($this->config->item('ui_test_enabled')){?>

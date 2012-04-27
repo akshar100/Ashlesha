@@ -129,6 +129,39 @@ $rtn = $this->getViewByGet($url);
 return $rtn;
 }
 
+public function getList($design, $list, $view, $key = null, $params = array())
+{
+$query = array();
+$query['group']=true;
+foreach($params as $k => $v)
+{
+	if($k=="limit"){ $v = intVal($v); }
+$v = is_string($v) ? '"'.$v.'"' : $v;
+$v = is_bool($v) ? $v ? 'true' : 'false' : $v;
+$query[] = $k . '=' . $v;
+}
+
+$url = '_design/'.$design.'/_list/'.$list."/".$view.'?group=true&'.implode('&', $query);
+//echo $url;
+if(is_array($key))
+{
+$rtn = $this->getViewByPost($url, $key);
+}
+else
+{
+if(!is_null($key))
+{
+$key = is_string($key) ? '"'.$key.'"' : $key;
+$key = is_bool($key) ? $key ? 'true' : 'false' : $key;
+
+$url .= '&key='.$key;
+}
+
+$rtn = $this->getViewByGet($url);
+}
+return $rtn;
+}
+
 /**
 * Sub-function of getView() - Makes requests by GET.
 *

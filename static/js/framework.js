@@ -2664,7 +2664,68 @@ YUI.add('babe', function (Y) {
     		return this;
     	}
     });
-    
+     var BarChartView = Y.Base.create('barchartview', Y.View, [], {
+     	containerTemplate:'<div/>',
+     	initializer:function(config){
+     		var c = this.get('container');
+     		var mychart = new Y.Chart({
+			    dataProvider: [
+			    	{"tag":'loading',"posts":10} 
+			    ], 
+			    type: "column"
+			});
+			this.set('chart',mychart);
+     		var dataSource = Y.Base.create('chartds', Y.ModelList, [], {
+		  
+			  sync: function (action, options, callback) {
+			    var data;
+			
+			    if (action === 'read') {
+			      Y.io(baseURL+'in/get_top_tags',{
+			  			method:'GET',
+			  			on:{
+			  				complete:function(i,o,a){
+			  					var response = Y.JSON.parse(o.responseText);
+			  					var data = [];
+			  					for(var row in response.rows)
+			  					{
+			  						data.push({
+			  							"category":response.rows[row].key,
+			  							"posts":parseInt(response.rows[row].value,10)
+			  						});
+			  						
+			  					}
+			  					callback(null, data);
+			  					
+			  				}
+			  			}
+			  		});
+			     
+			    } else {
+			      callback('Unsupported sync action: ' + action);
+			    }
+			  }
+		    });
+     		this.set('dataSource',new dataSource());
+     		this.get('dataSource').on('load',function(){
+     			mychart.set('dataProvider',this.get('dataSource').toJSON());
+     		},this);
+     		this.get('dataSource').load();
+     		
+     		
+     	}
+     	,render:function(par){ 
+     		var par = this.get('parentNode');
+     		var chartnode = Y.Node.create("<div/>")
+  			chartnode.setStyle('height',par.get('clientHeight'));
+  			chartnode.setStyle('width',par.get('clientWidth'));
+  			par.setHTML(chartnode);
+  			this.get('chart').render('#'+chartnode.generateID());
+  			var ds=this.get('dataSource');
+  			//setInterval(function(){	ds.load();},2000);
+			return this;
+     	}
+     });
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -2787,9 +2848,10 @@ YUI.add('babe', function (Y) {
         InviteView:InviteView,
         NotificationModel:NotificationModel,
         NotificationList:NotificationList,
-        NotificationView:NotificationView
+        NotificationView:NotificationView,
+        BarChartView:BarChartView
 
     };
 }, '0.0.1', {
-    requires: ['router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['charts','router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
 });

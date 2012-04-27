@@ -111,8 +111,24 @@ class IO extends CI_Controller {
 			"user_groups"=>array("map"=>read_file("./application/views/json/user_groups.js")),
 			"users_by_otp"=>array("map"=>read_file("./application/views/json/user_by_otp.js")),
 			"get_notifications"=>array("map"=>read_file("./application/views/json/get_all_notifications.js")),
+			"top_tags"=>array("map"=>read_file("./application/views/json/top_tags_map.js"),"reduce"=>read_file("./application/views/json/top_tags_reduce.js")),
 		);
-		$this->chill->post($doc); 
+		$doc["lists"] = array(
+			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
+		);
+		$this->chill->post($doc);
+		
+		$doc = $this->chill->get("_design/lucene");
+		$doc["fulltext"] = array(
+			"by_text" => array("index"=>read_file("./application/views/json/by_text.js")),
+			"by_tag" => array("index"=>read_file("./application/views/json/by_tag.js")),
+			"by_user" => array("index"=>read_file("./application/views/json/by_user.js")),
+			
+		);
+		
+		$this->chill->post($doc);
+		
+		
 		echo "updated";
 		
 	}
@@ -314,6 +330,7 @@ class IO extends CI_Controller {
 		}
 		echo json_encode($output);
 	}
+	
 	
 }
 

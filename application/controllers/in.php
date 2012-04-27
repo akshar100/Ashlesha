@@ -261,6 +261,14 @@ class In extends CI_Controller {
 		echo json_encode($this->dba->all_sector_list());
 	}
 	
+	function get_top_tags()
+	{
+		$response = $this->chill->getList("posts","top_tags","top_tags",NULL,array(
+			//"limit"=>5
+		));
+		$response['rows'] = array_splice($response['rows'],0,5);
+		echo json_encode($response);
+	}
 	
 }
 
