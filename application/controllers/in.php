@@ -270,6 +270,21 @@ class In extends CI_Controller {
 		echo json_encode($response);
 	}
 	
+	function search()
+	{
+		$term = $this->input->post('search');
+		$response = $this->chill->getLuceneView("lucene","by_text",urlencode($term));
+		$response = json_decode($response);
+		$count = $response->total_rows;
+		$rows = $response->rows;
+		$user=$this->user->get_current();
+		$output = array();
+		foreach($rows as $row)
+		{
+			$output[]= $this->dba->get_post($row->id,$user); 
+		}
+		echo json_encode($output);
+	}
 }
 
 /* End of file welcome.php */

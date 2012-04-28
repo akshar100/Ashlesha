@@ -646,7 +646,17 @@ YUI.add('babe', function (Y) {
         },
         initializer: function () {
             this.get('container').setHTML(Y.one('#wall').getHTML());
-            var wall = new Y.BABE.PostList();
+             var wall = new Y.BABE.PostList();
+            if(this.get('list'))
+            {
+            	wall = this.get('list');
+            }
+        	if(this.get('disableLoadMore'))
+        	{
+        		this.get('container').one("#loadMore").addClass('hide');
+        	}
+            
+           
 
             wall.after('add', this.prepend, this);
             wall.after('load', this.render, this);
@@ -2227,6 +2237,8 @@ YUI.add('babe', function (Y) {
 					user_name:Y.userModel.get("fullname"),
 					user_id:Y.userModel.get("user_id")
 				}));
+				var sv = new Y.BABE.SearchBoxView(); 
+				this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
 				if(!Y.APPCONFIG.notifications_enabled)
 				{
 					this.get('container').one("#notification-btn").addClass('hide');
@@ -2722,10 +2734,87 @@ YUI.add('babe', function (Y) {
   			par.setHTML(chartnode);
   			this.get('chart').render('#'+chartnode.generateID());
   			var ds=this.get('dataSource');
-  			//setInterval(function(){	ds.load();},2000);
 			return this;
      	}
      });
+     var SearchBoxView = Y.Base.create('searchboxview', Y.View, [], {
+     		containerTemplate:'<div/>',
+     		initializer:function(){
+     			var sb = Y.Node.create(Y.one('#searchbutton').getHTML()),si=Y.Node.create(Y.one('#search-box').getHTML());
+     			this.get('container').setHTML(Y.one('#searchbutton').getHTML());
+     			this.get('container').one('#search-btn').on('click',function(e){
+     				this.get('container').setHTML(si);
+     				this.get('container').one('.search').on('click',function(){
+     					Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
+     					
+     				},this);
+     			},this);
+     		},
+     		render:function(){
+     			
+     			return this;
+     		}
+     });
+     var SearchView = Y.Base.create('searchboxview', Y.View, [], {
+     		containerTemplate:'<div/>',
+     		search:'', 
+     		initializer:function(config){
+     			if(config && config.search){
+     				this.set('search',config.search);
+     			}
+     			this.get('container').setHTML(Y.Lang.sub(Y.one('#search-area').getHTML(),{
+     					SEARCH:this.get('search')
+     			}));
+     			this.get('container').one('.search').on('click',function(){
+     				Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
+     			},this);
+     			
+     		},
+     		render:function(){
+     			var c = this.get('container');
+     			Y.io(baseURL+'in/search',{
+     				method:'POST',
+     				data:{search: this.get('search')},
+     				on:{
+     					complete:function(i,o,a){
+     						var response  = Y.JSON.parse(o.responseText);
+     						var model;
+     						
+     						for(var i in response)
+     						{
+     							model = new PostModel(response[i]);
+     							var view;
+					            if (model.get('category') == 'event' && !Y.APPCONFIG.event_enabled) {
+					                return true;
+					            }
+					            if (model.get('category') == 'event') {
+					                view = new Y.EventView({
+					                    model: model
+					                });
+					            } else {
+					                view = new Y.PostView({
+					                    model: model
+					                });
+					            }
+					            var post = view.render().get('container');
+					            c.one(".search-posts").append(post);
+     						}
+     						
+     						if(response.length==0)
+     						{
+     							c.one(".search-posts").append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
+     								MESSAGE:'No posts found with that keyword!'
+     							}));
+     						}
+     						
+     						
+     					}
+     				}
+     			});
+     			return this;
+     		}
+     });
+     
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -2849,7 +2938,9 @@ YUI.add('babe', function (Y) {
         NotificationModel:NotificationModel,
         NotificationList:NotificationList,
         NotificationView:NotificationView,
-        BarChartView:BarChartView
+        BarChartView:BarChartView,
+        SearchBoxView:SearchBoxView,
+        SearchView:SearchView
 
     };
 }, '0.0.1', {

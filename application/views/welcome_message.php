@@ -41,6 +41,7 @@ $this->load->view("common/header");
 <?php $this->load->view("mixins/statusblock");?>
 <?php $this->load->view("mixins/wall");?>
 <?php $this->load->view("mixins/notification");?>
+<?php $this->load->view("mixins/search");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
@@ -739,6 +740,45 @@ $this->load->view("common/header");
 		    }
 		});
 		
+		Y.SearchPageView = Y.Base.create('SearchPageView', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var con = this.get('container');
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				var searchView = new Y.BABE.SearchView({
+					search:this.get('search')
+				});
+				con.one('.centercolumn').setHTML(searchView.render().get('container'));
+		    
+		    	return this;
+		    }
+		});
+		
 		
 		
 				
@@ -772,7 +812,8 @@ $this->load->view("common/header");
 		        postpage:{type:'PostPage',preserve:false},
 		        notificationpage:{type:'NotificationListView',preserve:false},
 		        topbarview:{type:'TopBarView',preserve:true},
-		        sidebarview:{type:'SideBarView',preserve:true}
+		        sidebarview:{type:'SideBarView',preserve:true},
+		        searchpage:{type:'SearchPageView',preserve:false}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -838,10 +879,18 @@ $this->load->view("common/header");
 		AppUI.route('/post/:post_tags/:post_id',function(req){
 		 	this.showView('postpage',{post_id:req.params.post_id});
 		});
+		AppUI.route('/search/:term',function(req){
+		 	this.showView('searchpage',{search:req.params.term});
+		});
+		AppUI.route('/search',function(req){
+		 	this.showView('searchpage',{search:''});
+		});
 		AppUI.route('/notifications',function(req){
 			this.showView('notificationpage');
 		});
-		
+		Y.on('search-init',function(e){ 
+			AppUI.navigate('/search/'+e.search);
+		});
 		AppUI.render().dispatch(); //.save('/');
 		Y.loadTemplate("messagebox",function(){}); 
 		

@@ -24,10 +24,13 @@
 			          </ul>
 			  		</div>
 	          </div>
-	          <div class="pull-right" style="padding-right:30px;">
+	          <div class="pull-right right-pad30">
 		          <div class="btn-group">
-			          		<a id="notification-btn" class="btn btn-info" href="#" data-original-title="A Title" data-content="And here's some amazing content. It's very engaging. right?" rel="popover"><i class="icon-envelope icon-white"></i></a>
+			          		<a id="notification-btn" class="btn btn-info" href="#" rel="popover"><i class="icon-envelope icon-white"></i></a>
 			      </div>
+			      
+		      </div>
+		      <div class="pull-right topbar-buttons right-pad30">
 		      </div>
           </div>
         </div>
