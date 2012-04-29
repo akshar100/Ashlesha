@@ -701,4 +701,22 @@ class DBA
 			
 		}
 	}
+	
+	function get_user_stats()
+	{
+		$response = $this->chill->getView("posts","user_by_createdat",NULL,array("group"=>true,"startkey"=>	"[2012,1,1]"));
+		$rows = $response['rows'];
+		$response = array();
+		$running = 0; 
+		foreach($rows as $row)
+		{
+			$running += intVal($row['value']); 
+			$response[]=array(
+				"date"=>implode("-",($row['key'])),
+				"users"=>$running
+				
+			);
+		}
+		return ($response);
+	}
 }

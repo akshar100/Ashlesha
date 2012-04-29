@@ -43,6 +43,7 @@ $this->load->view("common/header");
 <?php $this->load->view("mixins/notification");?>
 <?php $this->load->view("mixins/search");?>
 <?php $this->load->view("mixins/user_page");?>
+<?php $this->load->view("mixins/admin");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
@@ -780,6 +781,43 @@ $this->load->view("common/header");
 		    }
 		});
 		
+		Y.AdminPageView = Y.Base.create('AdminPageView', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var con = this.get('container');
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				var topbar = AppUI.getViewInfo('topbarview');
+				if(topbar.instance)
+				{
+					con.one(".topbar").setHTML(topbar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("topbar",function(){ 
+						var topbar= new Y.TopBarView();
+						con.one(".topbar").setHTML(topbar.render().get('container'));
+ 					});
+				}
+				var sidebar = AppUI.getViewInfo('sidebarview');
+				if(sidebar.instance)
+				{
+					con.one(".topbar").setHTML(sidebar.instance.get('container'));
+				}
+				else
+				{
+					Y.loadTemplate("sidebar",function(){ 
+						var sidebar = new SideBarView();
+						con.one(".leftbar").setHTML(sidebar.render().get('container'));
+					 });
+				}
+				var adminView = new Y.BABE.AdminView({user:Y.userModel});
+				con.one('.centercolumn').setHTML(adminView.render().get('container'));
+		    	adminView.updateCharts();
+		    	return this;
+		    }
+		});
+		
 		
 		
 				
@@ -801,7 +839,7 @@ $this->load->view("common/header");
 				<?php
 			}
 		?>
-		
+		Y.AdminView = Y.BABE.AdminView;
 		
 		var AppUI =  new Y.App({
 		    views: {
@@ -814,7 +852,8 @@ $this->load->view("common/header");
 		        notificationpage:{type:'NotificationListView',preserve:false},
 		        topbarview:{type:'TopBarView',preserve:true},
 		        sidebarview:{type:'SideBarView',preserve:true},
-		        searchpage:{type:'SearchPageView',preserve:false}
+		        searchpage:{type:'SearchPageView',preserve:false},
+		        adminview:{type:'AdminPageView',preserve:false}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -889,6 +928,44 @@ $this->load->view("common/header");
 		AppUI.route('/notifications',function(req){
 			this.showView('notificationpage');
 		});
+		
+		AppUI.route('/admin',function(req){
+			if(Y.userModel.get('_id')) // do this only if the user is loaded!
+			{
+				this.showView('adminview',{
+						userModel:Y.userModel
+					});
+			}
+			else
+			{
+				var that = this;
+				Y.userModel.load({"id":<?php echo json_encode($this->user->get_current()); ?>},function(){
+					that.showView('adminview',{
+						userModel:Y.userModel
+					});
+				});
+			}
+		});
+		AppUI.route('/admin/:sub_action',function(req){
+			if(Y.userModel.get('_id')) // do this only if the user is loaded!
+			{
+				this.showView('adminview',{
+						userModel:Y.userModel,
+						action:req.params.sub_action
+					});
+			}
+			else
+			{
+				var that = this;
+				Y.userModel.load({"id":<?php echo json_encode($this->user->get_current()); ?>},function(){
+					that.showView('adminview',{
+						userModel:Y.userModel,
+						action:req.params.sub_action
+					});
+				});
+			}
+		});
+		
 		Y.on('search-init',function(e){ 
 			AppUI.navigate('/search/'+e.search);
 		});

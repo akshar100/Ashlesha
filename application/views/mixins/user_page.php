@@ -16,7 +16,7 @@
 	</div>
 </script>
 <script type="text/x-template" id="user_block">
-	<div class="row-fluid userblock">
+	<div class="row-fluid userblock ">
 		<div class="span4 profile_pic">
 			<img src="{SRC}" height="{HEIGHT}" width="{WIDTH}" />
 		</div>

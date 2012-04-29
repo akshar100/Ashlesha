@@ -112,6 +112,7 @@ class IO extends CI_Controller {
 			"users_by_otp"=>array("map"=>read_file("./application/views/json/user_by_otp.js")),
 			"get_notifications"=>array("map"=>read_file("./application/views/json/get_all_notifications.js")),
 			"top_tags"=>array("map"=>read_file("./application/views/json/top_tags_map.js"),"reduce"=>read_file("./application/views/json/top_tags_reduce.js")),
+			"user_by_createdat"=>array("map"=>read_file("./application/views/json/users_by_createdat_map.js"),"reduce"=>read_file("./application/views/json/users_by_createdat_reduce.js")),
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")

@@ -315,6 +315,15 @@ class In extends CI_Controller {
 		}
 		echo json_encode($output);
 	}
+	
+	function site_stats()
+	{
+		$users = $this->dba->get_user_stats();
+		
+		echo json_encode(array(
+			"users"=>$users
+		));
+	}
 }
 
 /* End of file welcome.php */

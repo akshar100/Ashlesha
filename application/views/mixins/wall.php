@@ -14,10 +14,10 @@
 
 <script type="text/x-template" id="post-row">
 	
-	<div class="span1">
+	<div class="span2">
         <img class="profile-image" src="{IMG}" alt="" rel="{ID}">
     </div>
-	<div class="span11 post-zone"> 
+	<div class="span10 post-zone"> 
 		<div class="row-fluid"><div class="span1"></div><div class="tagzone span10"></div><div class="span1 wall-post-admin"></div></div>
 		<div class="row-fluid"><div class="span1"></div><div class="textzone span11 postBody"><blockquote><p>{TEXT}</p><small>{AUTHOR}</small></blockquote></div></div>
 		<div class="row-fluid"><div class="span1"></div><div class="metapost span11 "><span class="toolbar"></span></div></div>
@@ -26,10 +26,10 @@
 
 <script type="text/x-template" id="post-row-admin">
 	
-	<div class="span1">
+	<div class="span2">
         <img class="profile-image" src="{IMG}" alt="" rel="{ID}">
     </div>
-	<div class="span11 post-zone"> 
+	<div class="span10 post-zone"> 
 		<form>
 		<div class="row-fluid"><div class="span1"></div><div class="tagzone span10">
 			<div class="row-fluid"><input type="text" placeholder="Brand, Product , Service Name" name="tags" value="{TAGS}" class="span12 autocomplete"></div>

@@ -921,6 +921,17 @@ YUI.add('babe', function (Y) {
     var UserModel = Y.Base.create('userModel', Y.Model, [], {
         sync: modelSync,
         idAttribute: '_id',
+        hasRole:function(role){
+        	var roles = this.get('roles').split(",");
+        	for(var i in roles)
+        	{
+        		if(roles[i].trim().toLowerCase()===role.trim().toLowerCase())
+        		{
+        			return true;
+        		}
+        	}
+        	return false;
+        },
         validate: function (attr) {
 
             if (!attr.fullname) {
@@ -2863,7 +2874,83 @@ YUI.add('babe', function (Y) {
      			return this;
      		}
      });
-     
+    var AdminView = Y.Base.create('searchboxview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	showStats:function(){
+    		var c = this.get('container');
+    		this.get('container').one("a.stats").addClass('active');
+    		Y.io(baseURL+'in/site_stats',{
+    			method:'GET',
+    			on:{
+    				complete:function(i,o,a){
+    					var response = Y.JSON.parse(o.responseText);
+    					var myDataValues = response.users;
+						var n = Y.Node.create(Y.one('#stats-view').getHTML());
+						c.one('.mainarea').setHTML(n);
+						c.one('.mainarea').one('.user-stats').setStyle('height',300);
+						c.one('.mainarea').one('.user-stats').setStyle('width',600);
+						var mychart = new Y.Chart({
+						    dataProvider: myDataValues,
+						    render: "#"+c.one('.mainarea').one('.user-stats').generateID(),
+						    categoryKey:"date",
+						    horizontalGridlines: {
+                            styles: {
+                                line: {
+                                    color: "#dad8c9"
+                                }
+                            }
+	                        },
+	                        verticalGridlines: {
+	                            styles: {
+	                                line: {
+	                                    color: "#dad8c9"
+	                                }
+	                            }
+	                        },
+	                        styles:{
+	                        	axes:{
+						           date:{
+						                label:{
+						                    rotation:-45,
+						                    color: "#ff0000"
+						                }
+						            }
+						        }
+					       }
+						});
+    				}
+    			}
+    		});
+    		
+    		
+    		
+    	},
+    	initializer:function(){
+    		this.get('container').setHTML(Y.one('#admin-view').getHTML());
+    		
+    	},
+    	render:function(){
+    		if(this.get('action'))
+    		{
+    			switch(this.get('action'))
+    			{
+    				case "stats":
+    					this.showStats();
+    					break;
+    				default:
+    					this.showStats();
+    			}
+    		}
+    		else
+    		{
+    			this.showStats();
+    		}
+    		return this;
+    	},
+    	updateCharts:function(){
+    		this.render();
+    	}
+    });
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -2989,7 +3076,8 @@ YUI.add('babe', function (Y) {
         NotificationView:NotificationView,
         BarChartView:BarChartView,
         SearchBoxView:SearchBoxView,
-        SearchView:SearchView
+        SearchView:SearchView,
+        AdminView:AdminView
 
     };
 }, '0.0.1', {
