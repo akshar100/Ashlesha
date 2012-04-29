@@ -270,11 +270,15 @@ class In extends CI_Controller {
 		echo json_encode($response);
 	}
 	
-	function search()
+	function search_posts()
 	{
 		$term = $this->input->post('search');
 		$response = $this->chill->getLuceneView("lucene","by_text",urlencode($term));
 		$response = json_decode($response);
+		if(!isset($response->total_rows) || $response->total_rows==0)
+		{
+			echo json_encode(array()); return;
+		}
 		$count = $response->total_rows;
 		$rows = $response->rows;
 		$user=$this->user->get_current();
@@ -282,6 +286,32 @@ class In extends CI_Controller {
 		foreach($rows as $row)
 		{
 			$output[]= $this->dba->get_post($row->id,$user); 
+		}
+		echo json_encode($output);
+	}
+	
+	function search_users()
+	{
+		$term = $this->input->post('search');
+		$response = $this->chill->getLuceneView("lucene","user_by_term",urlencode($term));
+		$response = json_decode($response);if(!isset($response->total_rows) || $response->total_rows==0)
+		{
+			echo json_encode(array()); return;
+		}
+		$count = $response->total_rows;
+		$rows = $response->rows;
+		$user=$this->user->get_current();
+		$output = array();
+		foreach($rows as $row)
+		{
+			
+			$u = $this->dba->get($row->id);
+			unset($u['password']);
+			unset($u['email']);
+			unset($u['connections']);
+			unset($u['relationships']);
+			unset($u['mobile']);    
+			$output[]= $u;
 		}
 		echo json_encode($output);
 	}

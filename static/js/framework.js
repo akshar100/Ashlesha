@@ -2737,6 +2737,25 @@ YUI.add('babe', function (Y) {
 			return this;
      	}
      });
+     var UserBlockView = Y.Base.create('searchboxview', Y.View, [], {
+     	containerTemplate:'<div/>',
+     	initializer:function(){
+     		
+     	},
+     	render:function(){
+     		
+     		this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(),{
+     			SRC:this.get('model').get('profile_pic') || baseURL+'in/profile_pic/'+this.get('model').get('_id'),
+     			HEIGHT:'40',
+     			WIDTH:'40',
+     			FULLNAME:this.get('model').get('fullname'),
+     			USERNAME:this.get('model').get('username'),
+     			GENDER:this.get('model').get('gender'),
+     			USERID:this.get('model').get('_id')
+     		}));
+     		return this;
+     	}
+     });
      var SearchBoxView = Y.Base.create('searchboxview', Y.View, [], {
      		containerTemplate:'<div/>',
      		initializer:function(){
@@ -2744,9 +2763,9 @@ YUI.add('babe', function (Y) {
      			this.get('container').setHTML(Y.one('#searchbutton').getHTML());
      			this.get('container').one('#search-btn').on('click',function(e){
      				this.get('container').setHTML(si);
-     				this.get('container').one('.search').on('click',function(){
+     				this.get('container').one('.search').on('click',function(e){
      					Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
-     					
+     					e.halt();
      				},this);
      			},this);
      		},
@@ -2765,14 +2784,15 @@ YUI.add('babe', function (Y) {
      			this.get('container').setHTML(Y.Lang.sub(Y.one('#search-area').getHTML(),{
      					SEARCH:this.get('search')
      			}));
-     			this.get('container').one('.search').on('click',function(){
+     			this.get('container').one('.search').on('click',function(e){
      				Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
+     				e.halt();
      			},this);
      			
      		},
      		render:function(){
      			var c = this.get('container');
-     			Y.io(baseURL+'in/search',{
+     			Y.io(baseURL+'in/search_posts',{
      				method:'POST',
      				data:{search: this.get('search')},
      				on:{
@@ -2804,6 +2824,35 @@ YUI.add('babe', function (Y) {
      						{
      							c.one(".search-posts").append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
      								MESSAGE:'No posts found with that keyword!'
+     							}));
+     						}
+     						
+     						
+     					}
+     				}
+     			});
+     			Y.io(baseURL+'in/search_users',{
+     				method:'POST',
+     				data:{search: this.get('search')},
+     				on:{
+     					complete:function(i,o,a){
+     						var response  = Y.JSON.parse(o.responseText);
+     						var model;
+     						
+     						for(var i in response)
+     						{
+     							model = new UserModel(response[i]);
+     							uv = new UserBlockView({
+     								model:model
+     							});
+					            var user= uv.render().get('container');
+					            c.one(".search-users").append(user);
+     						}
+     						
+     						if(response.length==0)
+     						{
+     							c.one(".search-users").append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
+     								MESSAGE:'No <strong>Users</strong> found with that keyword!'
      							}));
      						}
      						

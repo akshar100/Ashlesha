@@ -123,6 +123,7 @@ class IO extends CI_Controller {
 			"by_text" => array("index"=>read_file("./application/views/json/by_text.js")),
 			"by_tag" => array("index"=>read_file("./application/views/json/by_tag.js")),
 			"by_user" => array("index"=>read_file("./application/views/json/by_user.js")),
+			"user_by_term" => array("index"=>read_file("./application/views/json/lucene_user_by_term.js")),
 			
 		);
 		

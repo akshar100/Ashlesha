@@ -42,6 +42,7 @@ $this->load->view("common/header");
 <?php $this->load->view("mixins/wall");?>
 <?php $this->load->view("mixins/notification");?>
 <?php $this->load->view("mixins/search");?>
+<?php $this->load->view("mixins/user_page");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
