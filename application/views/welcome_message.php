@@ -60,6 +60,7 @@ $this->load->view("common/header");
 	           
 	</div>
 </script>
+
 <?php $this->load->view("mixins/wall"); ?> 
 <script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>
 
@@ -811,9 +812,8 @@ $this->load->view("common/header");
 						con.one(".leftbar").setHTML(sidebar.render().get('container'));
 					 });
 				}
-				var adminView = new Y.BABE.AdminView({user:Y.userModel});
+				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action')});
 				con.one('.centercolumn').setHTML(adminView.render().get('container'));
-		    	adminView.updateCharts();
 		    	return this;
 		    }
 		});
