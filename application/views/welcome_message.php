@@ -60,6 +60,7 @@ $this->load->view("common/header");
 	           
 	</div>
 </script>
+
 <?php $this->load->view("mixins/wall"); ?> 
 <script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>
 
@@ -190,11 +191,7 @@ $this->load->view("common/header");
 		Y.EventView = Y.Base.create('eventView',Y.PostView,[],{
 			initializer:function(config){
 				
-				if(typeof config != "object")
-				{
-					config = [];
-				}
-				Y.PostView.constructor.apply(this,[]);
+				Y.PostView.constructor.apply(this,config);
 				var relmodel = new Y.BABE.RelationshipModel({
 							owner_id:window.current_user, 
 							resource_id:this.get('model').get('_id')
@@ -815,9 +812,8 @@ $this->load->view("common/header");
 						con.one(".leftbar").setHTML(sidebar.render().get('container'));
 					 });
 				}
-				var adminView = new Y.BABE.AdminView({user:Y.userModel});
+				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action')});
 				con.one('.centercolumn').setHTML(adminView.render().get('container'));
-		    	adminView.updateCharts();
 		    	return this;
 		    }
 		});
@@ -899,7 +895,6 @@ $this->load->view("common/header");
 		AppUI.route('/my',function(req){
 			this.showView('homepage',{},{callback:function(v){
 				setTimeout(function(){v.loadStream('my');},1000);
-
 			}});
 		});
 		AppUI.route('/stream',function(req){
@@ -986,3 +981,4 @@ $this->load->view("common/header");
 <?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?> 
 </body>
 </html>
+>>>>>>> 319ad3f9eb149c8b1829375a240ebb721e4cdef9

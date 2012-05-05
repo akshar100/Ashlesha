@@ -200,3 +200,7 @@ img.profile-image
     height: 36px;
     width: 100%;
 }
+.qdrag-area
+{
+	min-height:400px; 
+}

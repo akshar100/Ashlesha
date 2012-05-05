@@ -2045,14 +2045,18 @@ YUI.add('babe', function (Y) {
             this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin, TagBoxConfig);
            
             var inputNode = this.get('container').one(".ac-sector");
- if (!Y.APPCONFIG.post_sector_enabled) {
+            if(inputNode)
+            {
+            	if (!Y.APPCONFIG.post_sector_enabled) {
                 inputNode.addClass('hide');
             }
             inputNode.on('blur', function () {
                 if (inputNode.get('value').trim().length < 4) {
                     inputNode.set("value", '');
                 }
-            })
+            });
+            }
+ 			
             if (!cache.retrieve("all_sectors")) {
                 Y.io(baseURL + 'in/all_sectors', {
                     method: 'POST',
