@@ -486,6 +486,7 @@ YUI.add('babe', function (Y) {
 
                 Y.io(baseURL + 'io/create_notification', {
                     method: 'POST', 
+
                     data: data,
                     on: {
                         success: function (i, o, a) {
@@ -2042,10 +2043,11 @@ YUI.add('babe', function (Y) {
             }, this);
             var lastValue;
             this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin, TagBoxConfig);
-            if (!Y.APPCONFIG.post_sector_enabled) {
-                inputNode.setClass('hide');
-            }
+           
             var inputNode = this.get('container').one(".ac-sector");
+ if (!Y.APPCONFIG.post_sector_enabled) {
+                inputNode.addClass('hide');
+            }
             inputNode.on('blur', function () {
                 if (inputNode.get('value').trim().length < 4) {
                     inputNode.set("value", '');

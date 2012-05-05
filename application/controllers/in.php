@@ -197,7 +197,7 @@ class In extends CI_Controller {
 		{
 			
 			$user_profile = $this->facebook->api('/me','GET');
-       		$user = $this->user->get_by_email($user_profile['email']);
+       		$user = @$this->user->get_by_email($user_profile['email']);
 			if(!empty($user) && !empty($user['_id']) && isset($user_profile['email'])) //Make sure the FB profile has email in it.
 			{
 				$this->user->force_sign_in($user['_id']);

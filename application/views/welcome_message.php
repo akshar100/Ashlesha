@@ -190,7 +190,11 @@ $this->load->view("common/header");
 		Y.EventView = Y.Base.create('eventView',Y.PostView,[],{
 			initializer:function(config){
 				
-				Y.PostView.constructor.apply(this,config);
+				if(typeof config != "object")
+				{
+					config = [];
+				}
+				Y.PostView.constructor.apply(this,[]);
 				var relmodel = new Y.BABE.RelationshipModel({
 							owner_id:window.current_user, 
 							resource_id:this.get('model').get('_id')
@@ -895,6 +899,7 @@ $this->load->view("common/header");
 		AppUI.route('/my',function(req){
 			this.showView('homepage',{},{callback:function(v){
 				setTimeout(function(){v.loadStream('my');},1000);
+
 			}});
 		});
 		AppUI.route('/stream',function(req){

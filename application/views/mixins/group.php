@@ -4,7 +4,7 @@
 		<div class="span9">
 			<div class="alert alert-info">
 		        <a data-dismiss="alert" class="close">×</a>
-		        <strong>Heads up!</strong> You are creating a board. Boards are created for focussed discussion generally around certain people or topics.
+		        <strong>Heads up!</strong> You are creating a Project Group. Please make sure your project group is set as open. We will later assign you a more memorable unique code.
 		     </div>
 		</div>
 	</div>
@@ -13,21 +13,21 @@
 			<form class="form-vertical">
 			<div id="event-form" class="form">
 							<fieldset>
-								<legend>Create a Board</legend>
+								<legend>Create a Project GRoup</legend>
 								<div class="control-group">
-									<div class="controls">
+									<div class="row-fluid">
 										<input type="text" placeholder="Add a title" name="title"  class="span12">
 										<p class="help-block"></p>
 									</div>
 								</div>
 								<div class="control-group">
-									<div class="controls">
+									<div class="row-fluid">
 										<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
 										<p class="help-block"></p>
 									</div>
 								</div>
 								<div class="control-group">
-									<div class="controls">
+									<div class="row-fluid">
 										<label class="radio">
 							                <input type="radio" checked="" value="open"  name="visibility">
 							               		Open Board
@@ -42,7 +42,7 @@
 								</div>
 			
 								<div class="control-group">
-									<div class="controls">
+									<div class="row-fluid">
 										<textarea rows="3" name="description"  class="span12" placeholder="Description......"></textarea>
 										<p class="help-block">
 								            Mention the purpose of the board, who can join, what activity is expected and so on.
