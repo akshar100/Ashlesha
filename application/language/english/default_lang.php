@@ -1,12 +1,11 @@
-<?php
-$lang["site_title"] = "E-Yantra Competition";
-$lang["site_name"] = "E-Yantra.org";
-$lang["site_description"] = "E-Yantra is a project by IIT-Bombay and MHRD. E-Yantra's goal is to revolutionize the robotics and embdded systems education in India. E-Yantra Competition is a national level competition that enables students across the country to show their engineering talent."; 
+<?PHP
+$lang["site_title"] = "Brand A Brand! ";
+$lang["site_name"] = "BrandABrand.com";
+$lang["site_description"] = "BrandABrand.com is a portal for people to share their thoughts and views about various brands products and services they use. While the portal gives voice to consumers it can also be liveraged by the brands to understand their standing in the market. BrandABrand also is a SaaS model platform which means anyone can own their own custamized instance of this platform and control it's behaviour.";
 $lang["site_copyright"] = "&copy; ".date("Y",time())." ".$lang["site_name"]; //add year authomatically
-$lang["sign_up_pitch"] = "Revolutionizing Robotics Education";
-$lang["main_post_title"] = "Post";
-$lang["tags"] = "Topics e.g. Howto,rules";
-$lang["categorization"] = "Category";
-$lang["post"] = "Post";
-$lang["group"] = "Project Group";
-
+$lang["sign_up_pitch"] = "Brand A Brand Now!";
+$lang["main_post_title"] = "Painpoint";
+$lang["tags"] = "Brand, Product, Services";
+$lang["categorization"] = "Sector/Industry";
+$lang["post"] = "Painpoint";
+$lang["group"] = "Board";
