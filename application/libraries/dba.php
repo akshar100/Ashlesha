@@ -525,6 +525,11 @@ class DBA
 		{
 			$data['password'] = do_hash($data['password']);
 		}
+		else
+		{
+			$user = $this->get($id);
+			$data['password'] = $user['password'];
+		}
 		$response = $this->chill->put($id,$data);
 		$data = $this->chill->get($response['_id']);
 		$data['id'] = $data['_id'];

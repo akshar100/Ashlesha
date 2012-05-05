@@ -55,7 +55,12 @@ class IO extends CI_Controller {
 		
 		if(isset($data['profile_pic']) && empty($data['profile_pic'])) { unset($data['profile_pic']); }
 		else if($data['profile_pic']=="undefined") { $data['profile_pic']=''; }
+		
+		
 		$user = $this->user->get_user();
+		if(!empty($user['profile_pic'] ) && !empty($data['profile_pic']) && $data['profile_pic']!==$user['profile_pic']){
+			$this->dba->update($user);
+		}
 		foreach($data as $k=>$v)
 		{
 			if(!in_array($k,array("password","_rev")))
@@ -68,7 +73,7 @@ class IO extends CI_Controller {
 			}
 			
 		}
-		//print_r($user);
+		
 		echo json_encode($this->dba->update_user($user));
 	}
 	
