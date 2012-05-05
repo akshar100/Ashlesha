@@ -953,9 +953,11 @@ $this->load->view("common/header");
 						userModel:Y.userModel,
 						action:req.params.sub_action
 					});
+					
 			}
 			else
 			{
+				
 				var that = this;
 				Y.userModel.load({"id":<?php echo json_encode($this->user->get_current()); ?>},function(){
 					that.showView('adminview',{

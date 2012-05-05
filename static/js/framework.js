@@ -2884,7 +2884,11 @@ YUI.add('babe', function (Y) {
     	containerTemplate:'<div/>',
     	showStats:function(){
     		var c = this.get('container');
-    		this.get('container').one("a.stats").addClass('active');
+    		if(this.get('container').one("a.stats"))
+    		{
+    			this.get('container').one("a.stats").addClass('active');
+    		}
+    		
     		Y.io(baseURL+'in/site_stats',{
     			method:'GET',
     			on:{
@@ -2931,6 +2935,10 @@ YUI.add('babe', function (Y) {
     		
     		
     	},
+    	showCreateQuestion:function(){
+    		var qc = new QuestionCreationView();
+    		this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+    	},
     	initializer:function(){
     		this.get('container').setHTML(Y.one('#admin-view').getHTML());
     		
@@ -2942,6 +2950,9 @@ YUI.add('babe', function (Y) {
     			{
     				case "stats":
     					this.showStats();
+    					break;
+    				case "create_question":
+    					this.showCreateQuestion();
     					break;
     				default:
     					this.showStats();
@@ -2957,6 +2968,159 @@ YUI.add('babe', function (Y) {
     		this.render();
     	}
     });
+    var TextQuestionView = Y.Base.create('textquestionview', Y.View, [], {
+   		containerTemplate:'<div/>',
+   		initializer:function(){
+   			this.get('container').setHTML(Y.one('#text-question').getHTML());
+  			this.get('container').one('.close-btn').on('click',function(){
+  				this.get('container').remove();
+  			},this);
+  		},
+  		render:function(){
+  			return this;
+   		}
+   });
+   var RadioQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
+   		containerTemplate:'<div/>',
+   		initializer:function(){
+   			this.get('container').setHTML(Y.one('#radio-question').getHTML());
+   			this.get('container').one('.close-btn').on('click',function(){
+   				this.get('container').remove();
+   			},this);
+   		},
+  		render:function(){
+   			return this;
+   		}
+   });
+   var TextAreaQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
+   		containerTemplate:'<div/>',
+   		initializer:function(){
+   			this.get('container').setHTML(Y.one('#radio-question').getHTML());
+   			this.get('container').one('.close-btn').on('click',function(){
+   				this.get('container').remove();
+  			},this);
+   		},
+   		render:function(){
+   			return this;
+   		}
+   });
+   var QuestionCreationView = Y.Base.create('searchboxview', Y.View, [], {
+  		containerTemplate:'<div/>',
+   		initializer:function(){
+   			var c = this.get('container');
+   			c.setHTML(Y.one('#question-creation').getHTML());
+   			var drop = new Y.DD.Drop({
+		        node: c.one('.qdrag-area') 
+		    });
+   			c.one('.drag-zone').all('.component').each(function(item){
+
+	   					var drag = new Y.DD.Drag({
+			            	node: item
+			        	}).plug(Y.Plugin.DDProxy, {
+			            		moveOnEnd: false,
+			            		cloneNode:true
+			            		
+			        	});
+			        	drag.on('drag:drophit', function(e){
+			        		var type = e.drag.get('node').getAttribute('data-type');
+			        		switch(type)
+			        		{
+			        			case "text":
+			        				c.one('.qdrag-area').append((new TextQuestionView()).render().get('container'));
+		        				break;
+			        			case "radio":
+			        				c.one('.qdrag-area').append((new RadioQuestionView()).render().get('container'));
+			        				break;
+			        			case "freetext":
+			        				c.one('.qdrag-area').append((new TextAreaQuestionView()).render().get('container'));
+			        				break;
+			        			default:
+			        				
+			        		}
+			        	});
+	
+		   	});
+		   	c.one('.save-question').on('click',function(){
+		   		var question = this.get('container').one('textarea[name=question-text]').get('value');
+		   		if(!question)
+		   		{
+		   			Y.showAlert('Oh Snap!','Please enter a question');
+	   			return;
+		   		}
+		   		if(this.get('container').one('.qdrag-area').all(".component").size()==0)
+		   		{
+		   			Y.showAlert('Oh Snap!','Please drag at-least one answering model');
+		   			return;
+		   		}
+		   		
+		   	},this);
+		   	c.one('.preview').on('click',function(){
+		   		var form = this.getFormObject();
+		   		if(Y.one('#previewModal')){
+		   			Y.one('#previewModal').remove();
+		   		}
+		   		Y.one('body').append(Y.one('#preview-template').getHTML());
+		   		Y.one('#previewModal').one('.modal-body').setHTML(this.getMarkup(form));
+	   		    jQuery('#previewModal').modal({
+			    	keyboard: false
+			    });
+		   	},this);
+		   
+   		},
+   		render:function(){
+   			return this;
+   		},
+   		getFormObject:function(){
+   			var obj=[],response={};
+   			this.get('container').one('.qdrag-area').all(".component").each(function(item){
+   				obj.push({
+   					'data-type':item.getAttribute('data-type'),
+   					'label':item.one('.label').get('value'),
+   					'expected':item.one('.expected').get('value')
+   				});
+   			});
+   			response.items = obj;
+   			response.question = this.get('container').one('textarea[name=question-text]').get('value');
+   			return response;
+   		},
+   		getMarkup:function(response){
+   			var n = Y.Node.create('<div/>');
+   			n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(),{
+   				QUESTION:response.question
+   			}));
+   			Y.log(n.getHTML()); 
+   			for(var i in response.items)
+ 			{
+ 				var markup = Y.one('#simple-row').getHTML();
+  				if(response.items[i]['data-type']=='text')
+ 				{
+ 					markup = Y.Lang.sub(markup,{
+ 						CONTENT:"<input type='text' class='input span12' id='item"+i+"'/>",
+  						LABEL:response.items[i]['label']
+   					});
+ 				}
+   				else if(response.items[i]['data-type']=='radio')
+   				{
+   					markup = Y.Lang.sub(markup,{
+   						CONTENT:"<input type='text' class='input span12' id='item"+i+"'/>",
+   						LABEL:response.items[i]['label']
+   					});
+   				}
+   				else if(response.items[i]['data-type']=='textarea')
+   				{
+   					markup = Y.Lang.sub(markup,{
+  						CONTENT:"<textarea class='input span12' id='item"+i+"'></textarea>",
+   						LABEL:response.items[i]['label']
+   					});
+   				}
+   				n.one('.answer').append(markup);
+   			}
+   			return n.getHTML();
+   		}
+   	
+   });
+    
+    
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',

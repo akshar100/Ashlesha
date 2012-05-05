@@ -79,9 +79,9 @@
     
 </script>
 <script type="text/x-template" id="embedded-image">
-	<div class="row">
+	<div class="row-fluid">
 		<div class="span9">
-			<div class="row-fluid"><img src="{IMG}" class="span6 thumbnail"/></div> 
+			<div class="row-fluid"><img src="{IMG}" class="span12 thumbnail"/></div> 
 		</div>
 	</div>
 </script>
