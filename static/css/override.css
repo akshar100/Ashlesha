@@ -204,3 +204,7 @@ img.profile-image
 {
 	min-height:400px; 
 }
+.chart-area
+{
+	min-height:300px;
+}
