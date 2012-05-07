@@ -59,7 +59,7 @@ class IO extends CI_Controller {
 		
 		$user = $this->user->get_user();
 		if(!empty($user['profile_pic'] ) && !empty($data['profile_pic']) && $data['profile_pic']!==$user['profile_pic']){
-			$this->dba->update($user);
+			
 		}
 		foreach($data as $k=>$v)
 		{
