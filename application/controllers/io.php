@@ -300,6 +300,16 @@ class IO extends CI_Controller {
 		echo json_encode($this->dba->delete($this->input->post('_id')));
 	}
 
+	function create_model()
+	{
+		echo json_encode($this->dba->create($this->input->post()));
+	}
+	
+	function update_model()
+	{
+		echo json_encode($this->dba->update($this->input->post()));
+	}
+
 	function create_notification()
 	{
 		$post = $this->input->post();

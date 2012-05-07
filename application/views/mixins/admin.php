@@ -275,6 +275,23 @@ United States of America|USA|0.5
 		</div>
 	</div>
 </script>
+<script type="text/x-template" id="question-row-adder">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="row-fluid">
+				<div class="span6">{QUESTION}</div>
+				<div class="span6">
+					<div style="padding:10px;">
+						<button type="button" class="btn btn-primary">Add</button>
+						<button type="button" class="btn btn-danger hide">Remove</button>
+						<input type="hidden" name="question_id" value="{ID}"/>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</script>
 <script type="text/x-template" id="create-quiz">
 	<div class="row-fluid">
 		<div class="span12">
@@ -285,16 +302,43 @@ United States of America|USA|0.5
 	<form>
 	<fieldset>
 		<div class="row-fluid">
-			<div class="span1"><label>Give a title</label></div>
-			<input class="input span6" type="text" name="title"/> 
+			<div class="span2"><label>Give a title</label></div>
+			<input class="input span6" type="text" name="title" placeholder="Give a title"/> 
 		</div>
 		<div class="row-fluid">
-			<div class="span1"><label>Start Date</label></div>
-			<div class="span4"><div class='start'></div></div>
-			<div class="span1"><label>End Date</label></div>
-			<div class="span4"><div class='end'></div></div>
+			<div class="span2">&nbsp;</div>
+			<div class="span4">
+				<label>Start Date</label>
+				<div class='start'></div>
+				</div>
+			
+			<div class="span4">
+				<label>End Date</label>
+				<div class='end'></div>
+				<p>&nbsp;</p>
+			</div>
+			
 		</div>
-		
+		<div class="row-fluid">
+			<div class="span2"><label>Time For Test</label></div>
+			<input class="input span3" type="text" placeholder="time in minutes" name="time"/> 
+		</div>
+		<div class="row-fluid">
+			<div class="span6"><h3>All Questions</h3>
+				<div class="row-fluid"><div class="span10 all-questions well"></div></div>
+			</div>
+			<div class="span6">
+				<h3>Questions for This Quiz</h3>
+				<div class="row-fluid"><div class="span10 selected_questions well"></div></div>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="span10">
+				<div class="pull-right">
+					<button type="button" class="btn btn-primary create-btn">Create Quiz</button>
+				</div>
+			</div>
+		</div>
 	</fieldset>
 	</form>
 </script>

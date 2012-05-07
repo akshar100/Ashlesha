@@ -5,7 +5,55 @@ YUI.add('babe', function (Y) {
     });
     cache.flush();
     
-    
+    function genericModelSync(action, options, callback){
+        	var model = this;
+        	if(action=='read'){
+        		if(model.get('_id'))
+        		{
+        			Y.io(baseURL+'io/get_model',{
+        			method:'POST',
+        			data:model.toJSON(),
+        			on:{
+        				complete:function(i,o,a){
+        					
+        					callback(null, response);
+        				}
+        			}
+        			});
+        		}
+        		else
+        		{
+        			callback(null,model.toJSON());
+        		}
+        		
+        	}
+        	if(action=='create')
+        	{
+        		Y.io(baseURL+'io/create_model',{
+        			method:'POST',
+        			data:model.toJSON(),
+        			on:{
+        				complete:function(i,o,a){
+        					
+        					callback(null, response);
+        				}
+        			}
+        		});
+        	}
+        	if(action=='update')
+        	{
+        		Y.io(baseURL+'io/update_model',{
+        			method:'POST',
+        			data:model.toJSON(),
+        			on:{
+        				complete:function(i,o,a){
+        					
+        					callback(null, response);
+        				}
+        			}
+        		});
+        	}
+        }
     	function createMarkup(response) {
             var n = Y.Node.create('<div/>');
             n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(), {
@@ -2545,7 +2593,7 @@ YUI.add('babe', function (Y) {
             user.load({}, function () {
 
                 var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(), {
-                    IMG: baseURL+user.get("profile_pic"),
+                    IMG: user.get("profile_pic"),
                     FULLNAME: user.get("fullname")
                 });
                 that.get('container').setHTML(Y.Lang.sub(template, {
@@ -3013,36 +3061,188 @@ YUI.add('babe', function (Y) {
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         showCreateQuiz:function(){
-        	var qc = new CreateQuizView();
+        	var qc = new CreateQuizView({
+        		model:new QuizModel()
+        	});
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
     });
+    
+    var QuizModel = Y.Base.create('quizModel', Y.Model, [], {
+        sync: genericModelSync,
+        validate:function(attrs){
+        	if(!attrs.title)
+        	{
+        		return {
+        			field:'Title',
+        			error:'Title can not be Empty'
+        		}
+        	}
+        	if(!attrs.start_date)
+        	{
+        		return {
+        			field:'Start Date',
+        			error:'Title can not be Empty'
+        		}
+        	}
+        	if(!attrs.end_date)
+        	{
+        		return {
+        			field:'End Date',
+        			error:'End Date can not be Empty'
+        		}
+        	}
+        	if(new Date(attrs.start_date)>new Date(attrs.end_date))
+        	{
+        		return {
+        			field:'End Date',
+        			error:'End Date is before Start Date'
+        		}
+        	}
+        	
+        	if(!attrs.questions)
+        	{
+        		return {
+        			field:"questions",
+        			error:'You need to add at least one question to the list'
+        		}
+        	}
+        },
+        hasQuestion:function(id){
+        	var qs= this.get('questions').split(",");
+        	for(var i in qs)
+        	{
+        		if(qs[i].trim()==id)
+        		{
+        			return true;
+        		}
+        	}
+        	return false;
+        },
+        idAttribute: '_id',
+    	}, {
+    		
+    		ATTRS:{
+		        '_id': {
+		            value: ''
+		        },
+		        title:{
+		        	value:''
+		        },
+		        start_date:{
+		        	value:new Date().toUTCString()
+		        },
+		        end_date:{
+		        	value:new Date().toUTCString()
+		        },
+		        time:{
+		        	value:60
+		        },
+		        questions:{
+		        	value:''	
+		        },
+		        author_id:{
+		        	value:window.current_user
+		        },
+		        type:{
+		        	value:'quiz'
+		        }
+       		}
 
+    });
 	var CreateQuizView = Y.Base.create('managequestionview', Y.View, [], {
 		containerTemplate:'<div/>',
 		initializer:function(){
 			this.get('container').setHTML(Y.one('#create-quiz').getHTML());
+			var m = this.get('model'), cs = this.get('container').one(".all-questions"),ct=this.get('container').one(".selected_questions");;
+			
 			Y.one('body').addClass('yui3-skin-sam');
+			m.on('load',function(){
 			 this.set('start',new Y.Calendar({
-			          height:'200px',
+			          height:'200px', 
 			          width:'200px',
 			          showPrevMonth:false,
 			          showNextMonth: false,
-			          date: new Date()}));
+			          date: new Date(m.get('start_date'))}));
 			          
 			 this.set('end',new Y.Calendar({
 			          height:'200px',
 			          width:'200px',
 			          showPrevMonth: false,
 			          showNextMonth: false,
-			          date: new Date()}));
-			
-			
+			          date: new Date(m.get('end_date'))}));
+			 this.get('start').render(this.get('container').one('.start'));
+			 this.get('end').render(this.get('container').one('.end')); 
+			 
+			 Y.io(baseURL+'in/get_questions',{
+				method:'POST',
+				on:{
+					complete: function(i,o,a){
+						var res = Y.JSON.parse(o.responseText),node;
+						for(var i in res)
+						{
+							
+							var node = Y.Node.create(Y.Lang.sub(Y.one('#question-row-adder').getHTML(),{
+								QUESTION:res[i].data.question,
+								ID:res[i]['_id']
+							})),d = res[i].data;
+							node.one('.btn-primary').on('click',(function(d2,n){
+									return function(e){ 
+										n.remove();
+										ct.append(n);
+										n.one('.btn-primary').addClass('hide');
+										n.one('.btn-danger').removeClass('hide');
+									};
+							})(d,node)
+							);
+							node.one('.btn-danger').on('click',(function(d2,n){
+									return function(e){ 
+										n.remove();
+										cs.append(n);
+										n.one('.btn-primary').removeClass('hide');
+										n.one('.btn-danger').addClass('hide');
+									};
+							})(d,node)
+							);
+							
+							cs.append(((function(r){ return r;})(node)));
+							if(m.hasQuestion(res[i]['+id']))
+							{
+								node.one('.btn-primary').simulate('click');
+							}
+							
+						}
+					}
+				}
+			});
+			 
+			 
+				
+			},this);
+			 
+			m.load();
+			this.get('container').one('.create-btn').on('click',function(e){
+				m.setAttrs({
+					title:this.one("[name=title]").get('value'),
+					start_date:this.get('start').get
+				});
+				e.target.addClass('btn-warning');
+				var old_text = e.target.get('innerText');
+				e.target.set('innerText','Saving.....');
+				m.save(function(err){
+					if(err)
+					{
+						Y.showAlert("Problem with field:"+err.field,err.error);
+					}
+					e.target.removeClass('btn-warning');
+					e.target.set('innerText',old_text);
+				});
+			},this);
 		},
 		render:function(){
-			this.get('start').render(this.get('container').one('.start'));
-			this.get('end').render(this.get('container').one('.end'));
+			
+			
 			return this;
 		}
 	});
