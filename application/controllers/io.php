@@ -302,7 +302,9 @@ class IO extends CI_Controller {
 
 	function create_model()
 	{
-		echo json_encode($this->dba->create($this->input->post()));
+		$data = $this->input->post(); 
+		$data['author_id'] = $this->user->get_current();
+		echo json_encode($this->dba->create($data));
 	}
 	
 	function update_model()

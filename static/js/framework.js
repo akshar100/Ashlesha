@@ -15,7 +15,7 @@ YUI.add('babe', function (Y) {
         			data:model.toJSON(),
         			on:{
         				complete:function(i,o,a){
-        					
+        					var response = Y.JSON.parse(o.responseText);
         					callback(null, response);
         				}
         			}
@@ -25,20 +25,21 @@ YUI.add('babe', function (Y) {
         		{
         			callback(null,model.toJSON());
         		}
-        		
+        		return;
         	}
-        	if(action=='create')
+        	if(action=='create' || !model.get('_id'))
         	{
         		Y.io(baseURL+'io/create_model',{
         			method:'POST',
         			data:model.toJSON(),
         			on:{
         				complete:function(i,o,a){
-        					
+        					var response = Y.JSON.parse(o.responseText);
         					callback(null, response);
         				}
         			}
         		});
+        		return;
         	}
         	if(action=='update')
         	{
@@ -47,11 +48,12 @@ YUI.add('babe', function (Y) {
         			data:model.toJSON(),
         			on:{
         				complete:function(i,o,a){
-        					
+        					var response = Y.JSON.parse(o.responseText);
         					callback(null, response);
         				}
         			}
         		});
+        		return;
         	}
         }
     	function createMarkup(response) {
@@ -3043,7 +3045,11 @@ YUI.add('babe', function (Y) {
                 	this.showManageQuestions();
                 	break;
                 case "create_quiz":
-                	this.showCreateQuiz();
+                	this.showCreateQuiz(null);
+                	break;
+                case "quiz":
+                	Y.log
+                	this.showCreateQuiz(this.get('quiz_id'));
                 	break;
                 default:
                     this.showStats();
@@ -3060,9 +3066,12 @@ YUI.add('babe', function (Y) {
         	var qc = new QuestionManageView();
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
-        showCreateQuiz:function(){
+        showCreateQuiz:function(id){
+        	Y.log(id);
         	var qc = new CreateQuizView({
-        		model:new QuizModel()
+        		model:new QuizModel({
+        			'_id':id || null
+        		})
         	});
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
@@ -3072,6 +3081,7 @@ YUI.add('babe', function (Y) {
     var QuizModel = Y.Base.create('quizModel', Y.Model, [], {
         sync: genericModelSync,
         validate:function(attrs){
+        	
         	if(!attrs.title)
         	{
         		return {
@@ -3083,7 +3093,7 @@ YUI.add('babe', function (Y) {
         	{
         		return {
         			field:'Start Date',
-        			error:'Title can not be Empty'
+        			error:'Start Date can not be Empty'
         		}
         	}
         	if(!attrs.end_date)
@@ -3165,16 +3175,21 @@ YUI.add('babe', function (Y) {
 			          showPrevMonth:false,
 			          showNextMonth: false,
 			          date: new Date(m.get('start_date'))}));
-			          
+			          Y.log(new Date(m.get('start_date')));
 			 this.set('end',new Y.Calendar({
 			          height:'200px',
 			          width:'200px',
 			          showPrevMonth: false,
 			          showNextMonth: false,
 			          date: new Date(m.get('end_date'))}));
-			 this.get('start').render(this.get('container').one('.start'));
-			 this.get('end').render(this.get('container').one('.end')); 
 			 
+			 this.get('start').render(this.get('container').one('.start'));
+			 this.get('start').selectDates(new Date(m.get('start_date')));
+			 this.get('end').render(this.get('container').one('.end')); 
+			 this.get('end').selectDates(new Date(m.get('end_date')));
+			 
+			 this.get('container').one('[name=title]').set('value',m.get('title'));
+			 this.get('container').one('[name=time]').set('value',m.get('time'));
 			 Y.io(baseURL+'in/get_questions',{
 				method:'POST',
 				on:{
@@ -3207,7 +3222,7 @@ YUI.add('babe', function (Y) {
 							);
 							
 							cs.append(((function(r){ return r;})(node)));
-							if(m.hasQuestion(res[i]['+id']))
+							if(m.hasQuestion(res[i]['_id']))
 							{
 								node.one('.btn-primary').simulate('click');
 							}
@@ -3223,9 +3238,14 @@ YUI.add('babe', function (Y) {
 			 
 			m.load();
 			this.get('container').one('.create-btn').on('click',function(e){
+				
 				m.setAttrs({
-					title:this.one("[name=title]").get('value'),
-					start_date:this.get('start').get
+					title:this.get('container').one("[name=title]").get('value'),
+					start_date:(this.get('start').get('selectedDates').length && this.get('start').get('selectedDates')[0].toUTCString()) || null,
+					end_date:(this.get('end').get('selectedDates').length && this.get('end').get('selectedDates')[0].toUTCString()) || null,
+					time:this.get('container').one("[name=time]").get('value'),
+					questions:this.getSelectedQuestions()
+					 
 				});
 				e.target.addClass('btn-warning');
 				var old_text = e.target.get('innerText');
@@ -3234,6 +3254,12 @@ YUI.add('babe', function (Y) {
 					if(err)
 					{
 						Y.showAlert("Problem with field:"+err.field,err.error);
+					}
+					else
+					{
+						Y.fire('navigate',{
+							action:'/admin/quiz/'+m.get('_id')
+						});
 					}
 					e.target.removeClass('btn-warning');
 					e.target.set('innerText',old_text);
@@ -3244,6 +3270,13 @@ YUI.add('babe', function (Y) {
 			
 			
 			return this;
+		},
+		getSelectedQuestions:function(){
+			var str=[];
+			this.get('container').all('[name=question_id]').each(function(item){
+				str.push(item.get('value'));
+			});
+			return str.join(",");
 		}
 	});
 	var QuestionManageView =  Y.Base.create('managequestionview', Y.View, [], {

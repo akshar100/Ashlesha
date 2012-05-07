@@ -295,7 +295,7 @@ United States of America|USA|0.5
 <script type="text/x-template" id="create-quiz">
 	<div class="row-fluid">
 		<div class="span12">
-			<h3>Create a Quiz</h3>
+			<h3>Quiz!</h3>
 			<hr/>
 		</div>
 	</div>
@@ -335,7 +335,7 @@ United States of America|USA|0.5
 		<div class="row-fluid">
 			<div class="span10">
 				<div class="pull-right">
-					<button type="button" class="btn btn-primary create-btn">Create Quiz</button>
+					<button type="button" class="btn btn-primary create-btn">Save</button>
 				</div>
 			</div>
 		</div>

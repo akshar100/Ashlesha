@@ -812,7 +812,7 @@ $this->load->view("common/header");
 						con.one(".leftbar").setHTML(sidebar.render().get('container'));
 					 });
 				}
-				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action')});
+				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action'),quiz_id:this.get('quiz_id')});
 				con.one('.centercolumn').setHTML(adminView.render().get('container'));
 		    	return this;
 		    }
@@ -946,7 +946,18 @@ $this->load->view("common/header");
 				});
 			}
 		});
+		
+		AppUI.route('/admin/quiz/:id',function(req){
+			
+			this.showView('adminview',{
+						userModel:Y.userModel,
+						action:'quiz',
+						quiz_id:req.params.id
+					});
+		});
+		
 		AppUI.route('/admin/:sub_action',function(req){
+			
 			if(Y.userModel.get('_id')) // do this only if the user is loaded!
 			{
 				this.showView('adminview',{
