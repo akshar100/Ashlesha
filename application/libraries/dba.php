@@ -724,4 +724,16 @@ class DBA
 		}
 		return ($response);
 	}
+	
+	function get_all_questions()
+	{
+		$response = $this->chill->getView("posts","get_all_questions");
+		$rows = $response['rows'];
+		$arr = array();
+		foreach($rows as $v)
+		{
+			$arr[]=$v['value'];
+		}
+		return $arr;
+	}
 }

@@ -118,6 +118,7 @@ class IO extends CI_Controller {
 			"get_notifications"=>array("map"=>read_file("./application/views/json/get_all_notifications.js")),
 			"top_tags"=>array("map"=>read_file("./application/views/json/top_tags_map.js"),"reduce"=>read_file("./application/views/json/top_tags_reduce.js")),
 			"user_by_createdat"=>array("map"=>read_file("./application/views/json/users_by_createdat_map.js"),"reduce"=>read_file("./application/views/json/users_by_createdat_reduce.js")),
+			"get_all_questions"=>array("map"=>read_file("./application/views/json/get_all_questions.js"))
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -338,7 +339,23 @@ class IO extends CI_Controller {
 		echo json_encode($output);
 	}
 	
-	
+	function save_question()
+	{
+		$data = $this->input->post('form');
+		$question = array(
+			"type"=>'question',
+			"data"=>json_decode($data),
+			"author_id"=>$this->user->get_current(),
+			"created_at"=>time()
+		);
+		$response = $this->dba->create($question);
+		echo json_encode($response);
+	}
+
+	function delete_question(){
+		$this->dba->delete($this->input->post('id'));
+		echo "{success:true}";
+	}
 }
 
 /* End of file welcome.php */

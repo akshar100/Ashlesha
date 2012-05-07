@@ -324,6 +324,14 @@ class In extends CI_Controller {
 			"users"=>$users
 		));
 	}
+	
+	function get_questions()
+	{
+		$response = array();
+		$questions = $this->dba->get_all_questions();
+		echo json_encode($questions);
+		
+	}
 }
 
 /* End of file welcome.php */

@@ -4,7 +4,37 @@ YUI.add('babe', function (Y) {
         max: 200
     });
     cache.flush();
-
+    
+    
+    	function createMarkup(response) {
+            var n = Y.Node.create('<div/>');
+            n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(), {
+                QUESTION: response.question
+            }));
+            for (var i in response.items) {
+                var markup = Y.one('#simple-row').getHTML();
+                if (response.items[i]['data-type'] == 'text') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
+                        LABEL: response.items[i]['label']
+                    });
+                } else if (response.items[i]['data-type'] == 'radio') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
+                        LABEL: response.items[i]['label']
+                    });
+                } else if (response.items[i]['data-type'] == 'textarea') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<textarea class='input span12' id='item" + i + "'></textarea>",
+                        LABEL: response.items[i]['label']
+                    });
+                }
+                n.one('.answer').append(markup);
+            }
+            return n.getHTML();
+        }
+  
+   
     function listSync(action, options, callback) {
 
         if (options.name == "notificationlist" && action == "read") {
@@ -2515,7 +2545,7 @@ YUI.add('babe', function (Y) {
             user.load({}, function () {
 
                 var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(), {
-                    IMG: user.get("profile_pic"),
+                    IMG: baseURL+user.get("profile_pic"),
                     FULLNAME: user.get("fullname")
                 });
                 that.get('container').setHTML(Y.Lang.sub(template, {
@@ -2949,9 +2979,9 @@ YUI.add('babe', function (Y) {
 
         },
         showCreateQuestion:function(){
-	     var qc = new QuestionCreationView();
-	     this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
-	     },
+	    	var qc = new QuestionCreationView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+	    },
         render: function () {
             if (this.get('action')) {
                 switch (this.get('action')) {
@@ -2961,6 +2991,12 @@ YUI.add('babe', function (Y) {
                 case "create_question":
                     this.showCreateQuestion();
                     break;
+                case "manage_questions":
+                	this.showManageQuestions();
+                	break;
+                case "create_quiz":
+                	this.showCreateQuiz();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -2971,9 +3007,101 @@ YUI.add('babe', function (Y) {
         },
         updateCharts: function () {
             this.render();
+        },
+        showManageQuestions:function(){
+        	var qc = new QuestionManageView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        showCreateQuiz:function(){
+        	var qc = new CreateQuizView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
+        
     });
 
+	var CreateQuizView = Y.Base.create('managequestionview', Y.View, [], {
+		containerTemplate:'<div/>',
+		initializer:function(){
+			this.get('container').setHTML(Y.one('#create-quiz').getHTML());
+			Y.one('body').addClass('yui3-skin-sam');
+			 this.set('start',new Y.Calendar({
+			          height:'200px',
+			          width:'200px',
+			          showPrevMonth:false,
+			          showNextMonth: false,
+			          date: new Date()}));
+			          
+			 this.set('end',new Y.Calendar({
+			          height:'200px',
+			          width:'200px',
+			          showPrevMonth: false,
+			          showNextMonth: false,
+			          date: new Date()}));
+			
+			
+		},
+		render:function(){
+			this.get('start').render(this.get('container').one('.start'));
+			this.get('end').render(this.get('container').one('.end'));
+			return this;
+		}
+	});
+	var QuestionManageView =  Y.Base.create('managequestionview', Y.View, [], {
+		containerTemplate: '<div/>',
+		initializer:function(){
+			this.get('container').setHTML(Y.one('#manage-questions').getHTML());
+			var c = this.get('container').one('.question-list');
+			Y.io(baseURL+'in/get_questions',{
+				method:'POST',
+				on:{
+					complete: function(i,o,a){
+						var res = Y.JSON.parse(o.responseText),node;
+						for(var i in res)
+						{
+							
+							var node = Y.Node.create(Y.Lang.sub(Y.one('#question-row').getHTML(),{
+								QUESTION:res[i].data.question
+							})),d = res[i].data;
+							node.one('.btn-info').on('click',(function(d2){
+									return function(){ 
+									var form = d2;
+					                if (Y.one('#previewModal')) {
+					                    Y.one('#previewModal').remove();
+					                }
+					                Y.one('body').append(Y.one('#preview-template').getHTML());
+					                Y.one('#previewModal').one('.modal-body').setHTML(createMarkup(form));
+					                jQuery('#previewModal').modal({
+					                    keyboard: true
+					                });
+								};
+							})(d)
+							);
+							node.one('.btn-danger').on('click',(function(d2,n){
+									return function(e){ 
+									Y.log(d2); 
+									Y.io(baseURL+'io/delete_question',{
+										method:'POST',
+										data:{
+											id:d2['_id']
+										},
+										on:{
+											complete:function(i,o,a){
+												n.remove();
+											}
+										}
+									});
+									
+					               
+								};
+							})(res[i],node)
+							);
+							c.append(((function(r){ return r;})(node)));
+						}
+					}
+				}
+			});
+		}
+	});
     var TextQuestionView = Y.Base.create('textquestionview', Y.View, [], {
         containerTemplate: '<div/>',
         initializer: function () {
@@ -3045,7 +3173,8 @@ YUI.add('babe', function (Y) {
                 });
 
             });
-            c.one('.save-question').on('click', function () {
+            c.one('.save-question').on('click', function (e) {
+            	e.target.addClass('btn-warning');
                 var question = this.get('container').one('textarea[name=question-text]').get('value');
                 if (!question) {
                     Y.showAlert('Oh Snap!', 'Please enter a question');
@@ -3055,6 +3184,23 @@ YUI.add('babe', function (Y) {
                     Y.showAlert('Oh Snap!', 'Please drag at-least one answering model');
                     return;
                 }
+                Y.io(baseURL+'io/save_question',{
+                	method:'POST',
+                	data:{form:Y.JSON.stringify(this.getFormObject())},
+                	on:{
+                		complete:function(i,o,a){
+                			e.target.removeClass('btn-warning');
+                			e.target.addClass('btn-success');
+                			setTimeout(function(){
+                				e.target.removeClass('btn-success');
+                			},2000);
+                			Y.showAlert('Saved!', 'Your question has been saved');
+                			Y.fire('navigate',{
+                				action:'/admin/create_question'
+                			});
+                		}
+                	}
+                });
 
             }, this);
             c.one('.preview').on('click', function () {
@@ -3087,34 +3233,7 @@ YUI.add('babe', function (Y) {
             response.question = this.get('container').one('textarea[name=question-text]').get('value');
             return response;
         },
-        getMarkup: function (response) {
-            var n = Y.Node.create('<div/>');
-            n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(), {
-                QUESTION: response.question
-            }));
-            Y.log(n.getHTML());
-            for (var i in response.items) {
-                var markup = Y.one('#simple-row').getHTML();
-                if (response.items[i]['data-type'] == 'text') {
-                    markup = Y.Lang.sub(markup, {
-                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
-                        LABEL: response.items[i]['label']
-                    });
-                } else if (response.items[i]['data-type'] == 'radio') {
-                    markup = Y.Lang.sub(markup, {
-                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
-                        LABEL: response.items[i]['label']
-                    });
-                } else if (response.items[i]['data-type'] == 'textarea') {
-                    markup = Y.Lang.sub(markup, {
-                        CONTENT: "<textarea class='input span12' id='item" + i + "'></textarea>",
-                        LABEL: response.items[i]['label']
-                    });
-                }
-                n.one('.answer').append(markup);
-            }
-            return n.getHTML();
-        }
+        getMarkup: createMarkup
 
     });
     Y.BABE = {
@@ -3247,5 +3366,5 @@ YUI.add('babe', function (Y) {
 
     };
 }, '0.0.1', {
-    requires: ['charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
 });

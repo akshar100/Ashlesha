@@ -20,8 +20,9 @@
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Question Bank<b class="caret"></b></a>
 	        <ul class="dropdown-menu">
 	          <li><a href="/admin/create_question">Create Question</a></li>
-	          <li><a href="#buttonGroups">Manage Questions</a></li>
-	          <li><a href="#buttonGroups">Create Question List</a></li>
+	          <li><a href="/admin/manage_questions">Manage Questions</a></li>
+	          <li><a href="/admin/create_quiz">Create Question List</a></li>
+	          <li><a href="/admin/manage_quiz">Manage Question List</a></li>
 	          <li><a href="#buttonGroups">Responses</a></li>
 	        </ul>
 	      </li>
@@ -154,7 +155,7 @@
           </div>
 		</div>
 	</div>
-<</script>
+</script>
 
 <script type="text/x-template" id="text-question">
 	<div class="row-fluid">
@@ -250,4 +251,50 @@ United States of America|USA|0.5
 		    <div class="modal-footer">
 		    </div>
     	</div>
+</script>
+<script type="text/x-template" id="manage-questions">
+	<div class="row-fluid">
+		<div class="span12 question-list">
+		<p>&nbsp;</p>
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="question-row">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="row-fluid">
+				<div class="span6">{QUESTION}</div>
+				<div class="span6">
+					<div style="padding:10px;">
+						<button type="button" class="btn btn-info">Preview</button>
+						<button type="button" class="btn btn-danger">Delete</button>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="create-quiz">
+	<div class="row-fluid">
+		<div class="span12">
+			<h3>Create a Quiz</h3>
+			<hr/>
+		</div>
+	</div>
+	<form>
+	<fieldset>
+		<div class="row-fluid">
+			<div class="span1"><label>Give a title</label></div>
+			<input class="input span6" type="text" name="title"/> 
+		</div>
+		<div class="row-fluid">
+			<div class="span1"><label>Start Date</label></div>
+			<div class="span4"><div class='start'></div></div>
+			<div class="span1"><label>End Date</label></div>
+			<div class="span4"><div class='end'></div></div>
+		</div>
+		
+	</fieldset>
+	</form>
 </script>

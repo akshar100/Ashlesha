@@ -208,3 +208,8 @@ img.profile-image
 {
 	min-height:300px;
 }
+.yui3-skin-sam .yui3-calendar-content {
+    
+    overflow: hidden;
+	line-height:17px;
+}

@@ -971,6 +971,10 @@ $this->load->view("common/header");
 		Y.on('search-init',function(e){ 
 			AppUI.navigate('/search/'+e.search);
 		});
+		
+		Y.on('navigate',function(e){
+			AppUI.navigate(e.action);
+		});
 		AppUI.render().dispatch(); //.save('/');
 		Y.loadTemplate("messagebox",function(){}); 
 		
