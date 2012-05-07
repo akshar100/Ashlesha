@@ -7,17 +7,15 @@ YUI.add('babe', function (Y) {
 
     function listSync(action, options, callback) {
 
-		if(options.name=="notificationlist" && action=="read")
-		{
-			Y.io(baseURL + 'io/notifications', {
+        if (options.name == "notificationlist" && action == "read") {
+            Y.io(baseURL + 'io/notifications', {
                 method: 'GET',
                 on: {
                     success: function (i, o, a) {
                         var data = Y.JSON.parse(o.responseText);
-                        for(var i in data)
-                        {
-                        	data[i]['id'] = data[i]['_id'];
-                        
+                        for (var i in data) {
+                            data[i]['id'] = data[i]['_id'];
+
                         }
                         callback(null, data);
                     }
@@ -25,7 +23,7 @@ YUI.add('babe', function (Y) {
             });
 
             return;
-		}
+        }
 
         if (options.name == "commentlist" && action == "read") {
             Y.io(baseURL + 'in/comments', {
@@ -146,7 +144,7 @@ YUI.add('babe', function (Y) {
         var data = this.toJSON();
         if (data._id == 0) {
             action = "create";
-			
+
         }
 
         if (this.name == "postModel" || this.name == "eventModel" || this.name == "questionModel") {
@@ -303,7 +301,7 @@ YUI.add('babe', function (Y) {
                 //THIS NEEDS TO BE INSIDE AN AJAX CALL
                 return;
             }
-             if (action == 'delete') {
+            if (action == 'delete') {
                 var model = this;
                 var data = this.toJSON()
                 Y.io(baseURL + 'io/delete_model/', {
@@ -332,7 +330,7 @@ YUI.add('babe', function (Y) {
             if (action == "update") {
 
                 var data = this.toJSON();
-				delete data.connections;
+                delete data.connections;
                 Y.io(baseURL + 'io/update_user', {
                     method: 'POST',
                     data: data,
@@ -476,16 +474,15 @@ YUI.add('babe', function (Y) {
                 });
             }
         }
-    	
-    	if(this.name =="notificationModel")
-    	{
-    		var model = this;
-            if (action == "create" || action =="update") {
+
+        if (this.name == "notificationModel") {
+            var model = this;
+            if (action == "create" || action == "update") {
 
                 var data = this.toJSON();
 
                 Y.io(baseURL + 'io/create_notification', {
-                    method: 'POST', 
+                    method: 'POST',
 
                     data: data,
                     on: {
@@ -524,16 +521,16 @@ YUI.add('babe', function (Y) {
                                 callback(null, response);
                             }
 
-                            
+
 
                         }
                     }
                 });
                 return;
             }
-    	}
-    
-    
+        }
+
+
     }
     var sanitizeUI = function () {
             Y.one("#maincontainer").setContent(Y.one("#main").getContent());
@@ -647,17 +644,15 @@ YUI.add('babe', function (Y) {
         },
         initializer: function () {
             this.get('container').setHTML(Y.one('#wall').getHTML());
-             var wall = new Y.BABE.PostList();
-            if(this.get('list'))
-            {
-            	wall = this.get('list');
+            var wall = new Y.BABE.PostList();
+            if (this.get('list')) {
+                wall = this.get('list');
             }
-        	if(this.get('disableLoadMore'))
-        	{
-        		this.get('container').one("#loadMore").addClass('hide');
-        	}
-            
-           
+            if (this.get('disableLoadMore')) {
+                this.get('container').one("#loadMore").addClass('hide');
+            }
+
+
 
             wall.after('add', this.prepend, this);
             wall.after('load', this.render, this);
@@ -725,15 +720,15 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#follow_user").set("data-content", "You will stop seeing activity of this user on your homepage.");
                 this.get('container').one("#follow_user").set("data-original-title", "Unfollow");
                 this.get('container').one("#follow_user").removeClass("btn-success").addClass("btn-warning");
-               
-                
-                
+
+
+
             } else if (this.connection.get('target_follows_source')) {
                 this.get('container').one("#follow_user").set("innerHTML", '<i class="icon-white icon-eye-open"></i> Follow Back');
                 this.get('container').one("#follow_user").set("data-content", "This user is already following you. You might want to return the gesture.");
                 this.get('container').one("#follow_user").set("data-original-title", "Follow Back");
                 this.get('container').one("#follow_user").removeClass("btn-warning").addClass("btn-success");
-               
+
             }
 
             if (this.connection.isFriend()) {
@@ -749,62 +744,61 @@ YUI.add('babe', function (Y) {
                 this.get('container').one("#connect_user").set("data-content", "This user has sent you a connection request. You want to accept it ?");
                 this.get('container').one("#connect_user").set("data-original-title", "Accept Connection");
                 this.get('container').one("#connect_user").removeClass("btn-warning").addClass("btn-success");
-               
-                
+
+
             } else if (this.connection.requestPending()) {
                 this.get('container').one("#connect_user").set("innerHTML", '<i class="icon-white icon-minus"></i> Withdraw Request');
                 this.get('container').one("#connect_user").set("data-content", "This person has not yet accepted your Connect Request");
                 this.get('container').one("#connect_user").set("data-original-title", "Disconnect");
                 this.get('container').one("#connect_user").removeClass("btn-success").addClass("btn-warning");
-                
-                
+
+
             }
 
             this.get('container').one("#connect_user").on('click', function () {
-                
+
                 if (this.connection.requestedFriend()) {
-	                var notify = new NotificationModel({
-	                	source_user:window.current_user,
-	                	target_user:this.get('model').get('_id'),
-	                	notification_action:'friend_request',
-	                	linked_resource:'',
-	                	mark_read:''
-	                });
-	                notify.save();
+                    var notify = new NotificationModel({
+                        source_user: window.current_user,
+                        target_user: this.get('model').get('_id'),
+                        notification_action: 'friend_request',
+                        linked_resource: '',
+                        mark_read: ''
+                    });
+                    notify.save();
                 }
                 if (this.connection.requestPending()) {
-                	
-            		var notify = new NotificationModel({
-            			source_user:window.current_user,
-	                	target_user:this.get('model').get('_id'),
-	                	notification_action:'friend',
-	                	linked_resource:'',
-	                	mark_read:''
-                	});
-                	notify.save(); 
-                	
-                	
+
+                    var notify = new NotificationModel({
+                        source_user: window.current_user,
+                        target_user: this.get('model').get('_id'),
+                        notification_action: 'friend',
+                        linked_resource: '',
+                        mark_read: ''
+                    });
+                    notify.save();
+
+
                 }
                 this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
-                this.connection.save(); 
-                
+                this.connection.save();
+
             }, this);
 
             this.get('container').one("#follow_user").on('click', function () {
                 this.connection.set('source_follows_target', !this.connection.get('source_follows_target'));
                 this.connection.save();
-                if(this.connection.get('source_follows_target'))
-                {
-                		var notify = new NotificationModel({
-                			source_user:window.current_user,
-		                	target_user:this.get('model').get('_id'),
-		                	notification_action:'follow',
-		                	linked_resource:'',
-	                		mark_read:'' 
-	                	});
-	                	notify.save();
+                if (this.connection.get('source_follows_target')) {
+                    var notify = new NotificationModel({
+                        source_user: window.current_user,
+                        target_user: this.get('model').get('_id'),
+                        notification_action: 'follow',
+                        linked_resource: '',
+                        mark_read: ''
+                    });
+                    notify.save();
                 }
-                	
+
             }, this);
 
 
@@ -922,16 +916,14 @@ YUI.add('babe', function (Y) {
     var UserModel = Y.Base.create('userModel', Y.Model, [], {
         sync: modelSync,
         idAttribute: '_id',
-        hasRole:function(role){
-        	var roles = this.get('roles').split(",");
-        	for(var i in roles)
-        	{
-        		if(roles[i].trim().toLowerCase()===role.trim().toLowerCase())
-        		{
-        			return true;
-        		}
-        	}
-        	return false;
+        hasRole: function (role) {
+            var roles = this.get('roles').split(",");
+            for (var i in roles) {
+                if (roles[i].trim().toLowerCase() === role.trim().toLowerCase()) {
+                    return true;
+                }
+            }
+            return false;
         },
         validate: function (attr) {
 
@@ -1452,7 +1444,7 @@ YUI.add('babe', function (Y) {
                 e.halt();
             }, this);
             c.one('a.share').on("click", function (e) {
-                AppUI.navigate("/post/" + this.get('model').get('category') + "/" + this.get('model').get('_id')); 
+                AppUI.navigate("/post/" + this.get('model').get('category') + "/" + this.get('model').get('_id'));
                 e.halt();
             }, this);
         },
@@ -1915,11 +1907,11 @@ YUI.add('babe', function (Y) {
             tags: {
                 value: ''
             },
-            count:{
-            	value:'0' 
+            count: {
+                value: '0'
             },
-            image:{
-            	value:'http://placehold.it/100x100'
+            image: {
+                value: 'http://placehold.it/100x100'
             }
 
         }
@@ -2043,20 +2035,19 @@ YUI.add('babe', function (Y) {
             }, this);
             var lastValue;
             this.get('container').all(".autocomplete").plug(Y.BABE.AutoLoadTagsPlugin, TagBoxConfig);
-           
+
             var inputNode = this.get('container').one(".ac-sector");
-            if(inputNode)
-            {
-            	if (!Y.APPCONFIG.post_sector_enabled) {
-                inputNode.addClass('hide');
-            }
-            inputNode.on('blur', function () {
-                if (inputNode.get('value').trim().length < 4) {
-                    inputNode.set("value", '');
+            if (inputNode) {
+                if (!Y.APPCONFIG.post_sector_enabled) {
+                    inputNode.addClass('hide');
                 }
-            });
+                inputNode.on('blur', function () {
+                    if (inputNode.get('value').trim().length < 4) {
+                        inputNode.set("value", '');
+                    }
+                });
             }
- 			
+
             if (!cache.retrieve("all_sectors")) {
                 Y.io(baseURL + 'in/all_sectors', {
                     method: 'POST',
@@ -2240,887 +2231,892 @@ YUI.add('babe', function (Y) {
         }
     });
 
-	var TopBarView = Y.Base.create('topbarview', Y.View, [], {
-			containerTemplate:'<div/>',
-			initializer:function()
-			{
-				
-				
-			},
-			render:function()
-			{
-				var that = this;
-				this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(),{
-					user_name:Y.userModel.get("fullname"),
-					user_id:Y.userModel.get("user_id")
-				}));
-				var sv = new Y.BABE.SearchBoxView(); 
-				this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
-				if(!Y.APPCONFIG.notifications_enabled)
-				{
-					this.get('container').one("#notification-btn").addClass('hide');
-				}
-				else
-				{
-				
-					this.get('container').one("#notification-btn").on("click",function(e){
-						 AppUI.navigate('/notifications');
-						 e.preventDefault(); 
-					});
-					if(!window.nl && Y.APPCONFIG.push_notifications_enabled)
-					{
-						window.nl = new NotificationList();
-						var sr = setInterval(function(){
-							nl.load({name:'notificationlist'},function(){
-								if(!that.get('container')) { clearInterval(sr); }
-								if(that.get('container').one("#notification-btn").one('.badge'))
-								{ 
-									that.get('container').one("#notification-btn").one('.badge').remove();
-								}
-								if(nl.size()>0)
-								{
-									that.get('container').one("#notification-btn").append(' <span class="badge badge-error">'+nl.size()+'</span>');
-									
-								}
-							});
-						},5000);
-						this.on('destroy',function(){
-							clearInterval(sr);
-						});
-					}
-					
-					
-				}
-				this.get('container').one("a.brand").on("click",function(e){
-					AppUI.navigate("/");
-					e.preventDefault(); 
-				});
-				this.get('container').one("#edit-profile").on("click",function(e){
-					AppUI.navigate("/me");
-					e.preventDefault();
-				});
-				
-				this.get('container').one("a.logout").on('click',function(){
-					window.location = baseURL+'in/logout?seed='+Math.random();
-				});
-				
-				jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
-				return this;
-			}
-		});
-		
-	var MenuItemModel = Y.Base.create('menuitemmodel',Y.Model,[],{},{
-		ATTRS:{
-			label:{value:'unlabled'},
-			view:{value:'myposts'},
-			hide:{value:false}
-		}
-	});
-	
-	var MenuItemList = Y.Base.create('menuitemlist', Y.ModelList, [], {
-	 	sync:listSync,
-	 	model:MenuItemModel
-	 	
-	});
-	
-	var MenuSectionModel = Y.Base.create('menusectionmodel',Y.Model,[],{},{
-		ATTRS:{
-			label:{value:'unlabled'}
-			
-		}
-	});
-	
-	var MenuSectionList = Y.Base.create('menusectionlist', Y.ModelList, [], {
-	 	sync:listSync,
-	 	model:MenuSectionModel
-	 	
-	});
-	
-	var MenuItemView = Y.Base.create('menuitemview',Y.View,[],{
-		containerTemplate:"<li class='menuitem'/>",
-		hide:function(){
-			this.get('container').addClass('hide');
-		},
-		show:function(){
-			this.get('container').removeClass('hide');
-		},
-		initializer:function(config){
-			
-			this.get('model').on('hideChange',function(e){
-			
-				if(e.newVal==false)
-				{
-					this.get('container').removeClass('hide').addClass('show');
-					
-				}
-				else
-				{
-					this.get('container').removeClass('show').addClass('hide');
-				}
-			},this);
-			if(this.get('model').get('name'))
-			{
-				if(this.get('model').get('name').toLowerCase()=='group' && !Y.APPCONFIG.group_enabled ){
-				this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='painpoint' && !Y.APPCONFIG.post_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='question' && !Y.APPCONFIG.question_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='event' && !Y.APPCONFIG.event_enabled ){
-					this.get('container').addClass('hide');
-				}
-				if(this.get('model').get('name').toLowerCase()=='survey' && !Y.APPCONFIG.survey_enabled ){
-					this.get('container').addClass('hide');
-				}
-			}
-			
-			
-			this.get('container').on("click",function(e){
-				var view = this.get('model').get("view");
-				AppUI.navigate(view);
-				e.halt();
-			},this); 
-		},
-		render:function(){
-			
-			if(this.get('model').get("label").length<=12)
-			{
-				this.get('container').setContent(this.get('model').get("label"));
-			}
-			else
-			{
-				this.get('container').setContent(this.get('model').get("label").substr(0,10)+"..");
-				this.get('container').set("title",this.get('model').get("label"));
-			}
-			return this;
-		}
-	});
-	var MenuSectionView = Y.Base.create('menusectionview', Y.View, [], {
-			containerTemplate:'<div />',
-			initializer:function(){
-				this.template=Y.one("#menu-section").getContent();
-			},
-			render:function(){
-				if(this.get('model').get('name')=='group' && !(Y.APPCONFIG && Y.APPCONFIG.group_enabled))
-				{
-					this.get('container').addClass('hide');
-				}
-				this.get('container').setContent(Y.Lang.sub(this.template,{
-					LABEL:this.get('model').get("label")
-				}));
-				return this;
-			}
-		});
-	var SideBarMenuView = Y.Base.create('sidebarview', Y.View, [], {
-			containerTemplate:'<div/>',
-			initializer:function(){
-				var items = new GroupList();
-				this.set('items',items);
-			},
-			toggleList:function(sectionContainer){
-				var max_item = 2;
-				var items = this.get('items');
-				if(items.size()>max_item && (sectionContainer.one("a.more").hasClass('hide') || sectionContainer.one("a.more").hasClass('dropped')))
-				{
-					
-					var hide = 0;
-					items.each(function(item,index){
-						if(hide<max_item)
-						{
-							item.set('hide',false);
-							item.save();
-							hide++;
-						}
-						else
-						{
-							item.set('hide',true);
-							item.save();
-						}
-					
-					});
-					sectionContainer.one("a.more").removeClass('hide');
-					sectionContainer.one("a.more").setHTML("<h4><small>MORE</small></h4>");
-					sectionContainer.one("a.more").removeClass('dropped');
-				}
-				else
-				{
-					
-					items.each(function(item,index){
-						
-							item.set('hide',false);
-							item.save();
-							
+    var TopBarView = Y.Base.create('topbarview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
 
-					});
-					sectionContainer.one("a.more").addClass('dropped');
-					sectionContainer.one("a.more").setHTML("<h4><small>LESS</small><h4>");
-					
-				}
-			},
-			render:function(){
-				var menuContainer = this.get('container');
-				var sections  = new MenuSectionList(); 
-				var that = this;
-				
-				sections.load({name:'menusectionlist'},function(){
-					sections.each(function(item,index){
-						var section = new MenuSectionView({model:item});
-						
-						if(item.get('name')=='group')
-						{
-							
-							
-							var sectionContainer = section.render().get('container');
-							menuContainer.append(sectionContainer);
-							var items = that.get('items');
-							items.load({
-								name:'groupList'
-							},function(){
-								
-								
-								items.each(function(item,index){
-								
-									sectionContainer.one("ul").append(new MenuItemView({model:item}).render().get('container')); 
-									
-								});
-								
-								
-								that.toggleList(sectionContainer);
-								sectionContainer.one("a.more").on('click',function(){
-									that.toggleList(sectionContainer);
-								});
-								
-							});
-						}
-						else
-						{
-							var items = new MenuItemList();
-							var sectionContainer = section.render().get('container');
-							menuContainer.append(sectionContainer);
-							items.load({name:'menuitemlist',section:item.get("id")},function(){
-								items.each(function(item,index){
-									sectionContainer.one("ul").append(new MenuItemView({model:item}).render().get('container')); 
-								});
-							});
-						}
-						
-						
-						
-					});
-					
-				});
-				return this;
-			}
-		});
-   	var SideBarView = Y.Base.create('sidebarview', Y.View, [], {
-			containerTemplate:"<div/>",
-			render:function(){
-				
-				var user = new UserModel({'_id':window.current_user});
-				var that = this;
-				user.load({},function(){
-					
-					var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(),{
-						IMG:user.get("profile_pic"),
-						FULLNAME:user.get("fullname")
-					});
-					that.get('container').setHTML(Y.Lang.sub(template,{
-						user_name:user.get("fullname"),
-						user_id:user.get("_id")
-					}));
-					
-					that.get('container').append(new SideBarMenuView().render().get('container'));
-					
-					
-				});
-				
-				return this;
-				
-			}
-		}) ; 
-    
-    var StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
-			containerTemplate:'<div id="statusblock"/>',
-			initializer:function(){
-				
-				
-				
-			},
-			hide:function(){
-				this.get('container').hide(true);
-			},
-			show:function(){
-				this.get('container').show(true);
-			},
-			expandForm:function(val){
-				if(val=="question"){
-							
-							var q = new Y.BABE.CreateQuestionView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-							
-						}
-						if(val=="event"){
-							
-							var q = new Y.BABE.CreateEventView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-						
-						}
-						if(val=="painpoint"){
-							
-							var q = new Y.BABE.CreatePostView();
-							this.get('container').one(".forms").setContent(q.render().get('container'));
-							
-						}
-			},
-			render:function(){
-				
-				
-				this.set('container',Y.Node.create('<div id="statusblock"/>'));
-				
-				this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(),{
-					user_name:Y.user.get("name"),
-					user_id:Y.user.get("user_id") 
-				}));
-				if(Y.config)
-				{
-					if(!Y.APPCONFIG.post_enabled)
-					{
-						this.get('container').one('a.post').addClass('hide');
-					}
-					if(!Y.APPCONFIG.event_enabled)
-					{
-						this.get('container').one('a.event').addClass('hide');
-					}
-					if(!Y.APPCONFIG.survey_enabled)
-					{
-						this.get('container').one('a.survey').addClass('hide');
-					}
-					if(!Y.APPCONFIG.question_enabled)
-					{
-						this.get('container').one('a.question').addClass('hide');
-					}
-				}
-	
-				this.get('container').one(".pills-status").all("a").on("click",function(e){
-						
-						var val = Y.one(e.target).get("rel");
-						
-						this.expandForm(val);	
-						
-					},this);
-				if(this.get('expand'))
-				{
-					this.expandForm(this.get('expand'));
-				}
-				return this;
-			}
-		});
-    
-    var InviteView =  Y.Base.create('inviteview', Y.View, [], {
-    	containerTemplate:'<div/>',
-    	initializer:function(){
-    		var c = this.get('container');
-    		c.setHTML(Y.one('#invite-users-box').getHTML());
-    		
-    		c.one(".nav-tabs").all('a').on('click',function (e) {
-			    e.preventDefault();
-			    c.one('.tab-content').all('div.tab-pane').removeClass('active');
-			    c.one('.tab-content').one("#"+e.target.get('rel')).addClass('active');
-			});
-    	},
-    	render:function(){
-    		return this;
-    	}
+
+        },
+        render: function () {
+            var that = this;
+            this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(), {
+                user_name: Y.userModel.get("fullname"),
+                user_id: Y.userModel.get("user_id")
+            }));
+            var sv = new Y.BABE.SearchBoxView();
+            this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
+            if (!Y.APPCONFIG.notifications_enabled) {
+                this.get('container').one("#notification-btn").addClass('hide');
+            } else {
+
+                this.get('container').one("#notification-btn").on("click", function (e) {
+                    AppUI.navigate('/notifications');
+                    e.preventDefault();
+                });
+                if (!window.nl && Y.APPCONFIG.push_notifications_enabled) {
+                    window.nl = new NotificationList();
+                    var sr = setInterval(function () {
+                        nl.load({
+                            name: 'notificationlist'
+                        }, function () {
+                            if (!that.get('container')) {
+                                clearInterval(sr);
+                            }
+                            if (that.get('container').one("#notification-btn").one('.badge')) {
+                                that.get('container').one("#notification-btn").one('.badge').remove();
+                            }
+                            if (nl.size() > 0) {
+                                that.get('container').one("#notification-btn").append(' <span class="badge badge-error">' + nl.size() + '</span>');
+
+                            }
+                        });
+                    }, 5000);
+                    this.on('destroy', function () {
+                        clearInterval(sr);
+                    });
+                }
+
+
+            }
+            this.get('container').one("a.brand").on("click", function (e) {
+                AppUI.navigate("/");
+                e.preventDefault();
+            });
+            this.get('container').one("#edit-profile").on("click", function (e) {
+                AppUI.navigate("/me");
+                e.preventDefault();
+            });
+
+            this.get('container').one("a.logout").on('click', function () {
+                window.location = baseURL + 'in/logout?seed=' + Math.random();
+            });
+
+            jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
+            return this;
+        }
     });
-    
-    var NotificationModel = Y.Base.create('notificationModel',Y.Model,[],{
-    	 sync: modelSync,
-         idAttribute: '_id',
-    },{
-    	'_id':{value:''} 
-    	,source_user:{value:window.current_user}
-    	,target_user:{value:''}
-    	,notification_action:{value:''}
-    	,linked_resource:{value:''}
-    	,type:{value:'notification'}
-    	,created_at:{value:''}
-    	,mark_read:{value:''}
-    	
+
+    var MenuItemModel = Y.Base.create('menuitemmodel', Y.Model, [], {}, {
+        ATTRS: {
+            label: {
+                value: 'unlabled'
+            },
+            view: {
+                value: 'myposts'
+            },
+            hide: {
+                value: false
+            }
+        }
+    });
+
+    var MenuItemList = Y.Base.create('menuitemlist', Y.ModelList, [], {
+        sync: listSync,
+        model: MenuItemModel
+
+    });
+
+    var MenuSectionModel = Y.Base.create('menusectionmodel', Y.Model, [], {}, {
+        ATTRS: {
+            label: {
+                value: 'unlabled'
+            }
+
+        }
+    });
+
+    var MenuSectionList = Y.Base.create('menusectionlist', Y.ModelList, [], {
+        sync: listSync,
+        model: MenuSectionModel
+
+    });
+
+    var MenuItemView = Y.Base.create('menuitemview', Y.View, [], {
+        containerTemplate: "<li class='menuitem'/>",
+        hide: function () {
+            this.get('container').addClass('hide');
+        },
+        show: function () {
+            this.get('container').removeClass('hide');
+        },
+        initializer: function (config) {
+
+            this.get('model').on('hideChange', function (e) {
+
+                if (e.newVal == false) {
+                    this.get('container').removeClass('hide').addClass('show');
+
+                } else {
+                    this.get('container').removeClass('show').addClass('hide');
+                }
+            }, this);
+            if (this.get('model').get('name')) {
+                if (this.get('model').get('name').toLowerCase() == 'group' && !Y.APPCONFIG.group_enabled) {
+                    this.get('container').addClass('hide');
+                }
+                if (this.get('model').get('name').toLowerCase() == 'painpoint' && !Y.APPCONFIG.post_enabled) {
+                    this.get('container').addClass('hide');
+                }
+                if (this.get('model').get('name').toLowerCase() == 'question' && !Y.APPCONFIG.question_enabled) {
+                    this.get('container').addClass('hide');
+                }
+                if (this.get('model').get('name').toLowerCase() == 'event' && !Y.APPCONFIG.event_enabled) {
+                    this.get('container').addClass('hide');
+                }
+                if (this.get('model').get('name').toLowerCase() == 'survey' && !Y.APPCONFIG.survey_enabled) {
+                    this.get('container').addClass('hide');
+                }
+            }
+
+
+            this.get('container').on("click", function (e) {
+                var view = this.get('model').get("view");
+                AppUI.navigate(view);
+                e.halt();
+            }, this);
+        },
+        render: function () {
+
+            if (this.get('model').get("label").length <= 12) {
+                this.get('container').setContent(this.get('model').get("label"));
+            } else {
+                this.get('container').setContent(this.get('model').get("label").substr(0, 10) + "..");
+                this.get('container').set("title", this.get('model').get("label"));
+            }
+            return this;
+        }
+    });
+    var MenuSectionView = Y.Base.create('menusectionview', Y.View, [], {
+        containerTemplate: '<div />',
+        initializer: function () {
+            this.template = Y.one("#menu-section").getContent();
+        },
+        render: function () {
+            if (this.get('model').get('name') == 'group' && !(Y.APPCONFIG && Y.APPCONFIG.group_enabled)) {
+                this.get('container').addClass('hide');
+            }
+            this.get('container').setContent(Y.Lang.sub(this.template, {
+                LABEL: this.get('model').get("label")
+            }));
+            return this;
+        }
+    });
+    var SideBarMenuView = Y.Base.create('sidebarview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            var items = new GroupList();
+            this.set('items', items);
+        },
+        toggleList: function (sectionContainer) {
+            var max_item = 2;
+            var items = this.get('items');
+            if (items.size() > max_item && (sectionContainer.one("a.more").hasClass('hide') || sectionContainer.one("a.more").hasClass('dropped'))) {
+
+                var hide = 0;
+                items.each(function (item, index) {
+                    if (hide < max_item) {
+                        item.set('hide', false);
+                        item.save();
+                        hide++;
+                    } else {
+                        item.set('hide', true);
+                        item.save();
+                    }
+
+                });
+                sectionContainer.one("a.more").removeClass('hide');
+                sectionContainer.one("a.more").setHTML("<h4><small>MORE</small></h4>");
+                sectionContainer.one("a.more").removeClass('dropped');
+            } else {
+
+                items.each(function (item, index) {
+
+                    item.set('hide', false);
+                    item.save();
+
+
+                });
+                sectionContainer.one("a.more").addClass('dropped');
+                sectionContainer.one("a.more").setHTML("<h4><small>LESS</small><h4>");
+
+            }
+        },
+        render: function () {
+            var menuContainer = this.get('container');
+            var sections = new MenuSectionList();
+            var that = this;
+
+            sections.load({
+                name: 'menusectionlist'
+            }, function () {
+                sections.each(function (item, index) {
+                    var section = new MenuSectionView({
+                        model: item
+                    });
+
+                    if (item.get('name') == 'group') {
+
+
+                        var sectionContainer = section.render().get('container');
+                        menuContainer.append(sectionContainer);
+                        var items = that.get('items');
+                        items.load({
+                            name: 'groupList'
+                        }, function () {
+
+
+                            items.each(function (item, index) {
+
+                                sectionContainer.one("ul").append(new MenuItemView({
+                                    model: item
+                                }).render().get('container'));
+
+                            });
+
+
+                            that.toggleList(sectionContainer);
+                            sectionContainer.one("a.more").on('click', function () {
+                                that.toggleList(sectionContainer);
+                            });
+
+                        });
+                    } else {
+                        var items = new MenuItemList();
+                        var sectionContainer = section.render().get('container');
+                        menuContainer.append(sectionContainer);
+                        items.load({
+                            name: 'menuitemlist',
+                            section: item.get("id")
+                        }, function () {
+                            items.each(function (item, index) {
+                                sectionContainer.one("ul").append(new MenuItemView({
+                                    model: item
+                                }).render().get('container'));
+                            });
+                        });
+                    }
+
+
+
+                });
+
+            });
+            return this;
+        }
+    });
+    var SideBarView = Y.Base.create('sidebarview', Y.View, [], {
+        containerTemplate: "<div/>",
+        render: function () {
+
+            var user = new UserModel({
+                '_id': window.current_user
+            });
+            var that = this;
+            user.load({}, function () {
+
+                var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(), {
+                    IMG: user.get("profile_pic"),
+                    FULLNAME: user.get("fullname")
+                });
+                that.get('container').setHTML(Y.Lang.sub(template, {
+                    user_name: user.get("fullname"),
+                    user_id: user.get("_id")
+                }));
+
+                that.get('container').append(new SideBarMenuView().render().get('container'));
+
+
+            });
+
+            return this;
+
+        }
+    });
+
+    var StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
+        containerTemplate: '<div id="statusblock"/>',
+        initializer: function () {
+
+
+
+        },
+        hide: function () {
+            this.get('container').hide(true);
+        },
+        show: function () {
+            this.get('container').show(true);
+        },
+        expandForm: function (val) {
+            if (val == "question") {
+
+                var q = new Y.BABE.CreateQuestionView();
+                this.get('container').one(".forms").setContent(q.render().get('container'));
+
+            }
+            if (val == "event") {
+
+                var q = new Y.BABE.CreateEventView();
+                this.get('container').one(".forms").setContent(q.render().get('container'));
+
+            }
+            if (val == "painpoint") {
+
+                var q = new Y.BABE.CreatePostView();
+                this.get('container').one(".forms").setContent(q.render().get('container'));
+
+            }
+        },
+        render: function () {
+
+
+            this.set('container', Y.Node.create('<div id="statusblock"/>'));
+
+            this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(), {
+                user_name: Y.user.get("name"),
+                user_id: Y.user.get("user_id")
+            }));
+            if (Y.config) {
+                if (!Y.APPCONFIG.post_enabled) {
+                    this.get('container').one('a.post').addClass('hide');
+                }
+                if (!Y.APPCONFIG.event_enabled) {
+                    this.get('container').one('a.event').addClass('hide');
+                }
+                if (!Y.APPCONFIG.survey_enabled) {
+                    this.get('container').one('a.survey').addClass('hide');
+                }
+                if (!Y.APPCONFIG.question_enabled) {
+                    this.get('container').one('a.question').addClass('hide');
+                }
+            }
+
+            this.get('container').one(".pills-status").all("a").on("click", function (e) {
+
+                var val = Y.one(e.target).get("rel");
+
+                this.expandForm(val);
+
+            }, this);
+            if (this.get('expand')) {
+                this.expandForm(this.get('expand'));
+            }
+            return this;
+        }
+    });
+
+    var InviteView = Y.Base.create('inviteview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            var c = this.get('container');
+            c.setHTML(Y.one('#invite-users-box').getHTML());
+
+            c.one(".nav-tabs").all('a').on('click', function (e) {
+                e.preventDefault();
+                c.one('.tab-content').all('div.tab-pane').removeClass('active');
+                c.one('.tab-content').one("#" + e.target.get('rel')).addClass('active');
+            });
+        },
+        render: function () {
+            return this;
+        }
+    });
+
+    var NotificationModel = Y.Base.create('notificationModel', Y.Model, [], {
+        sync: modelSync,
+        idAttribute: '_id',
+    }, {
+        '_id': {
+            value: ''
+        },
+        source_user: {
+            value: window.current_user
+        },
+        target_user: {
+            value: ''
+        },
+        notification_action: {
+            value: ''
+        },
+        linked_resource: {
+            value: ''
+        },
+        type: {
+            value: 'notification'
+        },
+        created_at: {
+            value: ''
+        },
+        mark_read: {
+            value: ''
+        }
+
     });
     var NotificationList = Y.Base.create('notificationlist', Y.ModelList, [], {
-	 	sync:listSync,
-	 	model:NotificationModel
-	 	
-	});
-    
-    var NotificationView = Y.Base.create('notificationview', Y.View, [], {
-    	containerTemplate:'<div/>',
-    	initializer:function(){
-    		var c = this.get('container'),m=this.get('model');
-    		m.on('change',function(){
-    			if(m.get('mark_read'))
-    			{
-    				c.remove();
-    			}
-    		},this);
-    		
-    	},
-    	render:function(){
-    		
-    		var c = this.get('container'),m=this.get('model');
-    		var u = new UserModel({'id':m.get('source_user')});
-    		u.load({'id':m.get('source_user')},function(){
-    			c.setHTML(Y.Lang.sub(Y.one('#notification-row-'+m.get('notification_action')).getHTML(),{
-    				SOURCE_USER:u.get('fullname')
-	    		}));
-	    		if(m.get('notification_action')=='friend' || m.get('notification_action')=='friend_request' || m.get('notification_action')=='follow')
-	    		{
-	    			c.one('.visit').on('click',function(){
-	    				AppUI.navigate('/user/'+m.get('source_user'));
-	    			});
-	    		}
-    			c.one('.close').on('click',function(){
-					m.set('mark_read','true');
-					m.save();
-				});
-    		});
-    		
-    		
-			
-    		return this;
-    	}
+        sync: listSync,
+        model: NotificationModel
+
     });
-     var BarChartView = Y.Base.create('barchartview', Y.View, [], {
-     	containerTemplate:'<div/>',
-     	initializer:function(config){
-     		var c = this.get('container');
-     		var mychart = new Y.Chart({
-			    dataProvider: [
-			    	{"tag":'loading',"posts":10} 
-			    ], 
-			    type: "column"
-			});
-			this.set('chart',mychart);
-     		var dataSource = Y.Base.create('chartds', Y.ModelList, [], {
-		  
-			  sync: function (action, options, callback) {
-			    var data;
-			
-			    if (action === 'read') {
-			      Y.io(baseURL+'in/get_top_tags',{
-			  			method:'GET',
-			  			on:{
-			  				complete:function(i,o,a){
-			  					var response = Y.JSON.parse(o.responseText);
-			  					var data = [];
-			  					for(var row in response.rows)
-			  					{
-			  						data.push({
-			  							"category":response.rows[row].key,
-			  							"posts":parseInt(response.rows[row].value,10)
-			  						});
-			  						
-			  					}
-			  					callback(null, data);
-			  					
-			  				}
-			  			}
-			  		});
-			     
-			    } else {
-			      callback('Unsupported sync action: ' + action);
-			    }
-			  }
-		    });
-     		this.set('dataSource',new dataSource());
-     		this.get('dataSource').on('load',function(){
-     			mychart.set('dataProvider',this.get('dataSource').toJSON());
-     		},this);
-     		this.get('dataSource').load();
-     		
-     		
-     	}
-     	,render:function(par){ 
-     		var par = this.get('parentNode');
-     		var chartnode = Y.Node.create("<div/>")
-  			chartnode.setStyle('height',par.get('clientHeight'));
-  			chartnode.setStyle('width',par.get('clientWidth'));
-  			par.setHTML(chartnode);
-  			this.get('chart').render('#'+chartnode.generateID());
-  			var ds=this.get('dataSource');
-			return this;
-     	}
-     });
-     var UserBlockView = Y.Base.create('searchboxview', Y.View, [], {
-     	containerTemplate:'<div/>',
-     	initializer:function(){
-     		
-     	},
-     	render:function(){
-     		
-     		this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(),{
-     			SRC:this.get('model').get('profile_pic') || baseURL+'in/profile_pic/'+this.get('model').get('_id'),
-     			HEIGHT:'40',
-     			WIDTH:'40',
-     			FULLNAME:this.get('model').get('fullname'),
-     			USERNAME:this.get('model').get('username'),
-     			GENDER:this.get('model').get('gender'),
-     			USERID:this.get('model').get('_id')
-     		}));
-     		return this;
-     	}
-     });
-     var SearchBoxView = Y.Base.create('searchboxview', Y.View, [], {
-     		containerTemplate:'<div/>',
-     		initializer:function(){
-     			var sb = Y.Node.create(Y.one('#searchbutton').getHTML()),si=Y.Node.create(Y.one('#search-box').getHTML());
-     			this.get('container').setHTML(Y.one('#searchbutton').getHTML());
-     			this.get('container').one('#search-btn').on('click',function(e){
-     				this.get('container').setHTML(si);
-     				this.get('container').one('.search').on('click',function(e){
-     					Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
-     					e.halt();
-     				},this);
-     			},this);
-     		},
-     		render:function(){
-     			
-     			return this;
-     		}
-     });
-     var SearchView = Y.Base.create('searchboxview', Y.View, [], {
-     		containerTemplate:'<div/>',
-     		search:'', 
-     		initializer:function(config){
-     			if(config && config.search){
-     				this.set('search',config.search);
-     			}
-     			this.get('container').setHTML(Y.Lang.sub(Y.one('#search-area').getHTML(),{
-     					SEARCH:this.get('search')
-     			}));
-     			this.get('container').one('.search').on('click',function(e){
-     				Y.fire('search-init',{search:this.get('container').one('.search-query').get('value')});
-     				e.halt();
-     			},this);
-     			
-     		},
-     		render:function(){
-     			var c = this.get('container');
-     			Y.io(baseURL+'in/search_posts',{
-     				method:'POST',
-     				data:{search: this.get('search')},
-     				on:{
-     					complete:function(i,o,a){
-     						var response  = Y.JSON.parse(o.responseText);
-     						var model;
-     						
-     						for(var i in response)
-     						{
-     							model = new PostModel(response[i]);
-     							var view;
-					            if (model.get('category') == 'event' && !Y.APPCONFIG.event_enabled) {
-					                return true;
-					            }
-					            if (model.get('category') == 'event') {
-					                view = new Y.EventView({
-					                    model: model
-					                });
-					            } else {
-					                view = new Y.PostView({
-					                    model: model
-					                });
-					            }
-					            var post = view.render().get('container');
-					            c.one(".search-posts").append(post);
-     						}
-     						
-     						if(response.length==0)
-     						{
-     							c.one(".search-posts").append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
-     								MESSAGE:'No posts found with that keyword!'
-     							}));
-     						}
-     						
-     						
-     					}
-     				}
-     			});
-     			Y.io(baseURL+'in/search_users',{
-     				method:'POST',
-     				data:{search: this.get('search')},
-     				on:{
-     					complete:function(i,o,a){
-     						var response  = Y.JSON.parse(o.responseText);
-     						var model;
-     						
-     						for(var i in response)
-     						{
-     							model = new UserModel(response[i]);
-     							uv = new UserBlockView({
-     								model:model
-     							});
-					            var user= uv.render().get('container');
-					            c.one(".search-users").append(user);
-     						}
-     						
-     						if(response.length==0)
-     						{
-     							c.one(".search-users").append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
-     								MESSAGE:'No <strong>Users</strong> found with that keyword!'
-     							}));
-     						}
-     						
-     						
-     					}
-     				}
-     			});
-     			return this;
-     		}
-     });
-    var AdminView = Y.Base.create('searchboxview', Y.View, [], {
-    	containerTemplate:'<div/>',
-    	showStats:function(){
-    		var c = this.get('container');
-    		if(this.get('container').one("a.stats"))
-    		{
-    			this.get('container').one("a.stats").addClass('active');
-    		}
-    		
-    		Y.io(baseURL+'in/site_stats',{
-    			method:'GET',
-    			on:{
-    				complete:function(i,o,a){
-    					var response = Y.JSON.parse(o.responseText);
-    					var myDataValues = response.users;
-						var n = Y.Node.create(Y.one('#stats-view').getHTML());
-						c.one('.mainarea').setHTML(n);
-						c.one('.mainarea').one('.user-stats').setStyle('height',300);
-						c.one('.mainarea').one('.user-stats').setStyle('width',600);
-						var mychart = new Y.Chart({
-						    dataProvider: myDataValues,
-						    render: "#"+c.one('.mainarea').one('.user-stats').generateID(),
-						    categoryKey:"date",
-						    horizontalGridlines: {
-                            styles: {
-                                line: {
-                                    color: "#dad8c9"
+
+    var NotificationView = Y.Base.create('notificationview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            var c = this.get('container'),
+                m = this.get('model');
+            m.on('change', function () {
+                if (m.get('mark_read')) {
+                    c.remove();
+                }
+            }, this);
+
+        },
+        render: function () {
+
+            var c = this.get('container'),
+                m = this.get('model');
+            var u = new UserModel({
+                'id': m.get('source_user')
+            });
+            u.load({
+                'id': m.get('source_user')
+            }, function () {
+                c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
+                    SOURCE_USER: u.get('fullname')
+                }));
+                if (m.get('notification_action') == 'friend' || m.get('notification_action') == 'friend_request' || m.get('notification_action') == 'follow') {
+                    c.one('.visit').on('click', function () {
+                        AppUI.navigate('/user/' + m.get('source_user'));
+                    });
+                }
+                c.one('.close').on('click', function () {
+                    m.set('mark_read', 'true');
+                    m.save();
+                });
+            });
+
+
+
+            return this;
+        }
+    });
+    var BarChartView = Y.Base.create('barchartview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function (config) {
+            var c = this.get('container');
+            var mychart = new Y.Chart({
+                dataProvider: [{
+                    "tag": 'loading',
+                    "posts": 10
+                }],
+                type: "column"
+            });
+            this.set('chart', mychart);
+            var dataSource = Y.Base.create('chartds', Y.ModelList, [], {
+
+                sync: function (action, options, callback) {
+                    var data;
+
+                    if (action === 'read') {
+                        Y.io(baseURL + 'in/get_top_tags', {
+                            method: 'GET',
+                            on: {
+                                complete: function (i, o, a) {
+                                    var response = Y.JSON.parse(o.responseText);
+                                    var data = [];
+                                    for (var row in response.rows) {
+                                        data.push({
+                                            "category": response.rows[row].key,
+                                            "posts": parseInt(response.rows[row].value, 10)
+                                        });
+
+                                    }
+                                    callback(null, data);
+
                                 }
                             }
-	                        },
-	                        verticalGridlines: {
-	                            styles: {
-	                                line: {
-	                                    color: "#dad8c9"
-	                                }
-	                            }
-	                        },
-	                        styles:{
-	                        	axes:{
-						           date:{
-						                label:{
-						                    rotation:-45,
-						                    color: "#ff0000"
-						                }
-						            }
-						        }
-					       }
-						});
-    				}
-    			}
-    		});
-    		
-    		
-    		
-    	},
-    	showCreateQuestion:function(){
-    		var qc = new QuestionCreationView();
-    		this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
-    	},
-    	initializer:function(){
-    		this.get('container').setHTML(Y.one('#admin-view').getHTML());
-    		
-    	},
-    	render:function(){
-    		if(this.get('action'))
-    		{
-    			switch(this.get('action'))
-    			{
-    				case "stats":
-    					this.showStats();
-    					break;
-    				case "create_question":
-    					this.showCreateQuestion();
-    					break;
-    				default:
-    					this.showStats();
-    			}
-    		}
-    		else
-    		{
-    			this.showStats();
-    		}
-    		return this;
-    	},
-    	updateCharts:function(){
-    		this.render();
-    	}
-    });
-    var TextQuestionView = Y.Base.create('textquestionview', Y.View, [], {
-   		containerTemplate:'<div/>',
-   		initializer:function(){
-   			this.get('container').setHTML(Y.one('#text-question').getHTML());
-  			this.get('container').one('.close-btn').on('click',function(){
-  				this.get('container').remove();
-  			},this);
-  		},
-  		render:function(){
-  			return this;
-   		}
-   });
-   var RadioQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
-   		containerTemplate:'<div/>',
-   		initializer:function(){
-   			this.get('container').setHTML(Y.one('#radio-question').getHTML());
-   			this.get('container').one('.close-btn').on('click',function(){
-   				this.get('container').remove();
-   			},this);
-   		},
-  		render:function(){
-   			return this;
-   		}
-   });
-   var TextAreaQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
-   		containerTemplate:'<div/>',
-   		initializer:function(){
-   			this.get('container').setHTML(Y.one('#radio-question').getHTML());
-   			this.get('container').one('.close-btn').on('click',function(){
-   				this.get('container').remove();
-  			},this);
-   		},
-   		render:function(){
-   			return this;
-   		}
-   });
-   var QuestionCreationView = Y.Base.create('searchboxview', Y.View, [], {
-  		containerTemplate:'<div/>',
-   		initializer:function(){
-   			var c = this.get('container');
-   			c.setHTML(Y.one('#question-creation').getHTML());
-   			var drop = new Y.DD.Drop({
-		        node: c.one('.qdrag-area') 
-		    });
-   			c.one('.drag-zone').all('.component').each(function(item){
+                        });
 
-	   					var drag = new Y.DD.Drag({
-			            	node: item
-			        	}).plug(Y.Plugin.DDProxy, {
-			            		moveOnEnd: false,
-			            		cloneNode:true
-			            		
-			        	});
-			        	drag.on('drag:drophit', function(e){
-			        		var type = e.drag.get('node').getAttribute('data-type');
-			        		switch(type)
-			        		{
-			        			case "text":
-			        				c.one('.qdrag-area').append((new TextQuestionView()).render().get('container'));
-		        				break;
-			        			case "radio":
-			        				c.one('.qdrag-area').append((new RadioQuestionView()).render().get('container'));
-			        				break;
-			        			case "freetext":
-			        				c.one('.qdrag-area').append((new TextAreaQuestionView()).render().get('container'));
-			        				break;
-			        			default:
-			        				
-			        		}
-			        	});
-	
-		   	});
-		   	c.one('.save-question').on('click',function(){
-		   		var question = this.get('container').one('textarea[name=question-text]').get('value');
-		   		if(!question)
-		   		{
-		   			Y.showAlert('Oh Snap!','Please enter a question');
-	   			return;
-		   		}
-		   		if(this.get('container').one('.qdrag-area').all(".component").size()==0)
-		   		{
-		   			Y.showAlert('Oh Snap!','Please drag at-least one answering model');
-		   			return;
-		   		}
-		   		
-		   	},this);
-		   	c.one('.preview').on('click',function(){
-		   		var form = this.getFormObject();
-		   		if(Y.one('#previewModal')){
-		   			Y.one('#previewModal').remove();
-		   		}
-		   		Y.one('body').append(Y.one('#preview-template').getHTML());
-		   		Y.one('#previewModal').one('.modal-body').setHTML(this.getMarkup(form));
-	   		    jQuery('#previewModal').modal({
-			    	keyboard: false
-			    });
-		   	},this);
-		   
-   		},
-   		render:function(){
-   			return this;
-   		},
-   		getFormObject:function(){
-   			var obj=[],response={};
-   			this.get('container').one('.qdrag-area').all(".component").each(function(item){
-   				obj.push({
-   					'data-type':item.getAttribute('data-type'),
-   					'label':item.one('.label').get('value'),
-   					'expected':item.one('.expected').get('value')
-   				});
-   			});
-   			response.items = obj;
-   			response.question = this.get('container').one('textarea[name=question-text]').get('value');
-   			return response;
-   		},
-   		getMarkup:function(response){
-   			var n = Y.Node.create('<div/>');
-   			n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(),{
-   				QUESTION:response.question
-   			}));
-   			Y.log(n.getHTML()); 
-   			for(var i in response.items)
- 			{
- 				var markup = Y.one('#simple-row').getHTML();
-  				if(response.items[i]['data-type']=='text')
- 				{
- 					markup = Y.Lang.sub(markup,{
- 						CONTENT:"<input type='text' class='input span12' id='item"+i+"'/>",
-  						LABEL:response.items[i]['label']
-   					});
- 				}
-   				else if(response.items[i]['data-type']=='radio')
-   				{
-   					markup = Y.Lang.sub(markup,{
-   						CONTENT:"<input type='text' class='input span12' id='item"+i+"'/>",
-   						LABEL:response.items[i]['label']
-   					});
-   				}
-   				else if(response.items[i]['data-type']=='textarea')
-   				{
-   					markup = Y.Lang.sub(markup,{
-  						CONTENT:"<textarea class='input span12' id='item"+i+"'></textarea>",
-   						LABEL:response.items[i]['label']
-   					});
-   				}
-   				n.one('.answer').append(markup);
-   			}
-   			return n.getHTML();
-   		}
-   	
-   });
-    
-    
+                    } else {
+                        callback('Unsupported sync action: ' + action);
+                    }
+                }
+            });
+            this.set('dataSource', new dataSource());
+            this.get('dataSource').on('load', function () {
+                mychart.set('dataProvider', this.get('dataSource').toJSON());
+            }, this);
+            this.get('dataSource').load();
+
+
+        },
+        render: function (par) {
+            var par = this.get('parentNode');
+            var chartnode = Y.Node.create("<div/>")
+            chartnode.setStyle('height', par.get('clientHeight'));
+            chartnode.setStyle('width', par.get('clientWidth'));
+            par.setHTML(chartnode);
+            this.get('chart').render('#' + chartnode.generateID());
+            var ds = this.get('dataSource');
+            return this;
+        }
+    });
+    var UserBlockView = Y.Base.create('searchboxview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+
+        },
+        render: function () {
+
+            this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(), {
+                SRC: this.get('model').get('profile_pic') || baseURL + 'in/profile_pic/' + this.get('model').get('_id'),
+                HEIGHT: '40',
+                WIDTH: '40',
+                FULLNAME: this.get('model').get('fullname'),
+                USERNAME: this.get('model').get('username'),
+                GENDER: this.get('model').get('gender'),
+                USERID: this.get('model').get('_id')
+            }));
+            return this;
+        }
+    });
+    var SearchBoxView = Y.Base.create('searchboxview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            var sb = Y.Node.create(Y.one('#searchbutton').getHTML()),
+                si = Y.Node.create(Y.one('#search-box').getHTML());
+            this.get('container').setHTML(Y.one('#searchbutton').getHTML());
+            this.get('container').one('#search-btn').on('click', function (e) {
+                this.get('container').setHTML(si);
+                this.get('container').one('.search').on('click', function (e) {
+                    Y.fire('search-init', {
+                        search: this.get('container').one('.search-query').get('value')
+                    });
+                    e.halt();
+                }, this);
+            }, this);
+        },
+        render: function () {
+
+            return this;
+        }
+    });
+    var SearchView = Y.Base.create('searchboxview', Y.View, [], {
+        containerTemplate: '<div/>',
+        search: '',
+        initializer: function (config) {
+            if (config && config.search) {
+                this.set('search', config.search);
+            }
+            this.get('container').setHTML(Y.Lang.sub(Y.one('#search-area').getHTML(), {
+                SEARCH: this.get('search')
+            }));
+            this.get('container').one('.search').on('click', function (e) {
+                Y.fire('search-init', {
+                    search: this.get('container').one('.search-query').get('value')
+                });
+                e.halt();
+            }, this);
+
+        },
+        render: function () {
+            var c = this.get('container');
+            Y.io(baseURL + 'in/search_posts', {
+                method: 'POST',
+                data: {
+                    search: this.get('search')
+                },
+                on: {
+                    complete: function (i, o, a) {
+                        var response = Y.JSON.parse(o.responseText);
+                        var model;
+
+                        for (var i in response) {
+                            model = new PostModel(response[i]);
+                            var view;
+                            if (model.get('category') == 'event' && !Y.APPCONFIG.event_enabled) {
+                                return true;
+                            }
+                            if (model.get('category') == 'event') {
+                                view = new Y.EventView({
+                                    model: model
+                                });
+                            } else {
+                                view = new Y.PostView({
+                                    model: model
+                                });
+                            }
+                            var post = view.render().get('container');
+                            c.one(".search-posts").append(post);
+                        }
+
+                        if (response.length == 0) {
+                            c.one(".search-posts").append(Y.Lang.sub(Y.one('#info-alert').getHTML(), {
+                                MESSAGE: 'No posts found with that keyword!'
+                            }));
+                        }
+
+
+                    }
+                }
+            });
+            Y.io(baseURL + 'in/search_users', {
+                method: 'POST',
+                data: {
+                    search: this.get('search')
+                },
+                on: {
+                    complete: function (i, o, a) {
+                        var response = Y.JSON.parse(o.responseText);
+                        var model;
+
+                        for (var i in response) {
+                            model = new UserModel(response[i]);
+                            uv = new UserBlockView({
+                                model: model
+                            });
+                            var user = uv.render().get('container');
+                            c.one(".search-users").append(user);
+                        }
+
+                        if (response.length == 0) {
+                            c.one(".search-users").append(Y.Lang.sub(Y.one('#info-alert').getHTML(), {
+                                MESSAGE: 'No <strong>Users</strong> found with that keyword!'
+                            }));
+                        }
+
+
+                    }
+                }
+            });
+            return this;
+        }
+    });
+    var AdminView = Y.Base.create('searchboxview', Y.View, [], {
+        containerTemplate: '<div/>',
+        showStats: function () {
+            var c = this.get('container');
+            if (this.get('container').one("a.stats")) {
+                this.get('container').one("a.stats").addClass('active');
+            }
+
+            Y.io(baseURL + 'in/site_stats', {
+                method: 'GET',
+                on: {
+                    complete: function (i, o, a) {
+                        var response = Y.JSON.parse(o.responseText);
+                        var myDataValues = response.users;
+                        var n = Y.Node.create(Y.one('#stats-view').getHTML());
+                        c.one('.mainarea').setHTML(n);
+                        c.one('.mainarea').one('.user-stats').setStyle('height', 300);
+                        c.one('.mainarea').one('.user-stats').setStyle('width', 600);
+                        var mychart = new Y.Chart({
+                            dataProvider: myDataValues,
+                            render: "#" + c.one('.mainarea').one('.user-stats').generateID(),
+                            categoryKey: "date",
+                            horizontalGridlines: {
+                                styles: {
+                                    line: {
+                                        color: "#dad8c9"
+                                    }
+                                }
+                            },
+                            verticalGridlines: {
+                                styles: {
+                                    line: {
+                                        color: "#dad8c9"
+                                    }
+                                }
+                            },
+                            styles: {
+                                axes: {
+                                    date: {
+                                        label: {
+                                            rotation: -45,
+                                            color: "#ff0000"
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+
+
+        },
+        initializer: function () {
+            this.get('container').setHTML(Y.one('#admin-view').getHTML());
+
+        },
+        showCreateQuestion:function(){
+	     var qc = new QuestionCreationView();
+	     this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+	     },
+        render: function () {
+            if (this.get('action')) {
+                switch (this.get('action')) {
+                case "stats":
+                    this.showStats();
+                    break;
+                case "create_question":
+                    this.showCreateQuestion();
+                    break;
+                default:
+                    this.showStats();
+                }
+            } else {
+                this.showStats();
+            }
+            return this;
+        },
+        updateCharts: function () {
+            this.render();
+        }
+    });
+
+    var TextQuestionView = Y.Base.create('textquestionview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            this.get('container').setHTML(Y.one('#text-question').getHTML());
+            this.get('container').one('.close-btn').on('click', function () {
+                this.get('container').remove();
+            }, this);
+        },
+        render: function () {
+            return this;
+        }
+    });
+    var RadioQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            this.get('container').setHTML(Y.one('#radio-question').getHTML());
+            this.get('container').one('.close-btn').on('click', function () {
+                this.get('container').remove();
+            }, this);
+        },
+        render: function () {
+            return this;
+        }
+    });
+    var TextAreaQuestionView = Y.Base.create('radioquestionview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            this.get('container').setHTML(Y.one('#radio-question').getHTML());
+            this.get('container').one('.close-btn').on('click', function () {
+                this.get('container').remove();
+            }, this);
+        },
+        render: function () {
+            return this;
+        }
+    });
+    var QuestionCreationView = Y.Base.create('searchboxview', Y.View, [], {
+        containerTemplate: '<div/>',
+        initializer: function () {
+            var c = this.get('container');
+            c.setHTML(Y.one('#question-creation').getHTML());
+            var drop = new Y.DD.Drop({
+                node: c.one('.qdrag-area')
+            });
+            c.one('.drag-zone').all('.component').each(function (item) {
+
+                var drag = new Y.DD.Drag({
+                    node: item
+                }).plug(Y.Plugin.DDProxy, {
+                    moveOnEnd: false,
+                    cloneNode: true
+
+                });
+                drag.on('drag:drophit', function (e) {
+                    var type = e.drag.get('node').getAttribute('data-type');
+                    switch (type) {
+                    case "text":
+                        c.one('.qdrag-area').append((new TextQuestionView()).render().get('container'));
+                        break;
+                    case "radio":
+                        c.one('.qdrag-area').append((new RadioQuestionView()).render().get('container'));
+                        break;
+                    case "freetext":
+                        c.one('.qdrag-area').append((new TextAreaQuestionView()).render().get('container'));
+                        break;
+                    default:
+
+                    }
+                });
+
+            });
+            c.one('.save-question').on('click', function () {
+                var question = this.get('container').one('textarea[name=question-text]').get('value');
+                if (!question) {
+                    Y.showAlert('Oh Snap!', 'Please enter a question');
+                    return;
+                }
+                if (this.get('container').one('.qdrag-area').all(".component").size() == 0) {
+                    Y.showAlert('Oh Snap!', 'Please drag at-least one answering model');
+                    return;
+                }
+
+            }, this);
+            c.one('.preview').on('click', function () {
+                var form = this.getFormObject();
+                if (Y.one('#previewModal')) {
+                    Y.one('#previewModal').remove();
+                }
+                Y.one('body').append(Y.one('#preview-template').getHTML());
+                Y.one('#previewModal').one('.modal-body').setHTML(this.getMarkup(form));
+                jQuery('#previewModal').modal({
+                    keyboard: false
+                });
+            }, this);
+
+        },
+        render: function () {
+            return this;
+        },
+        getFormObject: function () {
+            var obj = [],
+                response = {};
+            this.get('container').one('.qdrag-area').all(".component").each(function (item) {
+                obj.push({
+                    'data-type': item.getAttribute('data-type'),
+                    'label': item.one('.label').get('value'),
+                    'expected': item.one('.expected').get('value')
+                });
+            });
+            response.items = obj;
+            response.question = this.get('container').one('textarea[name=question-text]').get('value');
+            return response;
+        },
+        getMarkup: function (response) {
+            var n = Y.Node.create('<div/>');
+            n.setHTML(Y.Lang.sub(Y.one('#question-markup').getHTML(), {
+                QUESTION: response.question
+            }));
+            Y.log(n.getHTML());
+            for (var i in response.items) {
+                var markup = Y.one('#simple-row').getHTML();
+                if (response.items[i]['data-type'] == 'text') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
+                        LABEL: response.items[i]['label']
+                    });
+                } else if (response.items[i]['data-type'] == 'radio') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<input type='text' class='input span12' id='item" + i + "'/>",
+                        LABEL: response.items[i]['label']
+                    });
+                } else if (response.items[i]['data-type'] == 'textarea') {
+                    markup = Y.Lang.sub(markup, {
+                        CONTENT: "<textarea class='input span12' id='item" + i + "'></textarea>",
+                        LABEL: response.items[i]['label']
+                    });
+                }
+                n.one('.answer').append(markup);
+            }
+            return n.getHTML();
+        }
+
+    });
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -3183,14 +3179,14 @@ YUI.add('babe', function (Y) {
         },
         modelSync: modelSync,
         listSync: listSync,
-        MenuItemModel:MenuItemModel,
-        MenuItemList:MenuItemList,
-        MenuSectionModel:MenuSectionModel,
+        MenuItemModel: MenuItemModel,
+        MenuItemList: MenuItemList,
+        MenuSectionModel: MenuSectionModel,
         MenuSectionList: MenuSectionList,
-        MenuItemView:MenuItemView,
-        MenuSectionView:MenuSectionView,
-        SideBarMenuView:SideBarMenuView,
-        SideBarView:SideBarView, 
+        MenuItemView: MenuItemView,
+        MenuSectionView: MenuSectionView,
+        SideBarMenuView: SideBarMenuView,
+        SideBarView: SideBarView,
         PostModel: PostModel,
         EventModel: EventModel,
         PostList: Y.Base.create('postlist', Y.ModelList, [], {
@@ -3238,18 +3234,18 @@ YUI.add('babe', function (Y) {
         CreateEventView: CreateEventView,
         GroupList: GroupList,
         WallView: WallView,
-        TopBarView:TopBarView,
-        StatusBlockView:StatusBlockView,
-        InviteView:InviteView,
-        NotificationModel:NotificationModel,
-        NotificationList:NotificationList,
-        NotificationView:NotificationView,
-        BarChartView:BarChartView,
-        SearchBoxView:SearchBoxView,
-        SearchView:SearchView,
-        AdminView:AdminView
+        TopBarView: TopBarView,
+        StatusBlockView: StatusBlockView,
+        InviteView: InviteView,
+        NotificationModel: NotificationModel,
+        NotificationList: NotificationList,
+        NotificationView: NotificationView,
+        BarChartView: BarChartView,
+        SearchBoxView: SearchBoxView,
+        SearchView: SearchView,
+        AdminView: AdminView
 
     };
 }, '0.0.1', {
-    requires: ['charts','router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
 });
