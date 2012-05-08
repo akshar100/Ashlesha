@@ -1567,87 +1567,7 @@ function (Y) {
 
     });
 
-    var SignUpView = Y.Base.create('signupview', Y.View, [], {
-        containerTemplate: '<div/>',
-        template_id: '#signupform-template',
-        setData: function (data) {
-            if (this.get('container')) {
-                this.get('container').one("#username").set("value", data.username);
-                this.get('container').one("#email").set("value", data.email);
-                this.get('container').one("#fullname").set("value", data.fullname);
-                if (data.gender && data.gender == "male") {
-                    this.get('container').one("[value=male]").set("checked", "true");
-                    this.get('container').one("[value=female]").removeAttribute("checked");
-                } else if (data.gender && data.gender == "female") {
-                    this.get('container').one("[value=female]").set("checked", "true");
-                    this.get('container').one("[value=male]").removeAttribute("checked");
-                }
-                if (data.picture) {
-                    this.get('container').one("#profile-image").append('<img src="' + data.picture + '" />');
-                    this.get('container').one("#profile-image").ancestor(".control-group").removeClass("hide");
-                }
-
-            }
-        },
-        initializer: function () {
-
-            this.render();
-        },
-        render: function () {
-            this.template = Y.one('#signupform-template').getContent();
-            this.get('container').setContent(this.template);
-            var container = this.get('container');
-            this.get('container').one("form").on("submit", function (e) {
-                e.halt();
-
-                var request = Y.io(baseURL + 'in/user', {
-                    method: 'POST',
-                    data: {
-                        username: container.one("#username").get("value"),
-                        password: container.one("#password").get("value"),
-                        email: container.one("#email").get("value"),
-                        fullname: container.one("#fullname").get("value"),
-                        gender: container.one("[name=gender]:checked").get("value")
-                    },
-                    on: {
-                        success: function (i, o, a) {
-
-
-                            var response = Y.JSON.parse(o.responseText);
-
-                            if (!response.success) {
-                                var inputs = container.all(".controls");
-                                inputs.each(function (taskNode) {
-                                    var inputItem = taskNode.one("input");
-
-                                    if (inputItem && response[inputItem.get("id")] && taskNode.one("span.help-inline")) {
-                                        taskNode.one("span.help-inline").setContent(response[inputItem.get("id")]);
-                                        taskNode.ancestor().addClass("error");
-
-                                    } else {
-                                        if (taskNode.one("span.help-inline")) {
-                                            taskNode.one("span.help-inline").setContent("");
-                                        }
-
-                                        taskNode.ancestor().removeClass("error");
-                                    }
-                                });
-                                return;
-                            }
-
-                            window.location = baseURL + "/?home"
-                        }
-                    }
-                }, this);
-
-            });
-            this.get('container').one("#signup-form").on("click", function (e) {
-
-            });
-            return this;
-        }
-    });
-
+    
     var TagBoxConfig = {
         activateFirstItem: true,
         allowTrailingDelimiter: true,
@@ -3270,6 +3190,7 @@ function (Y) {
     });
 	var UserModel = Y.BABEUSER.UserModel;
 	var ProfileView = Y.BABEUSER.ProfileView;
+	var SignUpView = Y.BABEUSER.SignUpView;
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
@@ -3655,10 +3576,91 @@ YUI.add('babe-user',function(Y){
             return this;
         }
     });
+	var SignUpView = Y.Base.create('signupview', Y.View, [], {
+        containerTemplate: '<div/>',
+        template_id: '#signupform-template',
+        setData: function (data) {
+            if (this.get('container')) {
+                this.get('container').one("#username").set("value", data.username);
+                this.get('container').one("#email").set("value", data.email);
+                this.get('container').one("#fullname").set("value", data.fullname);
+                if (data.gender && data.gender == "male") {
+                    this.get('container').one("[value=male]").set("checked", "true");
+                    this.get('container').one("[value=female]").removeAttribute("checked");
+                } else if (data.gender && data.gender == "female") {
+                    this.get('container').one("[value=female]").set("checked", "true");
+                    this.get('container').one("[value=male]").removeAttribute("checked");
+                }
+                if (data.picture) {
+                    this.get('container').one("#profile-image").append('<img src="' + data.picture + '" />');
+                    this.get('container').one("#profile-image").ancestor(".control-group").removeClass("hide");
+                }
+
+            }
+        },
+        initializer: function () {
+
+            this.render();
+        },
+        render: function () {
+            this.template = Y.one('#signupform-template').getContent();
+            this.get('container').setContent(this.template);
+            var container = this.get('container');
+            this.get('container').one("form").on("submit", function (e) {
+                e.halt();
+
+                var request = Y.io(baseURL + 'in/user', {
+                    method: 'POST',
+                    data: {
+                        username: container.one("#username").get("value"),
+                        password: container.one("#password").get("value"),
+                        email: container.one("#email").get("value"),
+                        fullname: container.one("#fullname").get("value"),
+                        gender: container.one("[name=gender]:checked").get("value")
+                    },
+                    on: {
+                        success: function (i, o, a) {
+
+
+                            var response = Y.JSON.parse(o.responseText);
+
+                            if (!response.success) {
+                                var inputs = container.all(".controls");
+                                inputs.each(function (taskNode) {
+                                    var inputItem = taskNode.one("input");
+
+                                    if (inputItem && response[inputItem.get("id")] && taskNode.one("span.help-inline")) {
+                                        taskNode.one("span.help-inline").setContent(response[inputItem.get("id")]);
+                                        taskNode.ancestor().addClass("error");
+
+                                    } else {
+                                        if (taskNode.one("span.help-inline")) {
+                                            taskNode.one("span.help-inline").setContent("");
+                                        }
+
+                                        taskNode.ancestor().removeClass("error");
+                                    }
+                                });
+                                return;
+                            }
+
+                            window.location = baseURL + "/?home"
+                        }
+                    }
+                }, this);
+
+            });
+            this.get('container').one("#signup-form").on("click", function (e) {
+
+            });
+            return this;
+        }
+    });
 
 	Y.BABEUSER = {
 		UserModel:UserModel,
-		ProfileView:ProfileView
+		ProfileView:ProfileView,
+		SignUpView:SignUpView
 	};
 },'0.0.1',{
 	requires:['app']
