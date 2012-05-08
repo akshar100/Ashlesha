@@ -94,7 +94,7 @@ $this->load->view("common/header");
 		
 		Y.hs = new Y.History();
 		 Y.on('io:failure', function(){
-		 	Y.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");
+		 	Y.BABE.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");
 		 }, Y);
 		 
 		Y.requestList = Y.BABE.requestList;
@@ -112,16 +112,6 @@ $this->load->view("common/header");
 		
 		
 		
-		Y.showAlert = function(head,body){
-			if(Y.one("#modal-from-dom")){ Y.one("#modal-from-dom").remove();}
-			var alertMarkup = Y.Lang.sub(Y.one("#messagebox").getContent(),{ HEADING: head , BODY:body});
-			Y.one(document.body).append(alertMarkup);
-			jQuery("#modal-from-dom").modal('show');
-						Y.one(".close-dialog").on('click',function(){
-							jQuery("#modal-from-dom").modal('hide');
-							Y.one("#modal-from-dom").remove();
-						});
-		};
 		
 		Y.CommentView = Y.Base.create('commentview',Y.View,[],{
 			containerTemplate:'<div class="row-fluid commentsView hide" />',

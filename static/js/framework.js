@@ -1,10 +1,20 @@
-YUI.add('babe', function (Y) {
+YUI.add('babe', 
+function (Y) {
     window.Y = Y;
     var cache = new Y.CacheOffline({
         max: 200
     });
     cache.flush();
-    
+    function showAlert(head,body){
+			if(Y.one("#modal-from-dom")){ Y.one("#modal-from-dom").remove();}
+			var alertMarkup = Y.Lang.sub(Y.one("#messagebox").getContent(),{ HEADING: head , BODY:body});
+			Y.one(document.body).append(alertMarkup);
+			jQuery("#modal-from-dom").modal('show');
+						Y.one(".close-dialog").on('click',function(){
+							jQuery("#modal-from-dom").modal('hide');
+							Y.one("#modal-from-dom").remove();
+						});
+		}
     function genericModelSync(action, options, callback){
         	var model = this;
         	if(action=='read'){
@@ -406,51 +416,7 @@ YUI.add('babe', function (Y) {
 
         }
 
-        if (this.name == "userModel") {
-            var model = this;
-            if (action == "update") {
-
-                var data = this.toJSON();
-                delete data.connections;
-                Y.io(baseURL + 'io/update_user', {
-                    method: 'POST',
-                    data: data,
-                    on: {
-                        success: function (i, o, a) {
-                            var response = Y.JSON.parse(o.responseText);
-                            if (response.success && response.data) {
-                                model.setAttrs(response.data);
-                                callback(null, data);
-                            } else {
-                                callback(response.error);
-                            }
-                        }
-                    }
-                });
-
-                return;
-            }
-            if (action == "read") {
-                var data = this.toJSON()
-                Y.io(baseURL + 'io/get_user/', {
-                    method: 'POST',
-                    data: {
-                        '_id': data['_id']
-                    },
-                    on: {
-                        success: function (i, o, a) {
-                            var response = Y.JSON.parse(o.responseText);
-                            if (response) {
-                                model.setAttrs(response);
-                            }
-
-                            callback(null, model.toJSON());
-
-                        }
-                    }
-                });
-            }
-        }
+        
 
         if (this.name == "ConnectionModel") {
             var model = this;
@@ -987,211 +953,7 @@ YUI.add('babe', function (Y) {
             $("#imageUploaderModal").modal('show');
         }
     });
-    var UserModel = Y.Base.create('userModel', Y.Model, [], {
-        sync: modelSync,
-        idAttribute: '_id',
-        hasRole: function (role) {
-            var roles = this.get('roles').split("|");
-            for (var i in roles) {
-                if (roles[i].trim().toLowerCase() === role.trim().toLowerCase()) {
-                    return true;
-                }
-            }
-            return false;
-        },
-        validate: function (attr) {
-
-            if (!attr.fullname) {
-                return {
-                    field: 'fullname',
-                    message: 'Full name can not be empty!'
-                }
-            } else if (attr.fullname.length > 100) {
-                return {
-                    field: 'fullname',
-                    message: 'Thats a very long name. Will you mind making it a bit short ?'
-                }
-            }
-
-        }
-    }, {
-
-        ATTRS: {
-            '_id': {
-                value: ''
-            },
-            '_rev': {
-                value: ''
-            },
-            username: {
-                value: ''
-            },
-            password: {
-                value: ''
-            },
-            email: {
-                value: ''
-            },
-            fullname: {
-                value: ''
-            },
-            gender: {
-                value: ''
-            },
-            city: {
-                value: ''
-            },
-            country: {
-                value: ''
-            },
-            mobile: {
-                value: ''
-            },
-            profile_pic: {
-                value: baseURL + 'static/images/male_profile.png'
-            },
-            dob: {
-                value: ''
-            },
-            type: {
-                value: 'user'
-            },
-            roles:{
-            	value:'user'
-            }
-        }
-    });
-
-    var ProfileView = Y.Base.create('profileView', Y.View, [], {
-        containerTemplate: '<div/>',
-        template_id: '#profileview-template',
-        initializer: function () {
-
-        },
-        updateVals: function () {
-            var container = this.get('container');
-            if (this.get('model')) {
-
-                container.all("input").each(function (node) {
-
-                    if (node.get("type") == "text" && this.get('model').get(node.get("name")) != undefined) {
-                        node.set("value", this.get('model').get(node.get("name")));
-                    } else if (node.get('type') == 'radio' && this.get('model').get(node.get("name")) != undefined) {
-                        if (node.get("value") == this.get('model').get(node.get("name"))) {
-                            container.all("[name=" + node.get("name") + "]").removeAttribute("checked");
-                            node.set("checked", "true");
-                        }
-                    }
-
-                }, this);
-
-                if (this.get('model').get("profile_pic") && this.get('model').get("profile_pic") != "false" && this.get('model').get("profile_pic") != "undefined") {
-
-                    this.get('container').one(".image_preview").setContent("<img src=" + this.get('model').get("profile_pic") + " class='thumbnail'/>");
-                } else if (this.get('model').get("gender") == "male") {
-                    this.get('container').one(".image_preview").setContent("<img src=" + Y.BABE.male_image + " class='thumbnail'/>");
-                } else {
-                    this.get('container').one(".image_preview").setContent("<img src=" + Y.BABE.female_image + " class='thumbnail'/>");
-                }
-            }
-        },
-        render: function () {
-            var viewObj = this;
-            this.template = Y.one('#profileview-template').getContent();
-            this.get('container').setContent(this.template);
-            var container = this.get('container');
-            container.all("[rel=popover]").each(function (node) {
-                $(node.getDOMNode()).popover();
-            });
-            this.updateVals();
-            if (this.get('model')) {
-                this.get('model').on('change', function () {
-                    this.updateVals();
-                }, this);
-
-            }
-            container.one(".img-upload").on("click", function () {
-                viewObj.img = new Y.BABE.ImageUploadView({
-                    display: ".image_preview",
-                    uploadedCallback: function (url) {
-                        viewObj.get('model').set("profile_pic", url);
-                        viewObj.get('model').save();
-                    }
-                });
-
-            });
-            if (container.one(".img-upload-facebook")) {
-                container.one(".img-upload-facebook").on("click", function () {
-                    Y.io(baseURL + 'in/facebook_image', {
-                        method: 'POST',
-                        on: {
-                            success: function (i, o, a) {
-                                var r = Y.JSON.parse(o.responseText);
-                                if (r.success) {
-                                    viewObj.get('model').set("profile_pic", r.image_url);
-                                    viewObj.get('model').save();
-                                }
-
-                            }
-                        }
-
-                    });
-
-
-                });
-            }
-            container.one("#profile-submit-form").on("click", function (e) {
-
-                e.preventDefault();
-                if (this.get('model')) {
-                    this.get('model').on('error', function () {
-
-                    });
-                    container.all("input").each(function (node) {
-
-                        if (node.get("type") == "text") {
-                            this.get('model').set(node.get("name"), node.get("value"));
-                        } else if (node.get("type") == "password" && node.get("value")) {
-                            this.get('model').set(node.get("name"), node.get("value"));
-                        } else if (node.get('type') == 'radio') {
-                            if (node.get("checked")) {
-                                this.get('model').set(node.get("name"), node.get("value"));
-                            }
-                        }
-                    }, this);
-                    container.one("#profile-submit-form").removeClass("btn-primary");
-                    container.one("#profile-submit-form").addClass("btn-warning");
-                    container.one("#profile-submit-form").set("value", "Saving.....");
-                    container.one("#profile-submit-form").set("innerHTML", "Saving.....");
-                    this.get('model').save(function (err) {
-
-                        Y.all(".error .help-inline").set("innerHTML", "");
-                        Y.all(".error").removeClass("error");
-                        if (err) {
-                            if (err.field) {
-                                Y.one("#" + err.field).focus();
-                                Y.one("#" + err.field).ancestor(".control-group").addClass("error");
-                                Y.one("#" + err.field).next(".help-inline").set("innerHTML", err.message);
-                            }
-                        }
-
-                        container.one("#profile-submit-form").addClass("btn-success");
-                        container.one("#profile-submit-form").removeClass("btn-warning");
-                        container.one("#profile-submit-form").set("value", "Saved");
-                        container.one("#profile-submit-form").set("innerHTML", "Saved");
-                        setTimeout(function () {
-                            container.one("#profile-submit-form").addClass("btn-primary");
-                            container.one("#profile-submit-form").removeClass("btn-success");
-                            container.one("#profile-submit-form").set("value", "Save");
-                            container.one("#profile-submit-form").set("innerHTML", "Save");
-                        }, 1500);
-                    });
-
-                }
-            }, this);
-            return this;
-        }
-    });
+    
     var CommentModel = Y.Base.create('commentModel', Y.Model, [], {
         sync: modelSync,
         idAttribute: '_id',
@@ -1447,10 +1209,10 @@ YUI.add('babe', function (Y) {
                 this.get('model').save(function (err, response) {
 
                     if (err) {
-                        Y.log(err);
-                        Y.showAlert("Ooops!", err.error);
+                        
+                        showAlert("Ooops!", err.error);
                     } else {
-                        Y.showAlert("Done!", "Your changes are saved successfully!");
+                        showAlert("Done!", "Your changes are saved successfully!");
                         viewObj.render();
                     }
 
@@ -1530,7 +1292,7 @@ YUI.add('babe', function (Y) {
                     this.get('model').set("dislike", 0);
                     this.get('model').save(function (err, response) {
                         if (err) {
-                            Y.showAlert("Ooops! Something went wrong.", "Could not save your response. Try doing it again.");
+                            showAlert("Ooops! Something went wrong.", "Could not save your response. Try doing it again.");
                         } else {
 
                             cmodel.setAttrs(response.data);
@@ -2053,9 +1815,9 @@ YUI.add('babe', function (Y) {
                 g.save(function (err, response) {
 
                     if (err) {
-                        Y.showAlert("Ooops!", err.error);
+                        showAlert("Ooops!", err.error);
                     } else {
-                        Y.showAlert("Done!", "Your group is created!");
+                        showAlert("Done!", "Your group is created!");
 
                     }
 
@@ -2120,9 +1882,9 @@ YUI.add('babe', function (Y) {
                 q.save(function (err, response) {
 
                     if (err) {
-                        Y.showAlert("Ooops!", err.error);
+                        showAlert("Ooops!", err.error);
                     } else {
-                        Y.showAlert("Done!", "Your post has been published successfully.");
+                        showAlert("Done!", "Your post has been published successfully.");
 
                         c.setContent('');
                     }
@@ -2246,9 +2008,9 @@ YUI.add('babe', function (Y) {
                 post.save(function (err, response) {
 
                     if (err) {
-                        Y.showAlert("Ooops!", err);
+                        showAlert("Ooops!", err);
                     } else {
-                        Y.showAlert("Done!", "Your post has been published successfully.");
+                        showAlert("Done!", "Your post has been published successfully.");
 
                         c.setContent('');
                     }
@@ -2299,9 +2061,9 @@ YUI.add('babe', function (Y) {
                 post.save(function (err, response) {
 
                     if (err) {
-                        Y.showAlert("Ooops!", err.error);
+                        Y.("Ooops!", err.error);
                     } else {
-                        Y.showAlert("Done!", "Your post has been published successfully.");
+                        showAlert("Done!", "Your post has been published successfully.");
                         c.setContent('');
                     }
 
@@ -3447,11 +3209,11 @@ YUI.add('babe', function (Y) {
             	e.target.addClass('btn-warning');
                 var question = this.get('container').one('textarea[name=question-text]').get('value');
                 if (!question) {
-                    Y.showAlert('Oh Snap!', 'Please enter a question');
+                    showAlert('Oh Snap!', 'Please enter a question');
                     return;
                 }
                 if (this.get('container').one('.qdrag-area').all(".component").size() == 0) {
-                    Y.showAlert('Oh Snap!', 'Please drag at-least one answering model');
+                    showAlert('Oh Snap!', 'Please drag at-least one answering model');
                     return;
                 }
                 Y.io(baseURL+'io/save_question',{
@@ -3464,7 +3226,7 @@ YUI.add('babe', function (Y) {
                 			setTimeout(function(){
                 				e.target.removeClass('btn-success');
                 			},2000);
-                			Y.showAlert('Saved!', 'Your question has been saved');
+                			showAlert('Saved!', 'Your question has been saved');
                 			Y.fire('navigate',{
                 				action:'/admin/create_question'
                 			});
@@ -3506,12 +3268,15 @@ YUI.add('babe', function (Y) {
         getMarkup: createMarkup
 
     });
+	var UserModel = Y.BABEUSER.UserModel;
+	var ProfileView = Y.BABEUSER.ProfileView;
     Y.BABE = {
         male_image: baseURL + 'static/images/male_profile.png',
         female_image: baseURL + 'static/images/female_profile.png',
         TagBoxConfig: TagBoxConfig,
         AutoLoadTagsPlugin: AutoLoadTagsPlugin,
         autoExpand: autoExpand,
+        showAlert:showAlert,
         requestList: function (config) {
             Y.io(baseURL + 'in/menu', {
                 method: 'POST',
@@ -3635,5 +3400,266 @@ YUI.add('babe', function (Y) {
 
     };
 }, '0.0.1', {
-    requires: ['calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['babe-user','calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+});
+
+YUI.add('babe-user',function(Y){
+	var UserModel = Y.Base.create('userModel', Y.Model, [], {
+        sync: function(action, options, callback){
+        	
+            var model = this;
+            if (action == "update") {
+
+                var data = this.toJSON();
+                delete data.connections;
+                Y.io(baseURL + 'io/update_user', {
+                    method: 'POST',
+                    data: data,
+                    on: {
+                        success: function (i, o, a) {
+                            var response = Y.JSON.parse(o.responseText);
+                            if (response.success && response.data) {
+                                model.setAttrs(response.data);
+                                callback(null, data);
+                            } else {
+                                callback(response.error);
+                            }
+                        }
+                    }
+                });
+
+                return;
+            }
+            if (action == "read") {
+                var data = this.toJSON()
+                Y.io(baseURL + 'io/get_user/', {
+                    method: 'POST',
+                    data: {
+                        '_id': data['_id']
+                    },
+                    on: {
+                        success: function (i, o, a) {
+                            var response = Y.JSON.parse(o.responseText);
+                            if (response) {
+                                model.setAttrs(response);
+                            }
+
+                            callback(null, model.toJSON());
+
+                        }
+                    }
+                });
+            }
+        
+        },
+        idAttribute: '_id',
+        hasRole: function (role) {
+            var roles = this.get('roles').split("|");
+            for (var i in roles) {
+                if (roles[i].trim().toLowerCase() === role.trim().toLowerCase()) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        validate: function (attr) {
+
+            if (!attr.fullname) {
+                return {
+                    field: 'fullname',
+                    message: 'Full name can not be empty!'
+                }
+            } else if (attr.fullname.length > 100) {
+                return {
+                    field: 'fullname',
+                    message: 'Thats a very long name. Will you mind making it a bit short ?'
+                }
+            }
+
+        }
+    }, {
+
+        ATTRS: {
+            '_id': {
+                value: ''
+            },
+            '_rev': {
+                value: ''
+            },
+            username: {
+                value: ''
+            },
+            password: {
+                value: ''
+            },
+            email: {
+                value: ''
+            },
+            fullname: {
+                value: ''
+            },
+            gender: {
+                value: ''
+            },
+            city: {
+                value: ''
+            },
+            country: {
+                value: ''
+            },
+            mobile: {
+                value: ''
+            },
+            profile_pic: {
+                value: baseURL + 'static/images/male_profile.png'
+            },
+            dob: {
+                value: ''
+            },
+            type: {
+                value: 'user'
+            },
+            roles:{
+            	value:'user'
+            }
+        }
+    });
+
+    var ProfileView = Y.Base.create('profileView', Y.View, [], {
+        containerTemplate: '<div/>',
+        template_id: '#profileview-template',
+        initializer: function () {
+
+        },
+        updateVals: function () {
+            var container = this.get('container');
+            if (this.get('model')) {
+
+                container.all("input").each(function (node) {
+
+                    if (node.get("type") == "text" && this.get('model').get(node.get("name")) != undefined) {
+                        node.set("value", this.get('model').get(node.get("name")));
+                    } else if (node.get('type') == 'radio' && this.get('model').get(node.get("name")) != undefined) {
+                        if (node.get("value") == this.get('model').get(node.get("name"))) {
+                            container.all("[name=" + node.get("name") + "]").removeAttribute("checked");
+                            node.set("checked", "true");
+                        }
+                    }
+
+                }, this);
+
+                if (this.get('model').get("profile_pic") && this.get('model').get("profile_pic") != "false" && this.get('model').get("profile_pic") != "undefined") {
+
+                    this.get('container').one(".image_preview").setContent("<img src=" + this.get('model').get("profile_pic") + " class='thumbnail'/>");
+                } else if (this.get('model').get("gender") == "male") {
+                    this.get('container').one(".image_preview").setContent("<img src=" + Y.BABE.male_image + " class='thumbnail'/>");
+                } else {
+                    this.get('container').one(".image_preview").setContent("<img src=" + Y.BABE.female_image + " class='thumbnail'/>");
+                }
+            }
+        },
+        render: function () {
+            var viewObj = this;
+            this.template = Y.one('#profileview-template').getContent();
+            this.get('container').setContent(this.template);
+            var container = this.get('container');
+            container.all("[rel=popover]").each(function (node) {
+                $(node.getDOMNode()).popover();
+            });
+            this.updateVals();
+            if (this.get('model')) {
+                this.get('model').on('change', function () {
+                    this.updateVals();
+                }, this);
+
+            }
+            container.one(".img-upload").on("click", function () {
+                viewObj.img = new Y.BABE.ImageUploadView({
+                    display: ".image_preview",
+                    uploadedCallback: function (url) {
+                        viewObj.get('model').set("profile_pic", url);
+                        viewObj.get('model').save();
+                    }
+                });
+
+            });
+            if (container.one(".img-upload-facebook")) {
+                container.one(".img-upload-facebook").on("click", function () {
+                    Y.io(baseURL + 'in/facebook_image', {
+                        method: 'POST',
+                        on: {
+                            success: function (i, o, a) {
+                                var r = Y.JSON.parse(o.responseText);
+                                if (r.success) {
+                                    viewObj.get('model').set("profile_pic", r.image_url);
+                                    viewObj.get('model').save();
+                                }
+
+                            }
+                        }
+
+                    });
+
+
+                });
+            }
+            container.one("#profile-submit-form").on("click", function (e) {
+
+                e.preventDefault();
+                if (this.get('model')) {
+                    this.get('model').on('error', function () {
+
+                    });
+                    container.all("input").each(function (node) {
+
+                        if (node.get("type") == "text") {
+                            this.get('model').set(node.get("name"), node.get("value"));
+                        } else if (node.get("type") == "password" && node.get("value")) {
+                            this.get('model').set(node.get("name"), node.get("value"));
+                        } else if (node.get('type') == 'radio') {
+                            if (node.get("checked")) {
+                                this.get('model').set(node.get("name"), node.get("value"));
+                            }
+                        }
+                    }, this);
+                    container.one("#profile-submit-form").removeClass("btn-primary");
+                    container.one("#profile-submit-form").addClass("btn-warning");
+                    container.one("#profile-submit-form").set("value", "Saving.....");
+                    container.one("#profile-submit-form").set("innerHTML", "Saving.....");
+                    this.get('model').save(function (err) {
+
+                        Y.all(".error .help-inline").set("innerHTML", "");
+                        Y.all(".error").removeClass("error");
+                        if (err) {
+                            if (err.field) {
+                                Y.one("#" + err.field).focus();
+                                Y.one("#" + err.field).ancestor(".control-group").addClass("error");
+                                Y.one("#" + err.field).next(".help-inline").set("innerHTML", err.message);
+                            }
+                        }
+
+                        container.one("#profile-submit-form").addClass("btn-success");
+                        container.one("#profile-submit-form").removeClass("btn-warning");
+                        container.one("#profile-submit-form").set("value", "Saved");
+                        container.one("#profile-submit-form").set("innerHTML", "Saved");
+                        setTimeout(function () {
+                            container.one("#profile-submit-form").addClass("btn-primary");
+                            container.one("#profile-submit-form").removeClass("btn-success");
+                            container.one("#profile-submit-form").set("value", "Save");
+                            container.one("#profile-submit-form").set("innerHTML", "Save");
+                        }, 1500);
+                    });
+
+                }
+            }, this);
+            return this;
+        }
+    });
+
+	Y.BABEUSER = {
+		UserModel:UserModel,
+		ProfileView:ProfileView
+	};
+},'0.0.1',{
+	requires:['app']
 });
