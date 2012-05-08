@@ -231,8 +231,8 @@ YUI.add('babe', function (Y) {
             if (action == "create") {
                 var model = this;
                 data = this.toJSON();
-
                 data.id = Y.Lang.now();
+                delete data.nlp;
                 Y.io(baseURL + 'io/create_post', {
                     method: 'POST',
                     data: data,
@@ -253,6 +253,7 @@ YUI.add('babe', function (Y) {
                 var model = this;
                 var data = this.toJSON();
                 data.id = Y.Lang.now();
+                delete data.nlp;
                 Y.io(baseURL + 'io/update_post', {
                     method: 'POST',
                     data: data,
@@ -997,7 +998,7 @@ YUI.add('babe', function (Y) {
         sync: modelSync,
         idAttribute: '_id',
         hasRole: function (role) {
-            var roles = this.get('roles').split(",");
+            var roles = this.get('roles').split("|");
             for (var i in roles) {
                 if (roles[i].trim().toLowerCase() === role.trim().toLowerCase()) {
                     return true;
@@ -1061,6 +1062,9 @@ YUI.add('babe', function (Y) {
             },
             type: {
                 value: 'user'
+            },
+            roles:{
+            	value:'user'
             }
         }
     });
@@ -1305,6 +1309,9 @@ YUI.add('babe', function (Y) {
             },
             sector: {
                 value: ''
+            },
+            sentiment:{
+            	value:''
             }
 
         }
@@ -1399,7 +1406,7 @@ YUI.add('babe', function (Y) {
             this.get("container").setContent(Y.Lang.sub(Y.one("#post-row-admin").getContent(), {
                 TEXT: this.get('model').get('text'),
                 TAGS: this.get('model').get('tags'),
-                IMG: this.get('model').profilePic()
+                IMG: this.get('model').profilePic() 
             }));
             Y.BABE.autoExpand(this.get("container").one("textarea"));
             this.get('container').all(".autocomplete").plug(Y.Plugin.AutoComplete, Y.BABE.TagBoxConfig);
@@ -1409,7 +1416,37 @@ YUI.add('babe', function (Y) {
                 });
                 e.halt();
             }, this);
-
+			if(Y.userModel.hasRole('administrator')){
+				if(this.get('model').get('sentiment'))
+				{
+					this.get('container').one(".administrator").all('button').removeClass('btn-success');
+					var btn = this.get('container').one(".administrator").one('button.'+this.get('model').get('sentiment'));
+					if(btn)
+					{
+						btn.addClass('btn-primary'); 
+					}
+				}
+				this.get('container').one(".administrator").removeClass('hide');
+				this.get('container').one(".administrator").all('button').on('click',function(e){
+					if(e.target.hasClass('positive'))
+					{
+						this.get('model').set('sentiment','positive');
+					}
+					else if(e.target.hasClass('negative'))
+					{
+						this.get('model').set('sentiment','negative');
+					}
+					else if(e.target.hasClass('neutral'))
+					{
+						this.get('model').set('sentiment','neutral');
+					}
+					this.get('model').save();
+				},this);
+			}
+			else
+			{
+				this.get('container').one(".administrator").remove(true);
+			}
             this.get('container').one(".save-btn").on("click", function () {
                 this.get('model').set('tags', this.get('container').one('[name=tags]').get('value'));
                 this.get('model').set('text', this.get('container').one('textarea').get('value'));
@@ -1430,7 +1467,7 @@ YUI.add('babe', function (Y) {
         updateToolbar: function () {
 
             var cmodel = this.get('model');
-            if (cmodel.get('author_id') == window.current_user) {
+            if (cmodel.get('author_id') == window.current_user || Y.userModel.hasRole('administrator')) {
                 this.get('container').one('.wall-post-admin').setHTML(Y.one('#wall-post-admin-btn').getHTML());
                 this.get('container').one('.wall-post-admin').one("button").on('click', function () {
                     this.adminView();
@@ -1706,6 +1743,9 @@ YUI.add('babe', function (Y) {
             },
             title: {
                 value: ''
+            },
+            sentiment:{
+            	value:''
             }
         }
     });

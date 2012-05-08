@@ -171,6 +171,7 @@ class DBA
 			$current_data = $this->chill->get($data['_id']); 
 			$current_data['tags'] = $data['tags'];
 			$current_data['text'] = $data['text'];
+			$current_data['sentiment'] = isset($data['sentiment'])?$data['sentiment']:'';
 			$this->chill->put($data['_id'],$current_data);
 			$response =array();
 			$response['data'] = $data;

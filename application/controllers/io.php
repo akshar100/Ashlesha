@@ -292,7 +292,15 @@ class IO extends CI_Controller {
 	
 	function get_model()
 	{
-		echo json_encode($this->dba->get($this->input->post('_id')));
+		$response = $this->dba->get($this->input->post('_id'));
+		foreach($response as $k=>$v)
+		{
+			if(is_object($v))
+			{
+				$response[$k]=json_encode($v);
+			}
+		}
+		echo json_encode($response);
 	}
 	
 	function delete_model()
