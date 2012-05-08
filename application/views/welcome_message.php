@@ -36,6 +36,8 @@ $this->load->view("common/header");
 	
 	    <?php $this->load->view("common/footer");?>
 </script> 
+<?php $this->load->view("mixins/wall"); ?> 
+<?php $this->load->view("mixins/sidebar"); ?> 
 <?php $this->load->view('mixins/topbar'); ?>
 <?php $this->load->view('mixins/group'); ?>
 <?php $this->load->view("mixins/statusblock");?>
@@ -61,14 +63,35 @@ $this->load->view("common/header");
 	</div>
 </script>
 
-<?php $this->load->view("mixins/wall"); ?> 
+
 <script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>
 
 <script>
+	
+
 
 	var baseURL = "<?php echo base_url();?>";
 	YUI().use('app','babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
 		Y.user = new Y.Model({ authenticated:false , user_id:null, name:null });
+		<?php
+			$current_user = $this->user->get_current();
+			if(!empty($current_user))
+			{
+				?>
+				Y.userModel = new Y.BABE.UserModel(<?php echo json_encode($this->user->get_user($this->user->get_current())); ?>);
+				window.current_user = <?php echo json_encode($this->user->get_current()); ?>;
+				Y.userModel.load();
+				Y.user.set("authenticated",true);
+				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
+				Y.APPCONFIG =  <?php echo json_encode($config);?>;
+				
+				<?php
+			}
+		?>
+		
+		
+		
+		
 		Y.hs = new Y.History();
 		 Y.on('io:failure', function(){
 		 	Y.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");
@@ -291,6 +314,18 @@ $this->load->view("common/header");
 		Y.WallView = Y.BABE.WallView;
 		Y.SignUpView =  Y.BABE.SignUpView;
 		Y.TopBarView = Y.BABE.TopBarView;
+		
+		
+		Y.sidebar = new SideBarView({
+			usermodel:Y.userModel
+		});
+		Y.topbar= new Y.TopBarView({
+			usermodel:Y.userModel
+		});			
+		
+		
+		
+		
 		Y.MainAppView = Y.Base.create('MainAppView', Y.View, [], {
 			containerTemplate:'<div class="the-app"/>',
 			expand:false,
@@ -314,30 +349,11 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				
+			
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				
 				
 				
 				Y.loadTemplate("statusblock",function(){
@@ -350,11 +366,11 @@ $this->load->view("common/header");
 					}
 				
 				});
-				Y.loadTemplate("wall",function(){ 
-					var wall = new Y.WallView({loadCommand:'wallposts'}); 
-					con.one('.wallcontainer').setHTML(wall.render().get('container'));
-					that.set('wall',wall);
-				});
+				
+				var wall = new Y.WallView({loadCommand:'wallposts',usermodel:Y.userModel}); 
+				con.one('.wallcontainer').setHTML(wall.render().get('container'));
+				that.set('wall',wall); 
+				
 		        return this;
 		    }
 		});
@@ -365,30 +381,8 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				Y.loadTemplate("profile",function(){ 
 					var user = new Y.BABE.UserModel({
 						'_id':window.current_user
@@ -413,30 +407,8 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
 				 
 				Y.BABE.loadTemplate('user_page',function(){
@@ -454,30 +426,8 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
 				 
 				Y.loadTemplate("group",function(){ 
@@ -590,18 +540,9 @@ $this->load->view("common/header");
 					});
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}		 
+				
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+ 				
 				Y.loadTemplate("group",function(){ 
 					
 					var grp =  new Y.GroupPageView({model:group});
@@ -621,30 +562,9 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
 				Y.loadTemplate("wall",function(){ 
 					
@@ -678,30 +598,9 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		    	con.setHTML(Y.one("#outer").getHTML());
 		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
 		    	var nlist = new Y.BABE.NotificationList();
 		    	
@@ -749,30 +648,8 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		    	con.setHTML(Y.one("#outer").getHTML());
 		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				var searchView = new Y.BABE.SearchView({
 					search:this.get('search')
 				});
@@ -788,30 +665,8 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		    	con.setHTML(Y.one("#outer").getHTML());
 		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				var topbar = AppUI.getViewInfo('topbarview');
-				if(topbar.instance)
-				{
-					con.one(".topbar").setHTML(topbar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("topbar",function(){ 
-						var topbar= new Y.TopBarView();
-						con.one(".topbar").setHTML(topbar.render().get('container'));
- 					});
-				}
-				var sidebar = AppUI.getViewInfo('sidebarview');
-				if(sidebar.instance)
-				{
-					con.one(".topbar").setHTML(sidebar.instance.get('container'));
-				}
-				else
-				{
-					Y.loadTemplate("sidebar",function(){ 
-						var sidebar = new SideBarView();
-						con.one(".leftbar").setHTML(sidebar.render().get('container'));
-					 });
-				}
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action'),quiz_id:this.get('quiz_id')});
 				con.one('.centercolumn').setHTML(adminView.render().get('container'));
 		    	return this;
@@ -824,21 +679,7 @@ $this->load->view("common/header");
 		
 		
 		
-		<?php
-			$current_user = $this->user->get_current();
-			if(!empty($current_user))
-			{
-				?>				
-				Y.userModel = new Y.BABE.UserModel({"id":<?php echo json_encode($this->user->get_current()); ?>});
-				window.current_user = <?php echo json_encode($this->user->get_current()); ?>;
-				Y.userModel.load();
-				Y.user.set("authenticated",true);
-				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
-				Y.APPCONFIG =  <?php echo json_encode($config);?>;
-				
-				<?php
-			}
-		?>
+		
 		Y.AdminView = Y.BABE.AdminView;
 		
 		var AppUI =  new Y.App({
@@ -850,8 +691,7 @@ $this->load->view("common/header");
 		        grouppage:{type:'GroupPageMainView',preserve:true},
 		        postpage:{type:'PostPage',preserve:false},
 		        notificationpage:{type:'NotificationListView',preserve:false},
-		        topbarview:{type:'TopBarView',preserve:true},
-		        sidebarview:{type:'SideBarView',preserve:true},
+		       
 		        searchpage:{type:'SearchPageView',preserve:false},
 		        adminview:{type:'AdminPageView',preserve:false}
 		    },
@@ -868,8 +708,7 @@ $this->load->view("common/header");
 		AppUI.route('/', function (req) {
 		    this.showView('homepage',{expand:false,loadCommand:'stream'});
 		});
-		AppUI.createView('topbarview');
-		AppUI.createView('sidebarview');
+		
 		AppUI.route('/me', function (req) {
 		    this.showView('profile');
 		});

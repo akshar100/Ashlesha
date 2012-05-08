@@ -613,15 +613,6 @@ YUI.add('babe', function (Y) {
 
 
     }
-    var sanitizeUI = function () {
-            Y.one("#maincontainer").setContent(Y.one("#main").getContent());
-            Y.loadTemplate("topbar", function () {
-                Y.App.views.topbar = new Y.TopBarView();
-            });
-            Y.loadTemplate("sidebar", function () {
-                Y.App.views.sidebar = new Y.SideBarView();
-            });
-        };
     var autoExpand = function (r) {
 
             r.on("change|keyup", function () {
@@ -742,7 +733,7 @@ YUI.add('babe', function (Y) {
                 user_id: this.get('user_id') || window.current_user
             });
 
-            this.set('wall', wall);
+            this.set('wall', wall); 
 
         },
         prepend: function (e) {
@@ -753,11 +744,13 @@ YUI.add('babe', function (Y) {
             }
             if (e.model.get('category') == 'event') {
                 view = new Y.EventView({
-                    model: e.model
+                    model: e.model,
+                    usermodel:this.get('usermodel')
                 });
             } else {
                 view = new Y.PostView({
-                    model: e.model
+                    model: e.model,
+                    usermodel:this.get('usermodel')
                 });
             }
             var post = view.render().get('container');
@@ -1416,7 +1409,7 @@ YUI.add('babe', function (Y) {
                 });
                 e.halt();
             }, this);
-			if(Y.userModel.hasRole('administrator')){
+			if(this.get('usermodel').hasRole('administrator')){
 				if(this.get('model').get('sentiment'))
 				{
 					this.get('container').one(".administrator").all('button').removeClass('btn-success');
@@ -1467,7 +1460,7 @@ YUI.add('babe', function (Y) {
         updateToolbar: function () {
 
             var cmodel = this.get('model');
-            if (cmodel.get('author_id') == window.current_user || Y.userModel.hasRole('administrator')) {
+            if (cmodel.get('author_id') == window.current_user || this.get('usermodel').hasRole('administrator')) {
                 this.get('container').one('.wall-post-admin').setHTML(Y.one('#wall-post-admin-btn').getHTML());
                 this.get('container').one('.wall-post-admin').one("button").on('click', function () {
                     this.adminView();
@@ -2354,14 +2347,10 @@ YUI.add('babe', function (Y) {
     var TopBarView = Y.Base.create('topbarview', Y.View, [], {
         containerTemplate: '<div/>',
         initializer: function () {
-
-
-        },
-        render: function () {
-            var that = this;
+        	var that = this;
             this.get('container').setContent(Y.Lang.sub(Y.one('#topbar-authenticated').getContent(), {
-                user_name: Y.userModel.get("fullname"),
-                user_id: Y.userModel.get("user_id")
+                user_name: this.get('usermodel').get("fullname"),
+                user_id: this.get('usermodel').get("user_id")
             }));
             var sv = new Y.BABE.SearchBoxView();
             this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
@@ -2412,6 +2401,11 @@ YUI.add('babe', function (Y) {
             });
 
             jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
+
+
+        },
+        render: function () {
+            
             return this;
         }
     });
@@ -2626,9 +2620,8 @@ YUI.add('babe', function (Y) {
     });
     var SideBarView = Y.Base.create('sidebarview', Y.View, [], {
         containerTemplate: "<div/>",
-        render: function () {
-
-            var user = new UserModel({
+        initializer:function(){
+        	var user = new UserModel({
                 '_id': window.current_user
             });
             var that = this;
@@ -2647,6 +2640,10 @@ YUI.add('babe', function (Y) {
 
 
             });
+        },
+        render: function () {
+
+            
 
             return this;
 
@@ -3613,7 +3610,6 @@ YUI.add('babe', function (Y) {
         ProfileView: ProfileView,
         ImageUploadView: ImageUploadView,
         UserView: UserView,
-        sanitizeUI: sanitizeUI,
         ConnectionModel: ConnectionModel,
         RelationshipModel: RelationshipModel,
         GroupModel: GroupModel,
