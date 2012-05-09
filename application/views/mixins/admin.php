@@ -4,8 +4,8 @@
 	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Users <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
-	          <li ><a href="#buttonGroups">Search User</a></li>
-	          <li><a href="#buttonGroups">Email All</a></li>
+	          <li ><a href="/admin/search_user">User Management</a></li>
+	          <li><a href="/admin/mass_mail">Email All</a></li>
 	        </ul>
 	      </li>
 	      <li class="dropdown">
@@ -23,7 +23,6 @@
 	          <li><a href="/admin/manage_questions">Manage Questions</a></li>
 	          <li><a href="/admin/create_quiz">Create Question List</a></li>
 	          <li><a href="/admin/manage_quiz">Manage Question List</a></li>
-	          <li><a href="#buttonGroups">Responses</a></li>
 	        </ul>
 	      </li>
 	      <li class='stats'><a  href="/admin/stats">Stats</a></li>
@@ -367,6 +366,9 @@ United States of America|USA|0.5
 		<td>
 			<button type="button" class="btn btn-primary view">View/Edit</button>&nbsp;
 			<button type="button" class="btn btn-danger delete">Delete</button>
+			<button type="button" class="btn btn-success send">Send To Users</button>
+			<button type="button" class="btn btn-info responses">Responses</button>
+			
 		</td>
 	</tr>
 </script>
