@@ -332,6 +332,11 @@ class In extends CI_Controller {
 		echo json_encode($questions);
 		
 	}
+	
+	function quizlist()
+	{
+		echo json_encode($this->dba->getview('get_all_quizes'));
+	}
 }
 
 /* End of file welcome.php */

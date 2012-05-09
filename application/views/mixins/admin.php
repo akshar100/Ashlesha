@@ -342,3 +342,31 @@ United States of America|USA|0.5
 	</fieldset>
 	</form>
 </script>
+<script type="text/x-template" id="manage-quiz">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Listing all available quizes</h3>
+			<a href="/admin/create_quiz" class='btn btn-primary'>Create New</a>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		
+	<table class="quizlist span9 table table-bordered">
+	 
+	</table>
+		
+	</div>
+</script>
+<script type="text/x-template" id="quiz-row">
+	<tr>
+		<td>
+			<h4>{TITLE}</h4>
+		</td>
+		<td>
+			<button type="button" class="btn btn-primary view">View/Edit</button>&nbsp;
+			<button type="button" class="btn btn-danger delete">Delete</button>
+		</td>
+	</tr>
+</script>

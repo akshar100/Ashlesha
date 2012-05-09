@@ -681,6 +681,20 @@ class DBA
 		return $this->chill->delete($id,$item['_rev']);
 	}
 	
+	function getview($view,$params=array()){
+		$response = $this->chill->getView("posts",$view,null,$params);
+		$result = array();
+		if(isset($response['total_rows']) && $response['total_rows']>0)
+		{
+			foreach($response['rows'] as $row)
+			{
+				$result[]=$row['value'];
+			}
+		}
+		
+		return $result;
+	}
+	
 	function get_user_by_otp($otp)
 	{
 		if(empty($otp))
@@ -728,7 +742,7 @@ class DBA
 	
 	function get_all_questions()
 	{
-		$response = $this->chill->getView("posts","get_all_questions");
+		$response = $this->chill->getView("posts","get_all_questions",null,array());
 		$rows = $response['rows'];
 		$arr = array();
 		foreach($rows as $v)

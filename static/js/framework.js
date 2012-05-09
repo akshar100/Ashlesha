@@ -37,6 +37,26 @@ function (Y) {
         		}
         		return;
         	}
+        	if(action=='delete'){
+        		if(model.get('_id'))
+        		{
+        			Y.io(baseURL+'io/delete_model',{
+        			method:'POST',
+        			data:model.toJSON(),
+        			on:{
+        				complete:function(i,o,a){
+        					var response = Y.JSON.parse(o.responseText);
+        					callback(null, response); 
+        				}
+        			}
+        			});
+        		}
+        		else
+        		{
+        			callback(null,model.toJSON());
+        		}
+        		return;
+        	}
         	if(action=='create' || !model.get('_id'))
         	{
         		Y.io(baseURL+'io/create_model',{
@@ -2313,6 +2333,7 @@ function (Y) {
                     IMG: user.get("profile_pic"),
                     FULLNAME: user.get("fullname")
                 });
+                
                 that.get('container').setHTML(Y.Lang.sub(template, {
                     user_name: user.get("fullname"),
                     user_id: user.get("_id")
@@ -2767,8 +2788,10 @@ function (Y) {
                 	this.showCreateQuiz(null);
                 	break;
                 case "quiz":
-                	Y.log
                 	this.showCreateQuiz(this.get('quiz_id'));
+                	break;
+                case "manage_quiz":
+                	this.manageQuiz(this.get('quiz_id'));
                 	break;
                 default:
                     this.showStats();
@@ -2786,17 +2809,19 @@ function (Y) {
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         showCreateQuiz:function(id){
-        	Y.log(id);
         	var qc = new CreateQuizView({
         		model:new QuizModel({
         			'_id':id || null
         		})
         	});
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        manageQuiz:function(id){
+        	var qc = new ManageQuizesView()
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
     });
-    
     var QuizModel = Y.Base.create('quizModel', Y.Model, [], {
         sync: genericModelSync,
         validate:function(attrs){
@@ -2876,10 +2901,69 @@ function (Y) {
 		        },
 		        type:{
 		        	value:'quiz'
+		        },
+		        created_at:{
+		        	value:''
 		        }
        		}
 
     });
+    var QuizList = Y.Base.create('quizlist', Y.ModelList, [], {
+            sync: function(action, options, callback){
+            	Y.io(baseURL+'in/quizlist',{
+            		method:'POST',
+            		on:{
+            			complete:function(i,o,a){
+            				callback(null,Y.JSON.parse(o.responseText))
+            			}
+            		}
+            	});
+            },
+            model: QuizModel,
+            comparator: function (model) {
+                return parseInt(model.get('created_at'), 10) * -1;
+            }
+
+        })
+    var ManageQuizesView = Y.Base.create('managequizesview', Y.View, [], {
+    	 containerTemplate:'<div/>',
+    	 initializer:function(){
+    	 	var list = new QuizList(),c=this.get('container');
+    	 	this.get('container').setHTML(Y.one('#manage-quiz').getHTML());
+    	 	list.on('load',function(){
+    	 		c.one('.quizlist').setHTML('');
+    	 		var that = this;
+    	 		list.each(function(item){
+    	 			that.append(item);
+    	 		});
+    	 	},this);
+    	 	list.load();
+    	 	this.set('list',list);
+    	 },
+    	 render:function(){
+    	 	return this;
+    	 },
+    	 append:function(item)
+    	 {
+    	 	var c=this.get('container'),node=Y.Node.create(Y.Lang.sub(Y.one('#quiz-row').getHTML(),{
+    	 		TITLE:item.get('title')
+    	 	}));
+    	 	node.one('.view').on('click',function(){
+    	 		Y.fire('navigate',{
+    	 			action:'/admin/quiz/'+item.get('_id')
+    	 		})
+    	 	});
+    	 	node.one('.delete').on('click',function(){
+    	 		item.destroy({
+    	 			remove:true
+    	 		});
+    	 		node.remove(true);
+    	 	});
+    	 	c.one('.quizlist').append(node);
+    	 }
+    });
+    
+    
 	var CreateQuizView = Y.Base.create('managequestionview', Y.View, [], {
 		containerTemplate:'<div/>',
 		initializer:function(){
@@ -2894,7 +2978,6 @@ function (Y) {
 			          showPrevMonth:false,
 			          showNextMonth: false,
 			          date: new Date(m.get('start_date'))}));
-			          Y.log(new Date(m.get('start_date')));
 			 this.set('end',new Y.Calendar({
 			          height:'200px',
 			          width:'200px',
