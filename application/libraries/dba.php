@@ -751,4 +751,13 @@ class DBA
 		}
 		return $arr;
 	}
+	
+	function get_all_roles() 
+	{
+		$response = $this->chill->getView("posts","get_available_roles",NULL,array("group"=>true));
+		$rows = $response['rows'];
+		
+		
+		return ($rows); 
+	}
 }

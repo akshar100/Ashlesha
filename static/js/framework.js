@@ -2791,7 +2791,10 @@ function (Y) {
                 	this.showCreateQuiz(this.get('quiz_id'));
                 	break;
                 case "manage_quiz":
-                	this.manageQuiz(this.get('quiz_id'));
+                	this.manageQuiz();
+                	break;
+                case "share_quiz":
+                	this.shareQuiz(this.get('quiz_id'));
                 	break;
                 default:
                     this.showStats();
@@ -2818,6 +2821,14 @@ function (Y) {
         },
         manageQuiz:function(id){
         	var qc = new ManageQuizesView()
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        shareQuiz:function(id){
+        	var qc = new ShareQuizView({
+        		quiz_id:id
+        	});
+        	
+        	
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
@@ -2959,10 +2970,111 @@ function (Y) {
     	 		});
     	 		node.remove(true);
     	 	});
+    	 	node.one('.send').on('click',function(){
+    	 		Y.fire('navigate',{
+    	 			action:'/admin/share_quiz/'+item.get('_id')
+    	 		});
+    	 	});
     	 	c.one('.quizlist').append(node);
     	 }
     });
-    
+    var ShareQuizView = Y.Base.create('sharequizview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		var c = this.get('container'),quiz=new QuizModel({'_id':this.get('quiz_id')}),that=this;
+    		quiz.on('load',function(){
+    			c.setHTML(Y.Lang.sub(Y.one('#share-quiz').getHTML(),{
+    				TITLE:quiz.get('title')
+    			}));
+    			c.one('.roles').one('.select-all').on('click',function(e){
+    				e.target.toggleClass('btn-success');
+    				if(e.target.hasClass('btn-success'))
+    				{
+    					c.all('.select-role').removeClass('btn-success');
+    				}
+    				if(c.one('.roles').all('button.btn-success').size()==0)
+					{
+						c.one('.send').addClass('hide');
+					}
+					else
+					{
+						c.one('.send').removeClass('hide');
+					}
+    			});
+    			c.one('button.send').on('click',function(e){
+    				var text = e.target.getHTML(),roles=[];
+    				if(c.one('.roles').one('.select-all').hasClass('btn-success'))
+    				{
+    					roles.push('*');
+    				}
+    				else
+    				{
+    					c.one('.roles').all('.select-role').each(function(n){
+    						roles.push(n.getAttribute('rel'))
+    					});
+    				}
+    				
+    				e.target.addClass('btn-warning');
+    				e.target.set('innerHTML','Sending...');
+    				Y.io(baseURL+'io/send_quiz',{
+    					method:'POST',
+    					data:{
+    						roles:roles.join("|"),
+    						id:quiz.get('_id'),
+    					},
+    					on:{
+    						complete:function(i,o,a){
+    							e.target.removeClass('btn-warning');
+    							e.target.addClass('btn-success');
+    							e.target.set('innerHTML','Sent!');
+    							setTimeout(function(){
+			    					e.target.removeClass('btn-success');
+			    					e.target.removeClass('btn-warning');
+			    					e.target.addClass('btn-primary');
+			    					e.target.set('innerHTML',text);
+			    				},2000);
+    						}
+    					}
+    				});
+    						
+    				
+    			});
+    			Y.io(baseURL+'in/available_roles',{
+    				method:'POST',
+    				on:{
+    					complete:function(i,o,a){
+    						var roles = Y.JSON.parse(o.responseText);
+    						for(var i in roles)
+    						{
+    							that.addRole(roles[i]['key'],roles[i]['value']);
+    						}
+    						c.all('.select-role').on('click',function(e){
+    							e.target.toggleClass('btn-success');
+    							c.one('.select-all').removeClass('btn-success');
+    							if(c.one('.roles').all('button.btn-success').size()==0)
+    							{
+    								
+    								c.one('.send').addClass('hide');
+    							}
+    							else
+    							{
+    								c.one('.send').removeClass('hide');
+    							}
+    						});
+    					}
+    				}
+    			});
+    		});
+    		quiz.load();
+    	},
+    	addRole:function(key,value){
+    		var c = this.get('container');
+    		c.one('.roles').append('&nbsp;<button type="button" class="btn select-role" rel="'+key+'">'+key.toUpperCase()+' ('+value+')</button> ');
+    	},
+    	render:function(){
+    		return this;
+    	}
+    });
     
 	var CreateQuizView = Y.Base.create('managequestionview', Y.View, [], {
 		containerTemplate:'<div/>',

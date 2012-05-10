@@ -784,6 +784,17 @@ $this->load->view("common/header");
 						quiz_id:req.params.id
 					});
 		});
+		AppUI.route('/admin/share_quiz/:id',function(req){
+			
+			this.showView('adminview',{
+						userModel:Y.userModel,
+						action:'share_quiz',
+						quiz_id:req.params.id
+					});
+		});
+		AppUI.route('/quiz/:quiz_title/:id',function(req){
+			
+		});
 		
 		AppUI.route('/admin/:sub_action',function(req){
 			

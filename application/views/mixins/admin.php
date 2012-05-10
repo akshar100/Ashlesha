@@ -294,7 +294,7 @@ United States of America|USA|0.5
 <script type="text/x-template" id="create-quiz">
 	<div class="row-fluid">
 		<div class="span12">
-			<h3>Quiz!</h3>
+			<h3><?php echo $this->lang->line('quiz'); ?>!</h3>
 			<hr/>
 		</div>
 	</div>
@@ -319,7 +319,7 @@ United States of America|USA|0.5
 			
 		</div>
 		<div class="row-fluid">
-			<div class="span2"><label>Time For Test</label></div>
+			<div class="span2"><label>Time For <?php echo $this->lang->line('quiz'); ?></label></div>
 			<input class="input span3" type="text" placeholder="time in minutes" name="time"/> 
 		</div>
 		<div class="row-fluid">
@@ -327,7 +327,7 @@ United States of America|USA|0.5
 				<div class="row-fluid"><div class="span10 all-questions well"></div></div>
 			</div>
 			<div class="span6">
-				<h3>Questions for This Quiz</h3>
+				<h3>Questions for This <?php echo $this->lang->line('quiz'); ?></h3>
 				<div class="row-fluid"><div class="span10 selected_questions well"></div></div>
 			</div>
 		</div>
@@ -345,7 +345,7 @@ United States of America|USA|0.5
 	<div class="row-fluid">
 		<div class="span12">
 			<p>&nbsp;</p>
-			<h3>Listing all available quizes</h3>
+			<h3>Listing all available <?php echo $this->lang->line('quiz'); ?></h3>
 			<a href="/admin/create_quiz" class='btn btn-primary'>Create New</a>
 			<hr/>
 		</div>
@@ -371,4 +371,25 @@ United States of America|USA|0.5
 			
 		</td>
 	</tr>
+</script>
+<script type="text/x-template" id="share-quiz">
+	<div class="row-fluid">
+		<div class="span12"><h3>Sharing <?php echo $this->lang->line('quiz'); ?></h4><hr/></div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<h4>You are sharing: <small>{TITLE}</small></h4>
+			<p>&nbsp;</p>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span9 roles well">
+			<button type="button" class="btn select-all">All</button> 
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<button class="btn btn-primary hide send">Send</button>
+		</div>
+	</div>
 </script>

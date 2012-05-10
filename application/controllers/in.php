@@ -80,7 +80,7 @@ class In extends CI_Controller {
 			array("id"=>1,"label"=>"Create","name"=>"post"),
 			array("id"=>2,"label"=>"Participate","name"=>"participate"),
 			array("id"=>3,"label"=>"Profile","name"=>"profile"),
-			array("id"=>4,"label"=>"Boards","name"=>"group")
+			array("id"=>4,"label"=>$this->lang->line('group'),"name"=>"group")
 		);
 		$menu_items = array(
 			array("id"=>1,"parent_id"=>1,"name"=>$this->lang->line("post"),"label"=>$this->lang->line("post"),"view"=>"/post/new" ),
@@ -336,6 +336,11 @@ class In extends CI_Controller {
 	function quizlist()
 	{
 		echo json_encode($this->dba->getview('get_all_quizes'));
+	}
+	
+	function available_roles()
+	{
+		echo json_encode($this->dba->get_all_roles('get_available_roles'));
 	}
 }
 

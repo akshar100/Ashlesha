@@ -13,7 +13,7 @@
 			<form class="form-vertical">
 			<div id="event-form" class="form">
 							<fieldset>
-								<legend>Create a Project GRoup</legend>
+								<legend>Create a <?php echo $this->lang->line('group');?></legend>
 								<div class="control-group">
 									<div class="row-fluid">
 										<input type="text" placeholder="Add a title" name="title"  class="span12">
@@ -30,14 +30,14 @@
 									<div class="row-fluid">
 										<label class="radio">
 							                <input type="radio" checked="" value="open"  name="visibility">
-							               		Open Board
+							               		Open
 							            </label>
 							            
 							            <label class="radio">
 							                <input type="radio" value="closed"  name="visibility">
-							                	Closed Board
+							                	Closed
 							            </label>
-										<p class="help-block">If you set your group as closed then you will have to manually pass the group link to others.</p>
+										<p class="help-block">If you set your <?php echo $this->lang->line('group');?> as closed then you will have to manually pass the group link to others.</p>
 									</div>
 								</div>
 			
