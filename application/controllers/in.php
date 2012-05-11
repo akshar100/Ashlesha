@@ -163,7 +163,8 @@ class In extends CI_Controller {
 				$url = base_url().'welcome/otp/'.$otp;
 				
 				$this->load->library('email');
-
+				
+			
 				$this->email->from($this->config->item('from_email'),$this->config->item('from_name'));
 				$this->email->to($user['email']);
 				$this->email->subject('Forgot password link');
@@ -341,6 +342,44 @@ class In extends CI_Controller {
 	function available_roles()
 	{
 		echo json_encode($this->dba->get_all_roles('get_available_roles'));
+	}
+	
+	function quiz_response()
+	{
+		$id = $this->input->post('quiz_id');
+		$user_id = $this->user->get_current();
+		$doc = $this->dba->get("response_{$id}_{$user_id}");
+		if(empty($doc))
+		{
+			echo json_encode(array(
+				'answered'=>false
+			));
+		}
+		else
+		{
+			echo json_encode(array(
+				'answered'=>true
+			));
+		}
+	}
+	
+	function get_list()
+	{
+		$action = $this->input->post('action');
+		switch($action)
+		{
+			case "quiz_questions":
+				$id = $this->input->post('id');
+				$quiz = $this->dba->get($id);
+				$questions = explode(",",$quiz['questions']);
+				$rows = array();
+				foreach($questions as $q)
+				{
+					$rows[]= $this->dba->get($q);
+				}
+			echo json_encode($rows);
+			break;
+		}
 	}
 }
 

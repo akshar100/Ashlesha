@@ -114,7 +114,18 @@ function (Y) {
             return n.getHTML();
         }
   
-   
+   function genericListSync(action, options, callback){
+   		Y.io(baseURL+'in/get_list',{
+   			method:'POST',
+   			data:options,
+   			on:{
+   				success:function(i,o,a){
+   					 var data = Y.JSON.parse(o.responseText);
+   					 callback(null,data);
+   				}
+   			}
+   		});
+   }
     function listSync(action, options, callback) {
 
         if (options.name == "notificationlist" && action == "read") {
@@ -2330,7 +2341,7 @@ function (Y) {
             user.load({}, function () {
 
                 var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(), {
-                    IMG: user.get("profile_pic"),
+                    IMG: baseURL+user.get("profile_pic"),
                     FULLNAME: user.get("fullname")
                 });
                 
@@ -2895,6 +2906,9 @@ function (Y) {
 		        title:{
 		        	value:''
 		        },
+		        description:{
+		        	value:''
+		        },
 		        start_date:{
 		        	value:new Date().toUTCString()
 		        },
@@ -2908,7 +2922,7 @@ function (Y) {
 		        	value:''	
 		        },
 		        author_id:{
-		        	value:window.current_user
+		        	value:''
 		        },
 		        type:{
 		        	value:'quiz'
@@ -2919,6 +2933,7 @@ function (Y) {
        		}
 
     });
+
     var QuizList = Y.Base.create('quizlist', Y.ModelList, [], {
             sync: function(action, options, callback){
             	Y.io(baseURL+'in/quizlist',{
@@ -2973,6 +2988,11 @@ function (Y) {
     	 	node.one('.send').on('click',function(){
     	 		Y.fire('navigate',{
     	 			action:'/admin/share_quiz/'+item.get('_id')
+    	 		});
+    	 	});
+    	 	node.one('.preview').on('click',function(){
+    	 		Y.fire('navigate',{
+    	 			action:'/quiz/'+item.get('_id')
     	 		});
     	 	});
     	 	c.one('.quizlist').append(node);
@@ -3104,6 +3124,7 @@ function (Y) {
 			 
 			 this.get('container').one('[name=title]').set('value',m.get('title'));
 			 this.get('container').one('[name=time]').set('value',m.get('time'));
+			 this.get('container').one('[name=description]').set('value',m.get('description'));
 			 Y.io(baseURL+'in/get_questions',{
 				method:'POST',
 				on:{
@@ -3158,7 +3179,8 @@ function (Y) {
 					start_date:(this.get('start').get('selectedDates').length && this.get('start').get('selectedDates')[0].toUTCString()) || null,
 					end_date:(this.get('end').get('selectedDates').length && this.get('end').get('selectedDates')[0].toUTCString()) || null,
 					time:this.get('container').one("[name=time]").get('value'),
-					questions:this.getSelectedQuestions()
+					questions:this.getSelectedQuestions(),
+					description:this.get('container').one("[name=description]").get('value')
 					 
 				});
 				e.target.addClass('btn-warning');
@@ -3383,12 +3405,208 @@ function (Y) {
         getMarkup: createMarkup
 
     });
+    var GenericModel = Y.Base.create('GenericModel', Y.Model, [], {
+        sync: genericModelSync,
+        idAttribute:'_id'
+      });
+    var GenericList = Y.Base.create('groupList', Y.ModelList, [], {
+    	sync:genericListSync,
+    	model:GenericModel
+    });
+    var AnswerBlock = Y.Base.create('searchboxview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(config)
+    	{
+    		
+    		this.get('container').setHTML(Y.Lang.sub(Y.one('#answer-row').getHTML(),{
+    			NO:config.index,
+    			QUESTION_TITLE:config.data.question,
+    			ANSWER_MARKUP:this.getMarkup(config.data.items)
+    		}));
+    	},
+    	render:function(){
+    		return this;
+    	},
+    	getMarkup:function(items){
+    		var markup = '',node,expected;
+    		for(var i in items)
+    		{
+    			switch(items[i]['data-type']) 
+    			{
+    				case "text":
+    					markup+=Y.Lang.sub(Y.one('#text-answer-row').getHTML(),{
+    						LABEL:items[i].label,
+    						NAME:'text'+i
+    					});
+    					break;
+    				case "radio":
+    					node = Y.Node.create(Y.Lang.sub(Y.one('#radio-answer-row').getHTML(),{
+    						LABEL:items[i].label,
+    						NAME:'radio'+i 
+    					}));
+    					expected = items[i].expected.split("\n"); 
+    					for(var j in expected)
+    					{
+    						var row = expected[j].split("|");
+    						node.one('.radio-area').append('<li><input type="radio" name="radio'+i+'" value="'+row[1]+'"/> '+row[0]+'</li>')
+    					}
+    					markup+=node.getHTML(); 
+    					break;
+    				default:
+    					break;
+    			}
+    		}
+    		return markup; 
+    	}
+    });
+	var AnswerQuizView = Y.Base.create('searchboxview', Y.View, [], {
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var c = this.get('container'),m=new QuizModel({
+				'_id':this.get('quiz_id')
+			}),now=new Date(),that=this;
+			m.on('load',function(){
+				c.setHTML(Y.Lang.sub(Y.one('#answer-quiz').getHTML(),{
+					TITLE:m.get('title'),
+					DESCRIPTION:m.get('description'),
+					START_DATE:Y.DataType.Date.format(new Date(m.get('start_date')),'%F'),
+					END_DATE:Y.DataType.Date.format(new Date(m.get('end_date')),'%F'),
+					TIME:m.get('time')
+				}));
+				if(now<new Date(m.get('start_date')))
+				{
+					c.one('.wait4_quiz').removeClass('hide');
+				}
+				else
+				{
+					Y.io(baseURL+'in/quiz_response',{
+						method:'POST',
+						data:{
+							quiz_id:m.get('_id')
+						}, 
+						on:{
+							complete:function(i,o,a){
+									var r = Y.JSON.parse(o.responseText);
+									if(r.answered)
+									{
+										c.one('.answered_quiz').removeClass('hide');
+									}
+									else
+									{
+										if(now>new Date(m.get('end_date')))
+										{
+											c.one('.over_quiz').removeClass('hide');
+										}
+										else
+										{
+											c.one('.start_quiz').removeClass('hide');
+											that.setupQuiz();
+										}
+									}
+							}
+						}
+					});
+				}
+			
+				
+			});
+			this.set('model',m);
+			m.load();
+		},
+		freezeQuiz:function(){
+			
+		},
+		setupQuiz:function(){
+			var c = this.get('container'),m=this.get('model'),that=this,quiz=new GenericList();
+			c.one('.start-btn').on('click',function(){
+				var count = 1,timer,start=Date.now(),questions, response = new GenericModel();
+				
+				Y.io(baseURL+'io/start_quiz',{
+					method:'POST',
+					data:{
+						id:m.get('_id')
+					},
+					on:{
+						success:function(i,o,a){
+							response.setAttrs(Y.JSON.parse(o.responseText));
+							that.set('response',response);
+							if(that.get('response'))
+				{
+					that.get('response').set('current_time',Math.random());
+					that.get('response').save(); 
+				}
+						}
+					}
+				});
+				c.setHTML(Y.Lang.sub(Y.one('#answer-quiz-start').getHTML(),{
+					TITLE:m.get('title'),
+					DESCRIPTION:m.get('description'),
+					START_DATE:Y.DataType.Date.format(new Date(m.get('start_date')),'%F'),
+					END_DATE:Y.DataType.Date.format(new Date(m.get('end_date')),'%F'),
+					TIME:m.get('time')
+				}));
+				
+				timer = setInterval(function(){
+					
+					var now = Date.now(),total=m.get('time')*60*1000,pec=0,remaining;
+					pec = ((now-start)/total)*100;
+					remaining = Math.ceil(((start+total)-now)/60000);
+					
+					
+					if(remaining<=0)
+					{
+						remaining = 0;
+						clearInterval(timer);
+						that.freezeQuiz();
+						return;
+					}
+					if(pec>99.99){ pec = 100; }
+					if(pec<1){ pec = 0; }
+					pec = Math.ceil(pec);
+					pec = 100-pec;
+					c.one('.bar').setStyle('width',pec+'%');
+					c.one('.badge-inverse').setHTML(remaining); 
+					count++;
+				},1000);
+				
+			
+				
+				
+				quiz.on('load',function(){
+					quiz.each(function(item,index){
+						var config= item.toJSON(),v;
+						config.index=index+1;
+						v = new AnswerBlock(config);
+						that.set('responseView',v)
+						c.one('.questions-area').append(v.render().get('container'));
+					
+					});
+				},this);
+				
+				quiz.load({
+					action:'quiz_questions',
+					id:m.get('_id')
+				});
+				c.one('.save-btn').on('click',function(){
+					
+				},this);
+				
+				
+				
+				
+			},this);
+			
+		},
+		render:function(){
+			return this;
+		}
+	});
 	var UserModel = Y.BABEUSER.UserModel;
 	var ProfileView = Y.BABEUSER.ProfileView;
 	var SignUpView = Y.BABEUSER.SignUpView;
     Y.BABE = {
-        male_image: baseURL + 'static/images/male_profile.png',
-        female_image: baseURL + 'static/images/female_profile.png',
+        male_image:'/static/images/male_profile.png',
+        female_image:'/static/images/female_profile.png',
         TagBoxConfig: TagBoxConfig,
         AutoLoadTagsPlugin: AutoLoadTagsPlugin,
         autoExpand: autoExpand,
@@ -3512,7 +3730,8 @@ function (Y) {
         BarChartView: BarChartView,
         SearchBoxView: SearchBoxView,
         SearchView: SearchView,
-        AdminView: AdminView
+        AdminView: AdminView,
+        AnswerQuizView: AnswerQuizView
 
     };
 }, '0.0.1', {
@@ -3636,7 +3855,7 @@ YUI.add('babe-user',function(Y){
                 value: 'user'
             },
             roles:{
-            	value:'user'
+            	value:'user|student'
             }
         }
     });

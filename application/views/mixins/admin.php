@@ -305,6 +305,10 @@ United States of America|USA|0.5
 			<input class="input span6" type="text" name="title" placeholder="Give a title"/> 
 		</div>
 		<div class="row-fluid">
+			<div class="span2"><label>Description</label></div>
+			<textarea class="input span6" type="text" name="description" placeholder="Optional Descriptipon"></textarea> 
+		</div>
+		<div class="row-fluid">
 			<div class="span2">&nbsp;</div>
 			<div class="span4">
 				<label>Start Date</label>
@@ -368,6 +372,7 @@ United States of America|USA|0.5
 			<button type="button" class="btn btn-danger delete">Delete</button>
 			<button type="button" class="btn btn-success send">Send To Users</button>
 			<button type="button" class="btn btn-info responses">Responses</button>
+			<button type="button" class="btn btn-info preview">Preview</button>
 			
 		</td>
 	</tr>
@@ -390,6 +395,100 @@ United States of America|USA|0.5
 	<div class="row-fluid">
 		<div class="span12">
 			<button class="btn btn-primary hide send">Send</button>
+		</div>
+	</div>
+</script >
+<script type="text/x-template" id="answer-quiz">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>You are answering <?php echo $this->lang->line('quiz'); ?>: <small>{TITLE}</small></h3>
+			
+			<div class="alert alert-info">
+    			<p>{DESCRIPTION}</p>
+    			<p>Starts On: <strong>{START_DATE}</strong></p>
+    			<p>Ends On: <strong>{END_DATE}</strong></p>
+    			<p>Available Time: <strong>{TIME}</strong> minutes</p>
+    		</div>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 start_quiz hide" style="text-align:center">
+			<buttton type="button" class='btn btn-primary btn-large start-btn'>Start <?php $this->lang->line('quiz');?></buttton>
+			<p>Once you start you must continue. You wont be allowed to pause.</p>
+		</div>
+		<div class="span12 wait4_quiz hide" style="text-align:center">
+			<strong>The <?php $this->lang->line('quiz');?> is not yet available. It will be available on {START_DATE}.</strong>
+		</div>
+		<div class="span12 over_quiz hide" style="text-align:center">
+			<strong>The last date to answer <?php $this->lang->line('quiz');?> is expired.</strong>
+		</div>
+		<div class="span12 answered_quiz hide" style="text-align:center">
+			<strong>You have already answered <?php $this->lang->line('quiz');?>.</strong>
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="answer-quiz-start">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>You are answering <?php echo $this->lang->line('quiz'); ?>: <small>{TITLE}</small></h3>
+			
+			<div class="alert alert-info">
+    			<p>{DESCRIPTION}</p>
+    			<p>Starts On: <strong>{START_DATE}</strong></p>
+    			<p>Ends On: <strong>{END_DATE}</strong></p>
+    			<p>Available Time: <strong>{TIME}</strong> minutes</p>
+    		</div>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			Time:<span class="badge badge-inverse"></span> minutes remaining (We are saving your response periodically so dont bother to save it. )<br/>
+			    <div class="progress">
+			    <div class="bar" style="width: 100%;"></div>
+			    </div>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 questions-area">
+			<p>&nbsp;</p>
+			
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="centered">
+				<button type="button" class="btn btn-primary btn-large save-btn">Done</button>
+				<p class="help-text">We save your response periodically hence you need not submit it again and again.</p>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="x-template" id="answer-row">
+	<div class="row-fluid postrow">
+		<div class="span1"><span class="badge badge-info">{NO}</span></div>
+		<div class="span11">
+			<h5>{QUESTION_TITLE}</h5>
+			{ANSWER_MARKUP}
+		</div>
+	</div>
+</script>
+<script type="x-template" id="text-answer-row">
+	<div class="row-fluid">
+		<div class="span12">
+			<label>{LABEL}</label>
+			<input type="text" class="input" name="{NAME}"/>
+		</div>
+	</div>
+</script>
+<script type="x-template" id="radio-answer-row"> 
+	<div class="row-fluid">
+		<div class="span12">
+			<label>{LABEL}</label>
+			<ul class='radio-area unstyled'>
+				
+			</ul>
 		</div>
 	</div>
 </script>

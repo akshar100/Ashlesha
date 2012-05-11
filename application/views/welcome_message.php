@@ -664,6 +664,23 @@ $this->load->view("common/header");
 		});
 		
 		
+		Y.AnswerQuizPageView = Y.Base.create('AnswerQuizPageView', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var con = this.get('container'),aq= new Y.BABE.AnswerQuizView({
+		    		quiz_id:this.get('quiz_id')
+		    	});
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				
+		    	con.one('.centercolumn').setHTML(aq.render().get('container'));
+		    	return this;
+		    }
+		});
+		
 		
 				
 		
@@ -681,9 +698,9 @@ $this->load->view("common/header");
 		        grouppage:{type:'GroupPageMainView',preserve:true},
 		        postpage:{type:'PostPage',preserve:false},
 		        notificationpage:{type:'NotificationListView',preserve:false},
-		       
 		        searchpage:{type:'SearchPageView',preserve:false},
-		        adminview:{type:'AdminPageView',preserve:false}
+		        adminview:{type:'AdminPageView',preserve:false},
+		        quizview:{type:'AnswerQuizPageView',preserve:false}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -792,8 +809,11 @@ $this->load->view("common/header");
 						quiz_id:req.params.id
 					});
 		});
-		AppUI.route('/quiz/:quiz_title/:id',function(req){
-			
+		AppUI.route('/quiz/:id',function(req){
+			this.showView('quizview',{
+				userModel:Y.userModel,
+				quiz_id:req.params.id
+			});
 		});
 		
 		AppUI.route('/admin/:sub_action',function(req){

@@ -120,7 +120,8 @@ class IO extends CI_Controller {
 			"top_tags"=>array("map"=>read_file("./application/views/json/top_tags_map.js"),"reduce"=>read_file("./application/views/json/top_tags_reduce.js")),
 			"user_by_createdat"=>array("map"=>read_file("./application/views/json/users_by_createdat_map.js"),"reduce"=>read_file("./application/views/json/users_by_createdat_reduce.js")),
 			"get_all_questions"=>array("map"=>read_file("./application/views/json/get_all_questions.js")),
-			"get_all_quizes"=>array("map"=>read_file("./application/views/json/all_quizes.js")) 
+			"get_all_quizes"=>array("map"=>read_file("./application/views/json/all_quizes.js")),
+			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js"))  
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -133,6 +134,7 @@ class IO extends CI_Controller {
 			"by_tag" => array("index"=>read_file("./application/views/json/by_tag.js")),
 			"by_user" => array("index"=>read_file("./application/views/json/by_user.js")),
 			"user_by_term" => array("index"=>read_file("./application/views/json/lucene_user_by_term.js")),
+			"users_by_roles" => array("index"=>read_file("./application/views/json/lucene_emails_by_role.js")),
 			
 		);
 		
@@ -320,23 +322,20 @@ class IO extends CI_Controller {
 	
 	function update_model()
 	{
-		echo json_encode($this->dba->update($this->input->post()));
+		$data = $this->input->post();
+		if($data['type']!='post')
+		{
+			$data['author_id'] = $this->user->get_current();
+		}
+		
+		$data['updated_at'] = time();
+		echo json_encode($this->dba->update($data));
 	}
 
 	function create_notification()
 	{
 		$post = $this->input->post();
-		$post['type'] = 'notification';
-		$post['created_at'] = time();
-		if(empty($post['_id']) or $post['_id']=='null')
-		{
-			unset($post['_id']);
-			$response = $this->dba->create($post);
-		}
-		else
-		{
-			$response = $this->dba->update($post);
-		}
+		$response = $this->dba->create_notification($post);
 		echo json_encode($response);
 	}
 	
@@ -383,7 +382,72 @@ class IO extends CI_Controller {
 	function send_quiz()
 	{
 		$data = $this->input->post();
-		print_r($data);
+		$roles = $data['roles'];
+		$id = $data['id'];
+		$rows = array();
+		if($roles=="*")
+		{
+			$response = $this->dba->getview('get_users_by_role',array(
+																	'key'=>'*'
+															));
+			foreach($response as $row)
+			{
+				$rows[]=$row;
+			}
+		}
+		else
+		{
+			$roles = explode("|",$roles);
+			foreach($roles as $role)
+			{
+				$response = $this->dba->getview('get_users_by_role',array('key'=>$role));
+				
+				foreach($response as $row)
+				{
+					$rows[]=$row;
+				}
+			}
+		}
+		$rows = array_unique($rows);
+		$this->load->library('email');
+		foreach($rows as $row)
+		{
+			
+			$this->dba->create_notification(array(
+				'type'=>'notification',
+				'notification_action'=>'quiz',
+				'source_user'=>$this->user->get_current(),
+				'target_user'=>$row[1],
+				'target_resource'=>'/quiz/'+$id
+			));
+			
+			
+			$url = base_url().'quiz/'.$id;
+			$this->email->from($this->config->item('from_email'),$this->config->item('from_name'));
+			$this->email->to($row[0]);
+			$this->email->subject($this->lang->line('quiz_subject'));
+			$this->email->message($this->load->view('email/quiz_request',array(
+				'url'=>$url
+			),TRUE));
+				
+			echo $this->email->send();
+			echo $row[0];
+			
+			
+		}
+		
+	}
+
+	function start_quiz()
+	{
+		$id = $this->input->post('id');
+		$user = $this->user->get_current();
+		$doc = array();
+		$doc['_id'] = "response_{$id}_{$user}";
+		$doc['created_at'] = time();
+		$doc['author_id'] = $user;
+		$doc['type'] = 'quiz_responses';
+		echo json_encode($this->dba->create($doc));
 	}
 }
 

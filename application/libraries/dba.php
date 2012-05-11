@@ -760,4 +760,21 @@ class DBA
 		
 		return ($rows); 
 	}
+	
+	function create_notification($post)
+	{
+		$post['type'] = 'notification';
+		$post['created_at'] = time();
+		if(empty($post['_id']) or $post['_id']=='null')
+		{
+			unset($post['_id']);
+			$response = $this->create($post);
+		}
+		else
+		{
+			$response = $this->update($post);
+		}
+		
+		return $response;
+	}
 }
