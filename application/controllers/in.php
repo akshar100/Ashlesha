@@ -349,7 +349,7 @@ class In extends CI_Controller {
 		$id = $this->input->post('quiz_id');
 		$user_id = $this->user->get_current();
 		$doc = $this->dba->get("response_{$id}_{$user_id}");
-		if(empty($doc))
+		if(empty($doc) || empty($doc['finished']))
 		{
 			echo json_encode(array(
 				'answered'=>false
@@ -375,7 +375,9 @@ class In extends CI_Controller {
 				$rows = array();
 				foreach($questions as $q)
 				{
-					$rows[]= $this->dba->get($q);
+					$q1 = $this->dba->get($q);
+					$q1['id'] = $q1['_id'];
+					$rows[]= $q1; 
 				}
 			echo json_encode($rows);
 			break;

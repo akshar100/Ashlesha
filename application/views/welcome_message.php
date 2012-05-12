@@ -398,11 +398,10 @@ $this->load->view("common/header");
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
-				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container')); 				
 				 
 				Y.BABE.loadTemplate('user_page',function(){
-		    		var UserView = new Y.BABE.UserView({user_id:that.get('user_id')});
+		    		var UserView = new Y.BABE.UserView({user_id:that.get('user_id'),usermodel:Y.userModel});
 		    		con.one('.centercolumn').setContent(UserView.render().get('container'));
 		    	});
 		        return this;

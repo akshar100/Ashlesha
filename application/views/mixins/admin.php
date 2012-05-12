@@ -444,8 +444,8 @@ United States of America|USA|0.5
 	</div>
 	<div class="row-fluid">
 		<div class="span12">
-			Time:<span class="badge badge-inverse"></span> minutes remaining (We are saving your response periodically so dont bother to save it. )<br/>
-			    <div class="progress">
+			<p>Time:<span class="badge badge-inverse"></span> minutes remaining (We are saving your response periodically so dont bother to save it. )<br/></p>
+			    <div class="progress span6">
 			    <div class="bar" style="width: 100%;"></div>
 			    </div>
 		</div>

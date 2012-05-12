@@ -897,7 +897,8 @@ function (Y) {
                 });
                 var wall = new WallView({
                     loadCommand: 'myposts',
-                    user_id: config.user_id
+                    user_id: config.user_id,
+                    usermodel:this.get('usermodel')
                 });
                 this.set('wall', wall);
 
@@ -3247,7 +3248,7 @@ function (Y) {
 							);
 							node.one('.btn-danger').on('click',(function(d2,n){
 									return function(e){ 
-									Y.log(d2); 
+									
 									Y.io(baseURL+'io/delete_question',{
 										method:'POST',
 										data:{
@@ -3406,8 +3407,8 @@ function (Y) {
 
     });
     var GenericModel = Y.Base.create('GenericModel', Y.Model, [], {
-        sync: genericModelSync,
-        idAttribute:'_id'
+        sync: genericModelSync
+        ,idAttribute:'_id'
       });
     var GenericList = Y.Base.create('groupList', Y.ModelList, [], {
     	sync:genericListSync,
@@ -3421,14 +3422,21 @@ function (Y) {
     		this.get('container').setHTML(Y.Lang.sub(Y.one('#answer-row').getHTML(),{
     			NO:config.index,
     			QUESTION_TITLE:config.data.question,
-    			ANSWER_MARKUP:this.getMarkup(config.data.items)
+    			ANSWER_MARKUP:this.getMarkup(config)
     		}));
+    		this.get('container').all('input').on('change',function(e){
+    			Y.fire('answerblock:change',{
+    				question_id:e.target.getAttribute('name'),
+    				value:e.target.getAttribute('value')
+    			});
+    		},this);
     	},
     	render:function(){
     		return this;
     	},
-    	getMarkup:function(items){
-    		var markup = '',node,expected;
+    	getMarkup:function(config){
+    		Y.log(config['_id']);
+    		var markup = '',node,expected,items=config.data.items;
     		for(var i in items)
     		{
     			switch(items[i]['data-type']) 
@@ -3436,19 +3444,19 @@ function (Y) {
     				case "text":
     					markup+=Y.Lang.sub(Y.one('#text-answer-row').getHTML(),{
     						LABEL:items[i].label,
-    						NAME:'text'+i
+    						NAME:config['_id']
     					});
     					break;
     				case "radio":
     					node = Y.Node.create(Y.Lang.sub(Y.one('#radio-answer-row').getHTML(),{
     						LABEL:items[i].label,
-    						NAME:'radio'+i 
+    						NAME:config['_id']
     					}));
     					expected = items[i].expected.split("\n"); 
     					for(var j in expected)
     					{
     						var row = expected[j].split("|");
-    						node.one('.radio-area').append('<li><input type="radio" name="radio'+i+'" value="'+row[1]+'"/> '+row[0]+'</li>')
+    						node.one('.radio-area').append('<li><input type="radio" name="'+config['_id']+'" value="'+row[1]+'"/> '+row[0]+'</li>')
     					}
     					markup+=node.getHTML(); 
     					break;
@@ -3528,13 +3536,14 @@ function (Y) {
 					},
 					on:{
 						success:function(i,o,a){
-							response.setAttrs(Y.JSON.parse(o.responseText));
+							var r = Y.JSON.parse(o.responseText);
+							response.setAttrs(r);
 							that.set('response',response);
-							if(that.get('response'))
-				{
-					that.get('response').set('current_time',Math.random());
-					that.get('response').save(); 
-				}
+							response.set('_id',r['_id']);
+							response.set('current','rt');
+							response.save();
+							start = response.get('created_at')*1000; 
+							
 						}
 					}
 				});
@@ -3555,6 +3564,11 @@ function (Y) {
 					
 					if(remaining<=0)
 					{
+						if(that.get('response'))
+						{
+							that.get('response').set('finished',true);
+							that.get('response').save();
+						}
 						remaining = 0;
 						clearInterval(timer);
 						that.freezeQuiz();
@@ -3577,9 +3591,8 @@ function (Y) {
 						var config= item.toJSON(),v;
 						config.index=index+1;
 						v = new AnswerBlock(config);
-						that.set('responseView',v)
 						c.one('.questions-area').append(v.render().get('container'));
-					
+						
 					});
 				},this);
 				
@@ -3591,7 +3604,15 @@ function (Y) {
 					
 				},this);
 				
-				
+				Y.on('answerblock:change',function(e){
+					
+							if(that.get('response'))
+							{
+								that.get('response').set(e.question_id,e.value);
+								that.get('response').save();
+							}
+							
+						},this);
 				
 				
 			},this);

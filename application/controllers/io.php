@@ -442,6 +442,12 @@ class IO extends CI_Controller {
 	{
 		$id = $this->input->post('id');
 		$user = $this->user->get_current();
+		$doc = $this->dba->get("response_{$id}_{$user}");
+		if(!empty($doc))
+		{
+			echo json_encode($doc); 
+			return;
+		}
 		$doc = array();
 		$doc['_id'] = "response_{$id}_{$user}";
 		$doc['created_at'] = time();
