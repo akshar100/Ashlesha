@@ -41,8 +41,10 @@ class Welcome extends CI_Controller {
 				'post_enabled' => $this->config->item('post_enabled'),
 				'post_sector_enabled' =>$this->config->item('post_sector_enabled'), 
 				'notifications_enabled' =>$this->config->item('notifications_enabled'),
-				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled')
+				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled'),
+				'supported_roles'=>$this->config->item('supported_roles')
 			);
+			$this->user->force_sign_in($this->user->get_current());
 			$this->load->view('welcome_message',array(
 				'config'=>$config
 			));
@@ -74,6 +76,10 @@ class Welcome extends CI_Controller {
 			else if(!isset($user['password']) || $user['password'] !== do_hash($password))
 			{
 				$this->session->set_userdata("form_error","Wrong username password.");
+			}
+			else if(isset($user['disabled']) && $user['disabled']!==false)
+			{
+				$this->session->set_userdata("form_error","This user has been disabled.");
 			}
 			else
 			{

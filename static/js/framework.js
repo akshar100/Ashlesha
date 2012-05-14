@@ -1165,16 +1165,19 @@ function (Y) {
                                 }
 
                                 ));
-
-                                c.one(".postBody").append(node);
-                                //  Y.log(node.one("img").get("clientWidth")+":"+width);
+								if(c.one(".postBody").all("img").size()==0)
+								{
+									 c.one(".postBody").append(node);
+								}
+                               
+                                
                                 if (node.one("img").get("clientWidth") && node.one("img").get("clientWidth") > width) {
                                     node.one("img").removeClass("span6");
                                     node.one("img").setStyle("width", width + "px");
 
                                 }
 
-                            }
+                            };
                             img.src = baseURL + images[i];
                             break; //Let us add only one image to the view
                         }
@@ -2012,10 +2015,10 @@ function (Y) {
                 var c = this.get('container');
                 post.save(function (err, response) {
 
-                    if (err) {
-                        Y.("Ooops!", err.error);
+                    if (err && err.error) {
+                        Y.showAlert("Ooops!", err.error);
                     } else {
-                        showAlert("Done!", "Your post has been published successfully.");
+                        Y.showAlert("Done!", "Your post has been published successfully."); 
                         c.setContent('');
                     }
 
@@ -2066,6 +2069,10 @@ function (Y) {
                 user_name: this.get('usermodel').get("fullname"),
                 user_id: this.get('usermodel').get("user_id")
             }));
+            if(this.get('usermodel').hasRole('administrator'))
+            {
+            	this.get('container').one('#admin-btn').removeClass('hide');
+            }
             var sv = new Y.BABE.SearchBoxView();
             this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
             if (!Y.APPCONFIG.notifications_enabled) {
@@ -2342,7 +2349,7 @@ function (Y) {
             user.load({}, function () {
 
                 var template = Y.Lang.sub(Y.one("#sidebar-authenticated").getHTML(), {
-                    IMG: baseURL+user.get("profile_pic"),
+                    IMG: (function(){ if(user.get("profile_pic").match("^http://")){ return user.get("profile_pic");}else{ return baseURL+user.get("profile_pic");} })(),
                     FULLNAME: user.get("fullname")
                 });
                 
@@ -2597,16 +2604,91 @@ function (Y) {
 
         },
         render: function () {
-
-            this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(), {
-                SRC: this.get('model').get('profile_pic') || baseURL + 'in/profile_pic/' + this.get('model').get('_id'),
-                HEIGHT: '40',
-                WIDTH: '40',
-                FULLNAME: this.get('model').get('fullname'),
-                USERNAME: this.get('model').get('username'),
-                GENDER: this.get('model').get('gender'),
-                USERID: this.get('model').get('_id')
-            }));
+			var available_roles,roles,node,that=this;
+			if(!this.get('adminView'))
+			{
+				 this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(), {
+	                SRC: this.get('model').get('profile_pic') || baseURL + 'in/profile_pic/' + this.get('model').get('_id'),
+	                HEIGHT: '40',
+	                WIDTH: '40',
+	                FULLNAME: this.get('model').get('fullname'),
+	                USERNAME: this.get('model').get('username'),
+	                GENDER: this.get('model').get('gender'),
+	                USERID: this.get('model').get('_id')
+	            }));
+			}
+			else
+			{
+				this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block_for_admin').getHTML(), {
+	                SRC: this.get('model').get('profile_pic') || baseURL + 'in/profile_pic/' + this.get('model').get('_id'),
+	                HEIGHT: '40',
+	                WIDTH: '40',
+	                FULLNAME: this.get('model').get('fullname'),
+	                USERNAME: this.get('model').get('username'),
+	                GENDER: this.get('model').get('gender'),
+	                USERID: this.get('model').get('_id'),
+	                EMAIL:this.get('model').get('email')
+	            }));
+	            
+	            this.get('container').one('.disable').on('click',function(e){
+	            	this.get('model').set('disabled',true);
+	            	this.get('model').save();
+	            	this.get('container').remove(true);
+	            	e.halt();
+	            },this);
+	             this.get('container').one('.delete').on('click',function(e){
+	             	this.get('model').destroy({
+	             		remove:true
+	             	});
+	             	this.get('container').remove(true);
+	             	e.halt();
+	             },this);
+	             available_roles = Y.APPCONFIG.supported_roles.split("|");
+	             roles = this.get('model').get('roles').split("|");
+	             for(var i in available_roles)
+	             {
+	             	node = Y.Node.create('<button type="button" class="btn btn-mini" rel="'+available_roles[i]+'">'+available_roles[i]+'</button>');
+	             	for(var j in roles)
+	             	{
+	             		if(available_roles[i]==roles[j])
+	             		{
+	             			node.addClass('btn-success');
+	             		}
+	             	}
+	             	node.on('click',function(e){
+	             		if(e.target.hasClass('btn-success'))
+	             		{
+	             			e.target.removeClass('btn-success');
+	             			roles = Y.Array.filter(roles,function(o){
+	             				if(e.target.getAttribute('rel')==o){ return false;}
+	             				return true;
+	             			});
+	             			that.get('model').set("roles",roles.join("|"));
+	             			that.get('model').save();
+	             			Y.log(roles);
+	             		}
+	             		else
+	             		{
+	             			e.target.addClass('btn-success');
+	             			roles.push(e.target.getAttribute('rel'));
+	             			Y.log(roles);
+	             			roles = Y.Array.unique(roles);
+	             			that.get('model').set("roles",roles.join("|"));
+	             			that.get('model').save();
+	             		}
+	             		
+	             	});
+	             	this.get('container').one('.actions').append("&nbsp;");
+	             	this.get('container').one('.actions').append(node);
+	             }
+	             if(this.get('model').get('roles'))
+	             {
+	             	
+	             	
+	             	
+	             }
+			}
+           
             return this;
         }
     });
@@ -2650,7 +2732,8 @@ function (Y) {
 
         },
         render: function () {
-            var c = this.get('container');
+            var c = this.get('container'),that=this;
+            c.one(".search-users").setHTML(Y.BABE.LOADER);
             Y.io(baseURL + 'in/search_posts', {
                 method: 'POST',
                 data: {
@@ -2660,7 +2743,7 @@ function (Y) {
                     complete: function (i, o, a) {
                         var response = Y.JSON.parse(o.responseText);
                         var model;
-
+						c.one(".search-posts").setHTML('');
                         for (var i in response) {
                             model = new PostModel(response[i]);
                             var view;
@@ -2669,11 +2752,14 @@ function (Y) {
                             }
                             if (model.get('category') == 'event') {
                                 view = new Y.EventView({
-                                    model: model
+                                    model: model,
+                                    usermodel:that.get('usermodel')
                                 });
                             } else {
                                 view = new Y.PostView({
-                                    model: model
+                                    model: model,
+                                    usermodel:that.get('usermodel')
+                                    
                                 });
                             }
                             var post = view.render().get('container');
@@ -2697,16 +2783,18 @@ function (Y) {
                 },
                 on: {
                     complete: function (i, o, a) {
-                        var response = Y.JSON.parse(o.responseText);
-                        var model;
-
+                        var response = Y.JSON.parse(o.responseText),model,user;
+                        
+						c.one(".search-users").setHTML('');
                         for (var i in response) {
                             model = new UserModel(response[i]);
                             uv = new UserBlockView({
-                                model: model
+                                model: model,
+                                usermodel:that.get('usermodel')
                             });
-                            var user = uv.render().get('container');
-                            c.one(".search-users").append(user);
+                            user = uv.render().get('container');
+                            
+                            c.one(".search-users").append(user); 
                         }
 
                         if (response.length == 0) {
@@ -2808,6 +2896,9 @@ function (Y) {
                 case "share_quiz":
                 	this.shareQuiz(this.get('quiz_id'));
                 	break;
+                case "search_user":
+                	this.searchUser();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -2842,8 +2933,68 @@ function (Y) {
         	
         	
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        searchUser:function(id){
+        	var qc = new SearchUserView()
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
+    });
+    var SearchUserView = Y.Base.create('searchuserview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	searchLoad:function(i,o,a){
+    						var response = Y.JSON.parse(o.responseText),c=this.get('container'),model;
+							c.one(".search-users").setHTML('');
+	                        for (var i in response) {
+	                            model = new UserModel(response[i]);
+	                            uv = new UserBlockView({
+	                                model: model,
+	                                adminView:true
+	                            });
+	                            var user = uv.render().get('container');
+	                            c.one(".search-users").append(user);
+	                        }
+	
+	                        if (response.length == 0) {
+	                            c.one(".search-users").append(Y.Lang.sub(Y.one('#info-alert').getHTML(), {
+	                                MESSAGE: 'No <strong>Users</strong> found with that keyword!'
+	                            }));
+	                        }
+    					},
+    	initializer:function(){
+    		var c = this.get('container');
+    		c.setHTML(Y.one('#search-user').getHTML());
+    		c.one('.search-btn').on('click',function(){
+    			var q = c.one('.search-box').get('value').trim();
+    			c.one(".search-users").setHTML(Y.BABE.LOADER);
+    			Y.io(baseURL+'in/search_users',{
+    				method:'POST',
+    				context:this,
+    				data:{
+    					search:q
+    				},
+    				on:{
+    					success:this.searchLoad
+    				}
+    			});
+    		},this);
+    		c.one('.all-btn').on('click',function(){
+    			var q = c.one('.search-box').get('value').trim();
+    			c.one(".search-users").setHTML(Y.BABE.LOADER);
+    			Y.io(baseURL+'in/all_users',{
+    				method:'POST',
+    				context:this,
+    				data:{
+    					search:q
+    				},
+    				on:{
+    					success:this.searchLoad
+    				}
+    			});
+    		},this);
+    	},
+    	render:function(){ return this;}
+    	
     });
     var QuizModel = Y.Base.create('quizModel', Y.Model, [], {
         sync: genericModelSync,
@@ -3628,6 +3779,7 @@ function (Y) {
     Y.BABE = {
         male_image:'/static/images/male_profile.png',
         female_image:'/static/images/female_profile.png',
+        LOADER:Y.Node.create('<img src="/static/loader.gif"/>'),
         TagBoxConfig: TagBoxConfig,
         AutoLoadTagsPlugin: AutoLoadTagsPlugin,
         autoExpand: autoExpand,
@@ -3787,7 +3939,7 @@ YUI.add('babe-user',function(Y){
                 return;
             }
             if (action == "read") {
-                var data = this.toJSON()
+                var data = this.toJSON();
                 Y.io(baseURL + 'io/get_user/', {
                     method: 'POST',
                     data: {
@@ -3805,6 +3957,15 @@ YUI.add('babe-user',function(Y){
                         }
                     }
                 });
+            }
+            if (action == "delete") {
+            	 var data = this.toJSON();
+            	 Y.io(baseURL + 'io/delete_model/', {
+            	 	method:'POST',
+            	 	data:{
+            	 		'_id':data['_id']
+            	 	}
+            	 });
             }
         
         },

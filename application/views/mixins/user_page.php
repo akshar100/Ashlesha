@@ -28,3 +28,28 @@
 		</div>
 	</div>
 </script>
+<script type="text/x-template" id="user_block_for_admin">
+	<div class="row-fluid userblock ">
+		<div class="span2 profile_pic">
+			<img src="{SRC}" height="{HEIGHT}" width="{WIDTH}" />
+		</div>
+		<div class="span10 user_info">
+			<a href="/user/{USERID}"><h4>{FULLNAME}</h4></a>
+			<p>{USERNAME}</p>
+			<p>{GENDER}</p>
+			<p>{EMAIL}</p>
+			<div class="row-fluid">
+				<div class="span12">
+					<a href="#" class='disable'>Disable</a> <a href="#" class='delete'>Delete</a>
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span12 actions">
+					<p>&nbsp;</p>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</script>

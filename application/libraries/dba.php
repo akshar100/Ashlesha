@@ -242,6 +242,7 @@ class DBA
 		unset($data['id']);
 		$data['type'] = "user";
 		$data['created_at'] = time();
+		$data['roles'] = $this->ci->config->item('default_role');
 		$data = array_map("trim", $data);
 		$output = array(
 			"success"=>false
@@ -475,65 +476,20 @@ class DBA
 	
 	function update_user($data)
 	{
-		//$data = array_map("trim", $data);
+		
+		$user = $this->get($data['_id']);
 		foreach($data as $k=>$v)
 		{
-			if(is_string($v))
+			if($k=="password" && !empty($v))
 			{
-				$data[$k]= trim($v);
-			}
-		}
-		$output = array(
-			"success"=>false
-		); 
-		//validating begins
-		foreach($data as $k=>$v)
-		{
-			if(empty($v) && in_array($k,array("fullname")))
-			{
-				$output[$k] = "$k can not be empty";
+				$user['password'] = do_hash($v);
 			}
 			else
 			{
-				
-				if($k=="password" && !empty($v))
-				{
-					
-					if(strlen($v)<6)
-					{
-						$output[$k] = "$k is not a valid. It should have at least 6 characters.";
-					}
-				}
-				
-				if($k=="fullname")
-				{
-					
-					if(!preg_match("/[a-zA-z\s+]/i",$v))
-					{
-						$output[$k] = "$k is not a valid full name. It can contan only alphabets and whitespace.";
-					}
-				}
+				$user[$k] = $v;
 			}
 		}
-		
-		if(count($output)>1)
-		{
-			return ($output);
-			
-		}
-		$id = $data['_id'];
-		if(isset($data['password']))
-		{
-			$data['password'] = do_hash($data['password']);
-		}
-		else
-		{
-			$user = $this->get($id);
-			$data['password'] = $user['password'];
-		}
-		$response = $this->chill->put($id,$data);
-		$data = $this->chill->get($response['_id']);
-		$data['id'] = $data['_id'];
+		$this->update($user);
 		$response['data'] = $data;
 		$response["success"] = true; 
 		return $response;

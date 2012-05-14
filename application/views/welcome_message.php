@@ -16,7 +16,7 @@ $this->load->view("common/header");
  <script type="text/x-template" id="main">
 	      <div class="content">
 	      	<div class="page-header hide">
-	          <h1></h1>
+	          <h1><?php echo $this->session->userdata('user_roles');?></h1>
 	        </div>
 	        <div class="row-fluid">
 	          <div class="span2">
@@ -84,7 +84,6 @@ $this->load->view("common/header");
 				Y.user.set("authenticated",true);
 				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
 				Y.APPCONFIG =  <?php echo json_encode($config);?>;
-				
 				<?php
 			}
 		?>
@@ -339,8 +338,6 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				
-			
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
@@ -640,7 +637,8 @@ $this->load->view("common/header");
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				var searchView = new Y.BABE.SearchView({
-					search:this.get('search')
+					search:this.get('search'),
+					usermodel:this.get('usermodel')
 				});
 				con.one('.centercolumn').setHTML(searchView.render().get('container'));
 		    
@@ -690,7 +688,7 @@ $this->load->view("common/header");
 		
 		var AppUI =  new Y.App({
 		    views: {
-		        homepage: {type: 'MainAppView', preserve:true },
+		        homepage: {type: 'MainAppView', preserve:false },
 		        profile:  {type:'MainProfileView'},
 		        userpage: {type:'UserPageView',preserve:false },
 		        create_group: {type:'CreateGroupMainView',preserve:true}, 
@@ -765,10 +763,10 @@ $this->load->view("common/header");
 		 	this.showView('postpage',{post_id:req.params.post_id});
 		});
 		AppUI.route('/search/:term',function(req){
-		 	this.showView('searchpage',{search:req.params.term});
+		 	this.showView('searchpage',{search:req.params.term,usermodel:Y.userModel});
 		});
 		AppUI.route('/search',function(req){
-		 	this.showView('searchpage',{search:''});
+		 	this.showView('searchpage',{search:'',usermodel:Y.userModel});
 		});
 		AppUI.route('/notifications',function(req){
 			this.showView('notificationpage');

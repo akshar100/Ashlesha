@@ -492,3 +492,26 @@ United States of America|USA|0.5
 		</div>
 	</div>
 </script>
+<script type="x-template" id="search-user">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>User Management</h3>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<form class="well form-search">
+				
+				<input type="text" class="input search-box"/> <button type="button" class="btn search-btn "> Search</button> <button class="btn all-btn" type="button"> List All </button>
+				
+			</form>			
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span6 search-users">
+			
+		</div>
+	</div>
+</script>

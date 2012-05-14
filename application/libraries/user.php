@@ -73,6 +73,15 @@ class User
 	function force_sign_in($user_id)
 	{
 		
+		$user = $this->ci->dba->get($user_id);
+		if(!empty($user['roles']))
+		{
+			$this->ci->session->set_userdata('user_roles',$user['roles']);
+		}
+		else
+		{
+			$this->ci->session->set_userdata('user_roles','user');
+		}
 		$this->ci->session->set_userdata("user_id",$user_id);
 		
 		
@@ -89,7 +98,19 @@ class User
 		return false;
 	}
 	
-	
+	function has_role($role)
+	{
+		$roles = $this->ci->session->userdata('user_roles');
+		if(!empty($roles))
+		{
+			$roles = explode("|",$this->ci->session->userdata('user_roles'));
+			if(in_array($role,$roles))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	function force_logout()
 	{

@@ -201,6 +201,12 @@ class In extends CI_Controller {
        		$user = @$this->user->get_by_email($user_profile['email']);
 			if(!empty($user) && !empty($user['_id']) && isset($user_profile['email'])) //Make sure the FB profile has email in it.
 			{
+				if(isset($user['disabled']) && $user['disabled']!==false)
+				{
+					$this->session->set_userdata("form_error","This user has been disabled.");
+					redirect("");
+					return;
+				}
 				$this->user->force_sign_in($user['_id']);
 				redirect("");
 			}
@@ -308,14 +314,49 @@ class In extends CI_Controller {
 			
 			$u = $this->dba->get($row->id);
 			unset($u['password']);
-			unset($u['email']);
+			if(!$this->user->has_role('administrator'))
+			{
+				unset($u['email']);
+				unset($u['mobile']);  
+			}
+			
 			unset($u['connections']);
 			unset($u['relationships']);
-			unset($u['mobile']);    
+			  
 			$output[]= $u;
 		}
 		echo json_encode($output);
 	}
+	
+	function all_users()
+	{
+		$term = $this->input->post('search');
+		$response = $this->chill->getview("posts","users_by_username");
+		
+		
+		$user=$this->user->get_current();
+		$output = array();
+		foreach($response['rows'] as $row)
+		{
+			
+			$u = $row['value'];
+			unset($u['password']);
+			if(!$this->user->has_role('administrator'))
+			{
+				unset($u['email']);
+				unset($u['mobile']);  
+			}
+			
+			unset($u['connections']);
+			unset($u['relationships']);
+			  
+			$output[]= $u;
+		}
+		echo json_encode($output);
+	}
+	
+	
+	
 	
 	function site_stats()
 	{

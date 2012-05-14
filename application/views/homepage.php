@@ -71,7 +71,7 @@ $this->load->view("common/header");
         </div>
         <div class="row-fluid">
           <div class="span7 hidden-phone hidden-tablet chart-area">
-            <?php echo img(array("src"=>'static/images/tagcloud.png',"width"=>500)); ?>
+            <?php echo img(array("src"=>'static/loader.gif')); ?>
           </div>
           <div id="signup" class="span4 well">
             
