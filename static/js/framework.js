@@ -2013,9 +2013,9 @@ function (Y) {
                 post.save(function (err, response) {
 
                     if (err) {
-                        Y.("Ooops!", err.error);
+                        Y.showAlert("Ooops!", err.error);
                     } else {
-                        showAlert("Done!", "Your post has been published successfully.");
+                        Y.showAlert("Done!", "Your post has been published successfully.");
                         c.setContent('');
                     }
 
