@@ -155,6 +155,10 @@ function (Y) {
                 on: {
                     success: function (i, o, a) {
                         var data = Y.JSON.parse(o.responseText);
+                        for (var i in data) {
+                            data[i]['id'] = data[i]['_id'];
+
+                        }
                         callback(null, data);
                     }
                 }
@@ -993,7 +997,9 @@ function (Y) {
     }, {
 
         ATTRS: {
-
+			'_id':{
+				value:null
+			},
             comment: {
                 value: 'Some Comment'
             },
@@ -1368,8 +1374,7 @@ function (Y) {
                     opacity: 1,
                     duration: 0.8
                 });
-                this.get('container').one(".commentsView").one(".commentText").focus();
-                var temp = this.get('container').one(".commentsView");
+                
 
 
             }
@@ -2899,6 +2904,9 @@ function (Y) {
                 case "search_user":
                 	this.searchUser();
                 	break;
+                case "mass_mail":
+                	this.massMail();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -2937,8 +2945,52 @@ function (Y) {
         searchUser:function(id){
         	var qc = new SearchUserView()
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        massMail:function(){
+        	var qc = new MassMailView()
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
+    });
+    var MassMailView = Y.Base.create('massmailview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){ 
+    		var c = this.get('container');
+    		c.setHTML(Y.one('#mass-mail').getHTML());
+    		c.one('.send').on('click',function(e){
+    			c.all('.help-block').setHTML('');
+    			c.all('.control-group').removeClass('error');
+    			if(!c.one('.subject').get('value'))
+    			{
+    				
+    				c.one('.subject').ancestor('.control-group').one('.help-block').setHTML('Subject can not be Empty.');
+    				c.one('.subject').ancestor('.control-group').addClass('error');
+    				return;
+    			}
+    			if(!c.one('.content').get('value'))
+    			{
+    				
+    				c.one('.content').ancestor('.control-group').one('.help-block').setHTML('We need some text to send isnt it ?');
+    				c.one('.content').ancestor('.control-group').addClass('error');
+    				return;
+    			}
+    			Y.io(baseURL+'io/mass_mail',{
+    				method:'POST',
+    				data:{
+    					subject:c.one('.subject').get('value'),
+    					content:c.one('.content').get('value')
+    				},
+    				on:{
+    					success:function(i,o,a){
+    						
+    					}
+    				}
+    			});
+    		});
+       	},
+    	render:function(){
+    		return this;
+    	}
     });
     var SearchUserView = Y.Base.create('searchuserview', Y.View, [], {
     	containerTemplate:'<div/>',

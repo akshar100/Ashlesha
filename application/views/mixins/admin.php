@@ -515,3 +515,37 @@ United States of America|USA|0.5
 		</div>
 	</div>
 </script>
+<script id="mass-mail" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Mass Mailing</h3>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<span class="span12">
+			<form class="form-horizontal well">
+		        <fieldset>
+		          <div class="control-group">
+		            <label for="input01" class="control-label">Subject</label>
+		            <div class="controls">
+		              <input type="text" id="input01" class="input-xlarge span5 subject">
+		              <p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p>
+		            </div>
+		          </div>
+		          <div class="control-group">
+		            <label for="textarea" class="control-label">Content</label>
+		            <div class="controls">
+		              <textarea rows="20" id="textarea" class="input-xlarge span5 content"></textarea>
+		               <p class="help-block">Mail will be sent to all the users</p>
+		            </div>
+		          </div>
+		          <div class="form-actions">
+		            <button class="btn btn-primary send" type="button">Send</button>
+		          </div>
+		        </fieldset>
+		      </form>
+		</span>
+	</div>
+</script>

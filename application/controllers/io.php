@@ -57,7 +57,7 @@ class IO extends CI_Controller {
 		else if($data['profile_pic']=="undefined") { $data['profile_pic']=''; }
 		
 		
-		$user = $this->user->get_user();
+		$user = $this->user->get_user($data['_id']);
 		if(!empty($user['profile_pic'] ) && !empty($data['profile_pic']) && $data['profile_pic']!==$user['profile_pic']){
 			
 		}
@@ -454,6 +454,27 @@ class IO extends CI_Controller {
 		$doc['author_id'] = $user;
 		$doc['type'] = 'quiz_responses';
 		echo json_encode($this->dba->create($doc));
+	}
+	
+	function mass_mail()
+	{
+		$subject = $this->input->post('subject');
+		$content = $this->input->post('content');
+		$response = $this->chill->getView('posts','users_by_email');
+		$emails = array();
+		foreach($response['rows'] as $row)
+		{
+			$emails[]=$row['key'];
+		}
+		$this->load->library('email');
+		$this->email->from($this->config->item('from_email'),$this->config->item('from_name'));
+		$this->email->to($this->config->item('from_email'));
+		$this->email->bcc($emails);
+		$this->email->subject($subject);
+		$this->email->message($content);
+			
+		echo $this->email->send();
+		
 	}
 }
 

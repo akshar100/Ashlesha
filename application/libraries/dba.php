@@ -489,6 +489,7 @@ class DBA
 				$user[$k] = $v;
 			}
 		}
+		
 		$this->update($user);
 		$response['data'] = $data;
 		$response["success"] = true; 
