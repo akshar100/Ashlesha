@@ -1,0 +1,13 @@
+{
+	"test":false,
+	"supported_roles":"student|moderator|faculty|user|administrator",
+	"default_role":"student|user",
+	"rights":{
+		"public_post":"user",
+		"create_group":"user",
+		"edit_post":"administrator|moderator",
+		"public_event":"user",
+		"public_first":"user",
+		"public_last":"user"
+	}
+}

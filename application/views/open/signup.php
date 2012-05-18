@@ -29,7 +29,7 @@ $this->load->view("common/header");
   		</div>
         <div class="row-fluid">
           <div class="span7">
-            <?php echo img(array("src"=>'static/images/tagcloud.png',"width"=>500)); ?>
+           
           </div>
           <div id="signup" class="span4 well">
             
@@ -40,11 +40,7 @@ $this->load->view("common/header");
      
 
     </div> <!-- /container -->
-    <hr/>
-	 <footer>
-        <p>&copy; BrandABrand.com 2012</p>
-
-     </footer>
+    <?php $this->load->view("common/footer"); ?>
   <script src="<?php echo base_url();?>static/js/framework.js"> </script>
   <script>
   	var baseURL = "<?php echo base_url();?>";

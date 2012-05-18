@@ -43,6 +43,44 @@ class In extends CI_Controller {
 		
 	}
 	
+	function groupposts()
+	{
+		$count = $this->input->post("count");
+		$user_id = $this->input->post("user_id");
+		if(empty($user_id))
+		{
+			$user_id = $this->user->get_current();
+		}
+		$group_id = $this->input->post('group_id');
+		
+		$group = $this->dba->get($group_id);
+		if(empty($count)){ $count = 8; }
+		echo json_encode($this->dba->groupposts($group_id,$user_id,1,$count));
+		
+	}
+	
+	function pending_members()
+	{
+		$group_id = $this->input->post('group_id');
+		$group = $this->dba->get($group_id);
+		$output = array();
+		if(isset($group['relations']))
+		{
+			foreach($group['relations'] as $k=>$v)
+			{
+				if($v!='requested'){
+					continue;
+				}
+				$user = $this->dba->get($k);
+				$output[]=array(
+					'user_id'=>$k,
+					'user_name'=>$user['fullname']
+				);
+			}
+		}
+		echo json_encode($output);
+	}
+	
 	function userposts()
 	{
 		$count = $this->input->post("count");
@@ -201,6 +239,12 @@ class In extends CI_Controller {
        		$user = @$this->user->get_by_email($user_profile['email']);
 			if(!empty($user) && !empty($user['_id']) && isset($user_profile['email'])) //Make sure the FB profile has email in it.
 			{
+				if(isset($user['disabled']) && $user['disabled']!==false)
+				{
+					$this->session->set_userdata("form_error","This user has been disabled.");
+					redirect("");
+					return;
+				}
 				$this->user->force_sign_in($user['_id']);
 				redirect("");
 			}
@@ -308,14 +352,49 @@ class In extends CI_Controller {
 			
 			$u = $this->dba->get($row->id);
 			unset($u['password']);
-			unset($u['email']);
+			if(!$this->user->has_role('administrator'))
+			{
+				unset($u['email']);
+				unset($u['mobile']);  
+			}
+			
 			unset($u['connections']);
 			unset($u['relationships']);
-			unset($u['mobile']);    
+			  
 			$output[]= $u;
 		}
 		echo json_encode($output);
 	}
+	
+	function all_users()
+	{
+		$term = $this->input->post('search');
+		$response = $this->chill->getview("posts","users_by_username");
+		
+		
+		$user=$this->user->get_current();
+		$output = array();
+		foreach($response['rows'] as $row)
+		{
+			
+			$u = $row['value'];
+			unset($u['password']);
+			if(!$this->user->has_role('administrator'))
+			{
+				unset($u['email']);
+				unset($u['mobile']);  
+			}
+			
+			unset($u['connections']);
+			unset($u['relationships']);
+			  
+			$output[]= $u;
+		}
+		echo json_encode($output);
+	}
+	
+	
+	
 	
 	function site_stats()
 	{

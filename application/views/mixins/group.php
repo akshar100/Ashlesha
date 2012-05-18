@@ -22,7 +22,7 @@
 								</div>
 								<div class="control-group">
 									<div class="row-fluid">
-										<input type="text" placeholder="Brand, Product , Service Name" name="tags"  class="span12 autocomplete">
+										<input type="text" placeholder="<?php echo $this->lang->line("tags");?>" name="tags"  class="span12 autocomplete">
 										<p class="help-block"></p>
 									</div>
 								</div>
@@ -37,7 +37,11 @@
 							                <input type="radio" value="closed"  name="visibility">
 							                	Closed
 							            </label>
-										<p class="help-block">If you set your <?php echo $this->lang->line('group');?> as closed then you will have to manually pass the group link to others.</p>
+							            <label class="radio">
+							                <input type="radio" value="hidden"  name="visibility">
+							                	Hidden
+							            </label>
+										<p class="help-block">If you set your <?php echo $this->lang->line('group');?> as closed you will have to confirm each subscription, for hidden you will have to add users manually.</p>
 									</div>
 								</div>
 			
@@ -88,12 +92,12 @@
 	</div>
 	<div class="row-fluid">
 		<div class="span12">
-			<H5>Members {MEMBERS_COUNT}</H5>
+			<H5>Group Type: {VISIBILITY}</H5>
 		</div>
 	</div>
 	<div class="row-fluid">
-		<div class="span12">
-			
+		<div class="span12 membership-request">
+			<hr/>
 		</div>
 	</div>
 </script>
@@ -106,7 +110,9 @@
 		<div class="span3">
 			<div class="group-join">
 				<button type="button" class="btn btn-primary join-btn"><i class="icon-plus icon-white"></i> Join</button>
+				<button type="button" class="btn btn-warning leave-btn"><i class="icon-minus icon-white"></i> Requested</button>
 				<button type="button" class="btn btn-danger unjoin-btn hide"><i class="icon-minus icon-white"></i> Leave</button>
+				<button type="button" class="btn btn-danger delete-btn hide"><i class="icon-minus icon-white"></i> Delete</button>
 			</div>
 		</div>
 	</div>
@@ -148,10 +154,25 @@
 	 
 	<div class="tab-content">
 		<div class="tab-pane active" id="email">
-			<textarea cols="60" placeholder="enter one email address per line..."></textarea>
+			<textarea id="email_invites" cols="50" rows="10" placeholder="enter one email address per line..."></textarea>
 		</div>
-		<div class="tab-pane" id="connections">Connections</div>
-		<div class="tab-pane" id="fb">Facebook</div>
+		<div class="tab-pane" id="connections"><?php echo $this->lang->line('site_name');?></div>
+		<div class="tab-pane" id="fb">We have not managed to fetch your facebook friends.</div>
 	</div>
  
+</script>
+<script type="text/x-template" id="user-request-accept">
+	<div class="row-fluid">
+		<img src="<?php echo base_url();?>in/profile_pic/{USER_ID}" class="span2"/>
+		<div class="span10"><a href="/user/{USER_ID}">{USER_NAME}</a>
+			<div class="row-fluid">
+				<div class="span12">
+			<button type="button" class="btn btn-primary accept-btn btn-mini">Accept</button>
+			<button type="button" class="btn btn-danger reject-btn btn-mini">Reject</button>
+		</div>
+			</div>
+			
+		</div>
+		
+	</div>
 </script>

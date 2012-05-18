@@ -24,6 +24,46 @@ class DBA
 		return $output;
 	}
 	
+	function groupposts($group_id,$user,$page=1, $size=10)
+	{
+		
+		$group = $this->get($group_id);
+		if($group['visibility']=='open')
+		{
+			$response = $this->chill->getView("posts","groupposts",$group_id,array(
+			"descending"=>true,
+			"limit"=>$size,
+			"key"=>$group_id
+			));
+			
+			$output = array();
+			foreach($response['rows'] as $row)
+			{
+				$output[]= $this->get_post($row["value"]["_id"],$user); 
+			}
+			return $output;
+		}		
+		else if($group['visibility']=='closed' || $group['visibility']=='hidden')
+		{
+			if($this->get_relationship($group_id, $user)=='member')
+			{
+				$response = $this->chill->getView("posts","groupposts",$group_id,array(
+				"descending"=>true,
+				"limit"=>$size,
+				"key"=>$group_id
+				));
+				
+				$output = array();
+				foreach($response['rows'] as $row)
+				{
+					$output[]= $this->get_post($row["value"]["_id"],$user); 
+				}
+				return $output;
+			}
+		}
+			
+	}
+	
 	function userposts($user,$page=1, $size=10)
 	{
 		$response = $this->chill->getView("posts","myposts",NULL,array(
@@ -242,6 +282,7 @@ class DBA
 		unset($data['id']);
 		$data['type'] = "user";
 		$data['created_at'] = time();
+		$data['roles'] = $this->ci->config->item('default_role');
 		$data = array_map("trim", $data);
 		$output = array(
 			"success"=>false
@@ -475,65 +516,21 @@ class DBA
 	
 	function update_user($data)
 	{
-		//$data = array_map("trim", $data);
+		
+		$user = $this->get($data['_id']);
 		foreach($data as $k=>$v)
 		{
-			if(is_string($v))
+			if($k=="password" && !empty($v))
 			{
-				$data[$k]= trim($v);
-			}
-		}
-		$output = array(
-			"success"=>false
-		); 
-		//validating begins
-		foreach($data as $k=>$v)
-		{
-			if(empty($v) && in_array($k,array("fullname")))
-			{
-				$output[$k] = "$k can not be empty";
+				$user['password'] = do_hash($v);
 			}
 			else
 			{
-				
-				if($k=="password" && !empty($v))
-				{
-					
-					if(strlen($v)<6)
-					{
-						$output[$k] = "$k is not a valid. It should have at least 6 characters.";
-					}
-				}
-				
-				if($k=="fullname")
-				{
-					
-					if(!preg_match("/[a-zA-z\s+]/i",$v))
-					{
-						$output[$k] = "$k is not a valid full name. It can contan only alphabets and whitespace.";
-					}
-				}
+				$user[$k] = $v;
 			}
 		}
 		
-		if(count($output)>1)
-		{
-			return ($output);
-			
-		}
-		$id = $data['_id'];
-		if(isset($data['password']))
-		{
-			$data['password'] = do_hash($data['password']);
-		}
-		else
-		{
-			$user = $this->get($id);
-			$data['password'] = $user['password'];
-		}
-		$response = $this->chill->put($id,$data);
-		$data = $this->chill->get($response['_id']);
-		$data['id'] = $data['_id'];
+		$this->update($user);
 		$response['data'] = $data;
 		$response["success"] = true; 
 		return $response;
@@ -624,6 +621,36 @@ class DBA
 			"success"=>true,
 			"data"=>$this->chill->get($response["_id"])
 		));
+	}
+	
+	function get_relationship($resource_id,$user_id)
+	{
+		$resource = $this->get($resource_id);
+		if(isset($resource) && is_array($resource))
+		{
+			if(!isset($resource['relations']))
+			{
+				$relationship = '';
+			}
+			else
+			{
+				if(isset($resource['relations'][$user_id]))
+				{
+					$relationship = $resource['relations'][$user_id];
+				}
+				else
+				{
+					$relationship='';
+				}
+			}	
+			
+		}
+		else
+		{
+			$relationship='';
+		}
+		
+		return $relationship;
 	}
 	
 	function all_sector_list()

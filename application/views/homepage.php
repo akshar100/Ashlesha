@@ -16,11 +16,11 @@ $this->load->view("common/header");
         
         <div class="row-fluid">
           <div class="span7">
-            <p class="desc">
-            	<?php echo $this->lang->line('site_description');?>
-            	
-            </p>
-
+			<div class="hero-unit">
+            <h1><?php echo $this->lang->line('hero_unit_title');?></h1>
+            <p><?php echo $this->lang->line('site_description');?></p>
+            <p><a href="<?php echo base_url();?>welcome/know_more" class="btn btn-primary btn-large">Know More »</a></p>
+          </div>
           </div>
           <div class="span4 well">
           	
@@ -71,7 +71,7 @@ $this->load->view("common/header");
         </div>
         <div class="row-fluid">
           <div class="span7 hidden-phone hidden-tablet chart-area">
-            <?php echo img(array("src"=>'static/images/tagcloud.png',"width"=>500)); ?>
+            <?php echo img(array("src"=>'static/loader.gif')); ?>
           </div>
           <div id="signup" class="span4 well">
             
@@ -105,7 +105,6 @@ $this->load->view("common/header");
   			parentNode:Y.one('.chart-area')
   		}); 
   		chart.render();
-  		
   		
   	});
   </script>

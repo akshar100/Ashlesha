@@ -303,6 +303,8 @@ return $this->asDocs ? $this->toDocument($rtn) : $rtn;
 */
 public function put($id, array $doc)
 {
+	
+	
 $context = array('http' => array());
 
 $context['http']['method'] = 'PUT';

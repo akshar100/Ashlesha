@@ -17,6 +17,13 @@
 	        </ul>
 	      </li>
 	      <li class="dropdown">
+	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Pages <b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+	          <li ><a href="#buttonGroups">Create Page</a></li>
+	          <li><a href="#buttonGroups">Manage Pages</a></li>
+	        </ul>
+	      </li>
+	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Question Bank<b class="caret"></b></a>
 	        <ul class="dropdown-menu">
 	          <li><a href="/admin/create_question">Create Question</a></li>
@@ -26,7 +33,6 @@
 	        </ul>
 	      </li>
 	      <li class='stats'><a  href="/admin/stats">Stats</a></li>
-	      <li><a href="#misc">Miscellaneous</a></li>
 	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Settings <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
@@ -489,6 +495,70 @@ United States of America|USA|0.5
 			<ul class='radio-area unstyled'>
 				
 			</ul>
+		</div>
+	</div>
+</script>
+<script type="x-template" id="search-user">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>User Management</h3>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<form class="well form-search">
+				
+				<input type="text" class="input search-box"/> <button type="button" class="btn search-btn "> Search</button> <button class="btn all-btn" type="button"> List All </button>
+				
+			</form>			
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span6 search-users">
+			
+		</div>
+	</div>
+</script>
+<script id="mass-mail" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Mass Mailing</h3>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<span class="span12">
+			<form class="form-horizontal well">
+		        <fieldset>
+		          <div class="control-group">
+		            <label for="input01" class="control-label">Subject</label>
+		            <div class="controls">
+		              <input type="text" id="input01" class="input-xlarge span5 subject">
+		              <p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p>
+		            </div>
+		          </div>
+		          <div class="control-group">
+		            <label for="textarea" class="control-label">Content</label>
+		            <div class="controls">
+		              <textarea rows="20" id="textarea" class="input-xlarge span5 content"></textarea>
+		               <p class="help-block">Mail will be sent to all the users</p>
+		            </div>
+		          </div>
+		          <div class="form-actions">
+		            <button class="btn btn-primary send" type="button">Send</button>
+		          </div>
+		        </fieldset>
+		      </form>
+		</span>
+	</div>
+</script>
+<script id="create-page" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<h3>Create a Page</h3>
 		</div>
 	</div>
 </script>

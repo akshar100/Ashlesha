@@ -1,6 +1,6 @@
 function(doc) { 
 	var ret=new Document(); 
-	if(doc.type=='user')
+	if(doc.type=='user' && !doc.disabled)
 	{
 		ret.add(doc.fullname,{
 			boost:2
@@ -13,7 +13,7 @@ function(doc) {
 			});
 		}
 		
-		
+		return ret; 
 	}
-	return ret; 
+	
 }

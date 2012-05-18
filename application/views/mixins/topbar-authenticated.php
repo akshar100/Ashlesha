@@ -27,6 +27,7 @@
 	          <div class="pull-right right-pad30">
 		          <div class="btn-group">
 			          		<a id="notification-btn" class="btn btn-info" href="#" rel="popover"><i class="icon-envelope icon-white"></i></a>
+			          		<a id="admin-btn" class="btn btn-info hide" href="/admin" rel="popover">Console</a>
 			      </div>
 			      
 		      </div>

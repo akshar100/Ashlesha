@@ -57,7 +57,7 @@ class IO extends CI_Controller {
 		else if($data['profile_pic']=="undefined") { $data['profile_pic']=''; }
 		
 		
-		$user = $this->user->get_user();
+		$user = $this->user->get_user($data['_id']);
 		if(!empty($user['profile_pic'] ) && !empty($data['profile_pic']) && $data['profile_pic']!==$user['profile_pic']){
 			
 		}
@@ -121,7 +121,8 @@ class IO extends CI_Controller {
 			"user_by_createdat"=>array("map"=>read_file("./application/views/json/users_by_createdat_map.js"),"reduce"=>read_file("./application/views/json/users_by_createdat_reduce.js")),
 			"get_all_questions"=>array("map"=>read_file("./application/views/json/get_all_questions.js")),
 			"get_all_quizes"=>array("map"=>read_file("./application/views/json/all_quizes.js")),
-			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js"))  
+			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js")),
+			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js"))  
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -140,6 +141,22 @@ class IO extends CI_Controller {
 		
 		$this->chill->post($doc);
 		
+		
+		$doc = $this->dba->get('app');
+		if(empty($doc))
+		{
+			$doc = array(
+				"configuration"=>read_file("./application/views/json/app_configuration.js"),
+				"_id"=>"app"
+			);
+			$this->dba->create($doc);
+		}
+		else
+		{
+			$doc['configuration'] = read_file("./application/views/json/config/app_configuration.js");
+			$this->dba->update($doc);
+		}
+
 		
 		echo "updated";
 		
@@ -239,7 +256,7 @@ class IO extends CI_Controller {
 	{
 		$resource_id = $this->input->post('resource_id');
 		$user_id = $this->input->post('owner_id');
-		$resource = $this->chill->get($resource_id);
+		$resource = $this->dba->get($resource_id);
 		if(isset($resource) && is_array($resource))
 		{
 			if(!isset($resource['relations']))
@@ -454,6 +471,27 @@ class IO extends CI_Controller {
 		$doc['author_id'] = $user;
 		$doc['type'] = 'quiz_responses';
 		echo json_encode($this->dba->create($doc));
+	}
+	
+	function mass_mail()
+	{
+		$subject = $this->input->post('subject');
+		$content = $this->input->post('content');
+		$response = $this->chill->getView('posts','users_by_email');
+		$emails = array();
+		foreach($response['rows'] as $row)
+		{
+			$emails[]=$row['key'];
+		}
+		$this->load->library('email');
+		$this->email->from($this->config->item('from_email'),$this->config->item('from_name'));
+		$this->email->to($this->config->item('from_email'));
+		$this->email->bcc($emails);
+		$this->email->subject($subject);
+		$this->email->message($content);
+			
+		echo $this->email->send();
+		
 	}
 }
 

@@ -16,7 +16,7 @@ $this->load->view("common/header");
  <script type="text/x-template" id="main">
 	      <div class="content">
 	      	<div class="page-header hide">
-	          <h1></h1>
+	          <h1><?php echo $this->session->userdata('user_roles');?></h1>
 	        </div>
 	        <div class="row-fluid">
 	          <div class="span2">
@@ -84,7 +84,6 @@ $this->load->view("common/header");
 				Y.user.set("authenticated",true);
 				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
 				Y.APPCONFIG =  <?php echo json_encode($config);?>;
-				
 				<?php
 			}
 		?>
@@ -116,11 +115,57 @@ $this->load->view("common/header");
 		Y.CommentView = Y.Base.create('commentview',Y.View,[],{
 			containerTemplate:'<div class="row-fluid commentsView hide" />',
 			initializer:function(config){
+				var viewObj = this,r;
 				this.template=Y.one("#post-comments").getContent();
 				this.list = new Y.CommentList();
 				this.list.on("add",this.addComment,this);
 				this.list.on("remove",this.render,this);
 				this.postId = config.postId;
+				this.get('container').setHTML(Y.BABE.LOADER);
+				this.list.on('load',function(){
+					this.get('container').setHTML('');
+					if(viewObj.list.size()>0)
+					{
+						viewObj.get('container').append("<hr/>");
+					}
+					viewObj.list.each(function(item,index){
+						viewObj.addComment({model:item});
+					},viewObj);
+					viewObj.get('container').append(Y.one("#comment-form").getContent());
+					r = this.get('container').one(".commentText");
+					Y.BABE.autoExpand(r);
+					this.get('container').one("textarea").on("focus",function(){
+						this.get('container').one("textarea").set("rows",3);
+					},this);
+					this.get('container').one(".submitComment").on("click",function(e){
+						this.get('container').one('.commentsForm').one('.help-block').setHTML(Y.BABE.LOADER);
+						e.halt();
+						var container = this.get('container'),list = this.list,that=this,comment = new Y.CommentModel({comment:this.get('container').one("textarea.commentText").get("value"),post_id:this.get('model').get("_id"),author_id:Y.user.get('id') });
+						if(comment.get('comment'))
+						{
+							comment.save(function(err,response){
+								if(!err){
+									list.add(comment);
+									that.get('container').one('.commentsForm').one('.help-block').setHTML('');
+									r.set('value','');
+								}	
+								
+								else
+								{
+									that.get('container').one('.commentsForm').one('.help-block').setHTML(err.error);
+								}
+							});
+						}
+						
+						r.focus();
+					
+					},this);
+				
+					
+				},this);
+				this.list.load({post_id:this.get('model').get("id"),name:this.list.name});
+				
+				
 				
 			},
 			addComment:function(e){
@@ -134,6 +179,7 @@ $this->load->view("common/header");
 					IMG:baseURL+'in/profile_pic/'+e.model.get("author_id")
 				}));
 				that.get('container').append(c);
+				Y.log(e.model.toJSON());
 				if(e.model.get("author_id")==window.current_user)
 				{
 					e.model.on('destroy',function(){
@@ -147,53 +193,12 @@ $this->load->view("common/header");
 				}
 				
 				if(form){
-					this.get('container').append(form);
+					this.get('container').append(form); 
 				} 
 				
 				
 			},
 			render:function(config){
-				
-				var viewObj = this;
-				
-				this.list.load({post_id:this.get('model').get("id"),name:this.list.name},function(){
-					if(viewObj.list.size()>0)
-					{
-						viewObj.get('container').append("<hr/>");
-					}
-					viewObj.list.each(function(item,index){
-						viewObj.addComment({model:item});
-						
-					},viewObj);
-					
-				});
-				
-				this.get('container').append(Y.one("#comment-form").getContent());
-				var r = this.get('container').one(".commentText");
-				Y.BABE.autoExpand(r);
-				
-				
-				
-				
-				this.get('container').one("textarea").on("focus",function(){
-					this.get('container').one("textarea").set("rows",3);
-				},this);
-				
-				this.get('container').one(".submitComment").on("click",function(e){
-					e.halt();
-					var comment = new Y.CommentModel({comment:this.get('container').one("textarea.commentText").get("value"),post_id:this.get('model').get("_id"),author_id:Y.user.get('id') });
-					var list = this.list;
-					var container = this.get('container'); 
-					comment.save(function(err,response){
-						if(!err){
-							comment.setAttrs(response);
-							list.add(comment);
-							container.one("textarea").set("value","");
-						}
-					});
-					
-					
-				},this);
 				return this;
 			}
 		});
@@ -339,8 +344,6 @@ $this->load->view("common/header");
 		    	var con = this.get('container');
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				
-			
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				
@@ -436,24 +439,34 @@ $this->load->view("common/header");
 				
 				this.set('sidebar',Y.Node.create('<div/>')); 
 				this.set('relation',new Y.BABE.RelationshipModel());
-				this.set('statusbar',new Y.BABE.StatusBlockView());
-				this.set('wall',new Y.BABE.WallView({loadCommand:'wallposts'}));
+				
+				
 				var r = this.get('relation'),m=this.get('model');
 				
 				
 				this.get('model').on(['load','save'],function(){
+					
+					this.set('wall',new Y.BABE.WallView({loadCommand:'groupposts',usermodel:this.get('usermodel'),group_id:this.get('model').get('_id')}));
+					r.on('save',function(){
+						this.get('wall').loadWall('groupposts');
+					},this);
+					this.set('statusbar',new Y.BABE.StatusBlockView({
+						ownership: this.get('model').get('_id')
+					}));
 					this.get('container').setHTML(Y.Lang.sub(Y.one('#group-page-main').getHTML('#group-page-main'),{
 						'GROUP_TITLE':m.get('title'),
 						'GROUP_DESCRIPTION':m.get('description'),
 						'MEMBERS_COUNT':m.get('count') || '0',
-						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100'
+						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100',
+						'VISIBILITY':m.get('visibility')
 						
 					}));
 					this.get('sidebar').setHTML(Y.Lang.sub(Y.one('#group-page-sidebar').getHTML('#group-page-sidebar'),{
 						'GROUP_TITLE':m.get('title'),
 						'GROUP_DESCRIPTION':m.get('description'),
 						'MEMBERS_COUNT':m.get('count') || '0',
-						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100'
+						'GROUP_IMAGE':m.get('image') || 'http://placehold.it/100x100',
+						'VISIBILITY':m.get('visibility')
 						
 					}));
 					this.get('container').one(".status-block").setHTML(this.get('statusbar').render().get('container'));
@@ -462,39 +475,110 @@ $this->load->view("common/header");
 							if(Y.one('#invite-box')) { Y.one('#invite-box').remove(); }
 							Y.one('body').append(Y.one('#invite-group-members').getHTML());
 						    jQuery('#invite-box').modal('show');
-						    Y.one('#invite-box').one('.modal-body').setHTML(new Y.BABE.InviteView().render().get('container'));
+						    Y.one('#invite-box').one('.modal-body').setHTML(new Y.BABE.InviteView({invite_action:'group',group_id:this.get('model').get('_id')}).render().get('container'));
 							Y.one('#invite-box').all('.close').on('click',function(){
 								Y.one('#invite-box').destroy();
 							});
 						
 					},this);
 					this.get('container').one('.join-btn').on('click',function(){
-							r.set('relationship','member');
+							if(this.get('model').get('visibility')==='closed')
+							{
+								r.set('relationship','requested');
+							}
+							else
+							{
+								r.set('relationship','member');
+							}
+							
 							r.save();
 						},this);
 						this.get('container').one('.unjoin-btn').on('click',function(){
 							r.set('relationship','');
 							r.save();
 						},this);
+						this.get('container').one('.leave-btn').on('click',function(){
+							r.set('relationship','');
+							r.save();
+						},this);
+						this.get('container').one('.delete-btn').on('click',function(){
+							this.get('model').destroy({remove:true});
+							Y.fire("sidebar:refresh");
+							Y.fire('navigate',{action:"/"});
+						},this);
 					
 					},this);
+					
 				this.get('relation').on(['load','save'],function(){
 						if(this.get('relation').get('relationship')==="")
 						{
 							this.get('container').one('.join-btn').removeClass('hide');
+							this.get('container').one('.leave-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
 						}
 						else if(this.get('relation').get('relationship')==="member")
 						{
+							
 							this.get('container').one('.join-btn').addClass('hide');
+							this.get('container').one('.leave-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').removeClass('hide');
+						}
+						else if(this.get('relation').get('relationship')==="requested")
+						{
+							
+							this.get('container').one('.join-btn').addClass('hide');
+							this.get('container').one('.leave-btn').removeClass('hide');
 						}
 						if(this.get('model').get('author_id')===window.current_user)
 						{
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
+							this.get('container').one('.leave-btn').addClass('hide');
+							this.get('container').one('.delete-btn').removeClass('hide');
+							Y.io(baseURL+'in/pending_members',{
+								method:'POST',
+								data:{group_id: this.get('model').get('_id')},
+								context:this,
+								on:{
+									success:function(i,o,a){
+										var r = Y.JSON.parse(o.responseText),n;
+										for(var i in r)
+										{
+											n = Y.Node.create(Y.Lang.sub(Y.one('#user-request-accept').getHTML(),{
+												USER_ID:r[i]['user_id'],
+												USER_NAME:r[i]['user_name']
+											}));
+											n.one('.accept-btn').on('click',function(){
+												var rm = new Y.BABE.RelationshipModel();
+												rm.set('resource_id',m.get("_id"));
+												rm.set('owner_id',r[i]['user_id']);
+												rm.set('relationship','member');
+												rm.save();
+												n.remove(true);
+											},this);
+											n.one('.reject-btn').on('click',function(){
+												var rm = new Y.BABE.RelationshipModel();
+												rm.set('resource_id',m.get("_id"));
+												rm.set('owner_id',r[i]['user_id']);
+												rm.set('relationship','');
+												rm.save();
+												n.remove(true);
+											},this);
+											this.get('sidebar').one('.membership-request').append(n);
+										}
+									}
+								}
+							});
 						}
 						
+						if(this.get('model').get('visibility')=='closed' && this.get('relation').get('relationship')!=='member' && this.get('relation').get('relationship')!=='owner')
+						{
+							this.get('statusbar').hide();
+						}
+						else
+						{
+							this.get('statusbar').show();
+						}
 						
 						
 					},this);
@@ -521,24 +605,24 @@ $this->load->view("common/header");
 		
 		Y.GroupPageMainView = Y.Base.create('GroupPageMainView', Y.View, [], {
 			containerTemplate:'<div/>',
-		    render: function () {
-		    	var that= this;
-		    	var con = this.get('container');
-		    	var group = new Y.BABE.GroupModel({
+			initializer:function(){
+				var that= this,con = this.get('container'),group = new Y.BABE.GroupModel({
 						"_id":that.get("group_id")
 					});
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
-				
+				var grp =  new Y.GroupPageView({model:group,usermodel:this.get('usermodel')});
+ 				con.one(".leftbar").setHTML(grp.getSidebar());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
- 				
-				Y.loadTemplate("group",function(){ 
-					
-					var grp =  new Y.GroupPageView({model:group});
-					con.one(".centercolumn").setContent(grp.render().get('container'));
-					con.one(".leftbar").setHTML(grp.getSidebar());
-				});
 				
+				
+				con.one(".centercolumn").setContent(grp.render().get('container'));
+				
+				
+				
+			},
+		    render: function () {
+		    	
 		        return this;
 		    }
 		});
@@ -558,18 +642,18 @@ $this->load->view("common/header");
 				Y.loadTemplate("wall",function(){ 
 					
 					var id = that.get('post_id');
-					Y.log(id);
+					
 					var postModel = new Y.BABE.PostModel({
 						'_id':id
 					});
 					postModel.on('load',function(){
 						if(postModel.get('category')=='event')
 						{
-							var view = new Y.EventView({model:postModel,expandComments:true});
+							var view = new Y.EventView({model:postModel,usermodel:this.get('usermodel'),expandComments:true});
 						}
 						else
 						{
-							var view = new Y.PostView({model:postModel,expandComments:true});
+							var view = new Y.PostView({model:postModel,usermodel:this.get('usermodel'),expandComments:true});
 						}
 						con.one(".centercolumn").setHTML(view.render().get('container'));
 					},that);
@@ -640,7 +724,8 @@ $this->load->view("common/header");
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
 				var searchView = new Y.BABE.SearchView({
-					search:this.get('search')
+					search:this.get('search'),
+					usermodel:this.get('usermodel')
 				});
 				con.one('.centercolumn').setHTML(searchView.render().get('container'));
 		    
@@ -690,11 +775,11 @@ $this->load->view("common/header");
 		
 		var AppUI =  new Y.App({
 		    views: {
-		        homepage: {type: 'MainAppView', preserve:true },
+		        homepage: {type: 'MainAppView', preserve:false },
 		        profile:  {type:'MainProfileView'},
 		        userpage: {type:'UserPageView',preserve:false },
 		        create_group: {type:'CreateGroupMainView',preserve:true}, 
-		        grouppage:{type:'GroupPageMainView',preserve:true},
+		        grouppage:{type:'GroupPageMainView',preserve:false},
 		        postpage:{type:'PostPage',preserve:false},
 		        notificationpage:{type:'NotificationListView',preserve:false},
 		        searchpage:{type:'SearchPageView',preserve:false},
@@ -758,17 +843,17 @@ $this->load->view("common/header");
 		});
 		
 		AppUI.route('/group/:group_title/:group_id',function(req){
-		 	this.showView('grouppage',{group_id:req.params.group_id});
+		 	this.showView('grouppage',{group_id:req.params.group_id,usermodel:Y.userModel});
 		});
 		
 		AppUI.route('/post/:post_tags/:post_id',function(req){
-		 	this.showView('postpage',{post_id:req.params.post_id});
+		 	this.showView('postpage',{post_id:req.params.post_id,usermodel:Y.userModel});
 		});
 		AppUI.route('/search/:term',function(req){
-		 	this.showView('searchpage',{search:req.params.term});
+		 	this.showView('searchpage',{search:req.params.term,usermodel:Y.userModel});
 		});
 		AppUI.route('/search',function(req){
-		 	this.showView('searchpage',{search:''});
+		 	this.showView('searchpage',{search:'',usermodel:Y.userModel});
 		});
 		AppUI.route('/notifications',function(req){
 			this.showView('notificationpage');
@@ -837,6 +922,7 @@ $this->load->view("common/header");
 				});
 			}
 		});
+		
 		
 		Y.on('search-init',function(e){ 
 			AppUI.navigate('/search/'+e.search);
