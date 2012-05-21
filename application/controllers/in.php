@@ -162,6 +162,7 @@ class In extends CI_Controller {
 		$userdata["created_at"] = time();
 		$response = $this->dba->add_user($userdata);
 		if($response["success"]){
+			//$this->user->run_signup_errands($response["data"]["id"]);
 			$this->user->force_sign_in($response["data"]["id"]);
 		}
 		echo json_encode($response);
@@ -462,6 +463,25 @@ class In extends CI_Controller {
 			break;
 		}
 	}
+	
+	function remaining_time()
+	{
+		$quiz_id = $this->input->post('quiz_id');
+		$user = $this->user->get_current();
+		$quiz = $this->dba->get($quiz_id);
+		$doc = $this->dba->get("response_{$quiz_id}_{$user}");
+		$remaining = $doc['created_at']+$quiz['time']*60 - time();
+		if($remaining<=0)
+		{
+			echo 0;
+		}
+		else
+		{
+			echo $remaining;
+		} 
+	}
+	
+	
 }
 
 /* End of file welcome.php */

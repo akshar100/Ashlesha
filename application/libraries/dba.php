@@ -653,6 +653,24 @@ class DBA
 		return $relationship;
 	}
 	
+	function update_relationship($resource_id,$user,$relationship)
+	{
+		
+		$resource = $this->get($resource_id);
+		if(isset($resource['relations']) && is_array($resource['relations']))
+		{
+			$resource['relations'][$user] = $relationship;
+		}
+		else
+		{
+			$resource['relations'] = array();
+			$resource['relations'][$user] = $relationship;
+		}
+	
+		$this->update($resource);
+	}
+	
+	
 	function all_sector_list()
 	{
 		$result = $this->chill->getView("posts","all_sectors",null);
@@ -804,4 +822,6 @@ class DBA
 		
 		return $response;
 	}
+	
+	
 }

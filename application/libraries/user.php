@@ -161,5 +161,33 @@ class User
 		$user['otp']='';
 		$this->ci->dba->update($user);
 	}
-
+	
+	function send_invite($email)
+	{
+		
+	}
+	
+	function invite_to_group($email,$group,$source_id=null)
+	{
+		
+		$source = $this->ci->dba->get($source_id);
+		$email  = $this->ci->load->view('email/group_invitation',array(
+			"url"=>base_url()."/group/".$group['title']."/".$group['_id'],
+			"user"=>$source['fullname']
+		),true);
+		
+		$this->send_email($email,$source['fullname']." has invited you to join ".$group['title'], $email);
+	}
+	
+	function send_email($to,$subject,$text)
+	{
+		$this->ci->load->library('email');
+				
+			
+		$this->ci->email->from($this->ci->config->item('from_email'),$this->ci->config->item('from_name'));
+		$this->ci->email->to($to);
+		$this->ci->email->subject($subject);
+		$this->ci->email->message($text);		
+		$this->ci->email->send();
+	}
 }

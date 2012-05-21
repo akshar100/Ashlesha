@@ -272,6 +272,16 @@ class IO extends CI_Controller {
 				else
 				{
 					$relationship='';
+					if(isset($resource['allowed_emails']) && is_array($resource['allowed_emails']))
+					{
+						$user = $this->dba->get($user_id);
+						if(in_array($user['email'],$resource['allowed_emails']))
+						{
+							$resource['relations'][$user['_id']] = 'member';
+							$this->dba->update($resource);
+						}
+						$relationship='member';
+					}
 				}
 			}	
 			
@@ -492,6 +502,66 @@ class IO extends CI_Controller {
 			
 		echo $this->email->send();
 		
+	}
+	
+	function invite_to_group()
+	{
+		$request = $this->input->post();
+		$group = $this->dba->get($request['group_id']);
+		if(!empty($request['emails']))
+		{
+			$emails = explode("\n",$request['emails']);
+			$final_emails = array();
+			foreach($emails as $email)
+			{
+				$e = explode(",",$email);
+				$final_emails = array_merge($final_emails,$e); 
+			}
+			foreach($final_emails as $email)
+			{
+				
+				$user = $this->dba->getview("users_by_email",array("key"=>strtolower(trim($email))));
+				
+				
+				if(!empty($user[0]) &&!empty($user))
+				{
+					$user = $user[0];
+					$this->dba->update_relationship($request['group_id'],$user['_id'],'member');
+					$group = $this->dba->get($request['group_id']);
+					$post = array(
+						'source_user'=>$this->user->get_current(),
+						'target_user'=>$user['_id'],
+						'notification_action'=>'group_add',
+						'linked_resource'=>$request['group_id'],
+						'mark_read'=>false,
+						'group_name'=>$group['title']
+					);
+					$this->dba->create_notification($post);
+				}
+				else
+				{
+					if(!empty($group['allowed_emails']))
+					{
+						$group['allowed_emails'][]=$email;
+					}
+					else
+					{
+						$group['allowed_emails'] = array($email);
+					}
+					$group = $this->dba->update($group);
+					$group = $this->dba->get($request['group_id']);
+					
+					$this->user->invite_to_group($email,$group,$this->user->get_current());
+				}
+				
+				
+				
+			}
+			
+		}
+		
+		
+		echo json_encode(array("success"=>true));
 	}
 }
 

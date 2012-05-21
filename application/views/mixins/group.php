@@ -140,7 +140,7 @@
 		    <div class="modal-body">
 		    </div>
 		    <div class="modal-footer">
-		    <a href="#" class="btn btn-primary">Send Invite</a>
+		    <a href="#" class="btn btn-primary send-invites">Send Invite</a>
 		    </div>
     	</div>
 </script>
@@ -148,7 +148,7 @@
 	
 	<ul class="nav nav-tabs" id="">
 		<li class="active"><a href="#" rel="email">By Email</a></li>
-		<li><a href="#" rel="connections">Your Connections</a></li>
+		<!-- <li><a href="#" rel="connections"><?php echo $this->lang->line('site_name');?></a></li>-->
 		<li><a href="#" rel="fb">Via Facebook</a></li>
 	</ul>
 	 
@@ -156,7 +156,9 @@
 		<div class="tab-pane active" id="email">
 			<textarea id="email_invites" cols="50" rows="10" placeholder="enter one email address per line..."></textarea>
 		</div>
-		<div class="tab-pane" id="connections"><?php echo $this->lang->line('site_name');?></div>
+		<div class="tab-pane" id="connections">
+			<form><input class="input x-large" id="search-box"/> <button></button> </form> 
+		</div>
 		<div class="tab-pane" id="fb">We have not managed to fetch your facebook friends.</div>
 	</div>
  

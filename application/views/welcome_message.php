@@ -441,7 +441,7 @@ $this->load->view("common/header");
 				this.set('relation',new Y.BABE.RelationshipModel());
 				
 				
-				var r = this.get('relation'),m=this.get('model');
+				var r = this.get('relation'),m=this.get('model'),c=this.get('container');
 				
 				
 				this.get('model').on(['load','save'],function(){
@@ -471,11 +471,40 @@ $this->load->view("common/header");
 					}));
 					this.get('container').one(".status-block").setHTML(this.get('statusbar').render().get('container'));
 					this.get('container').one(".wall").setHTML(this.get('wall').render().get('container'));
+					this.get('sidebar').one('#invite').addClass('hide');
 					this.get('sidebar').one('#invite').on('click',function(){
+							var emails;
 							if(Y.one('#invite-box')) { Y.one('#invite-box').remove(); }
 							Y.one('body').append(Y.one('#invite-group-members').getHTML());
 						    jQuery('#invite-box').modal('show');
 						    Y.one('#invite-box').one('.modal-body').setHTML(new Y.BABE.InviteView({invite_action:'group',group_id:this.get('model').get('_id')}).render().get('container'));
+						    Y.one('#invite-box').one('.send-invites').on('click',function(e){
+						    	var content =  Y.one('#invite-box').one('.send-invites').get('innerHTML');
+						    	Y.one('#invite-box').one('.send-invites').addClass('btn-warning');
+						    	Y.one('#invite-box').one('.send-invites').setHTML('Sending Invitations....');
+						    	e.halt();
+						    	emails = Y.one('#invite-box').one('textarea#email_invites').get('value');
+						    	Y.io(baseURL+'io/invite_to_group',{
+						    		method:'POST',
+						    		context:this,
+						    		data:{
+						    			group_id:this.get('model').get('_id'),
+						    			emails:emails
+						    		},
+						    		on:{
+						    			success:function(i,o,a){
+						    				var res = Y.JSON.parse(o.responseText);
+						    				Y.one('#invite-box').one('.send-invites').removeClass('btn-warning');
+						    				Y.one('#invite-box').one('.send-invites').addClass('btn-success');
+						    				Y.one('#invite-box').one('.send-invites').set('innerHTML','Sent');
+						    				setTimeout(function(){
+						    					Y.one('#invite-box').one('.send-invites').removeClass('btn-success');
+						    					Y.one('#invite-box').one('.send-invites').set('innerHTML','Send Invites');
+						    				},2000)
+						    			}
+						    		}
+						    	});
+						    },this);
 							Y.one('#invite-box').all('.close').on('click',function(){
 								Y.one('#invite-box').destroy();
 							});
@@ -515,6 +544,14 @@ $this->load->view("common/header");
 							this.get('container').one('.join-btn').removeClass('hide');
 							this.get('container').one('.leave-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
+							if(m.get('visibility')=='hidden' && this.get('usermodel').get('_id')!=m.get('author_id'))
+							{
+								
+								this.get('sidebar').hide(true);
+								c.hide(true);
+								Y.BABE.showAlert('Message','Such resource either does not exist or you do not have enough permissions to have a look at them.')
+							}
+							
 						}
 						else if(this.get('relation').get('relationship')==="member")
 						{
@@ -522,19 +559,22 @@ $this->load->view("common/header");
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.leave-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').removeClass('hide');
+							
 						}
 						else if(this.get('relation').get('relationship')==="requested")
 						{
 							
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.leave-btn').removeClass('hide');
+							
 						}
 						if(this.get('model').get('author_id')===window.current_user)
 						{
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
 							this.get('container').one('.leave-btn').addClass('hide');
-							this.get('container').one('.delete-btn').removeClass('hide');
+							this.get('container').one('.delete-btn').removeClass('hide'); 
+							this.get('sidebar').one('#invite').removeClass('hide');
 							Y.io(baseURL+'in/pending_members',{
 								method:'POST',
 								data:{group_id: this.get('model').get('_id')},
@@ -686,7 +726,7 @@ $this->load->view("common/header");
 		    		
 		    		if(nlist.size()===0)
 		    		{
-		    			console.log(Y.one('#info-alert').getHTML());
+		    			
 		    			con.one('.centercolumn').append(Y.Lang.sub(Y.one('#info-alert').getHTML(),{
 		    				MESSAGE:'No new notifications here!'
 		    			}));
@@ -874,6 +914,10 @@ $this->load->view("common/header");
 						userModel:Y.userModel
 					});
 				});
+			}
+			if(!Y.userModel.hasRole('administrator'))
+			{
+				AppUI.navigate("/");
 			}
 		});
 		

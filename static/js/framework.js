@@ -1833,8 +1833,7 @@ function (Y) {
                     title: this.get('container').one('[name=title]').get('value'),
                     description: this.get('container').one('[name=description]').get('value'),
                     tags: this.get('container').one('[name=tags]').get('value')
-                });
-                var c = this.get('container');
+                }),c = this.get('container');
                 g.save(function (err, response) {
 
                     if (err) {
@@ -1842,6 +1841,9 @@ function (Y) {
                     } else {
                         showAlert("Done!", "Your group is created!");
 						Y.fire("sidebar:refresh");
+						Y.fire('navigate',{
+							action:'/group/'+g.get('title')+'/'+g.get('_id')
+						})
                     }
 
                 });
@@ -2143,6 +2145,10 @@ function (Y) {
             {
             	this.get('container').one('#admin-btn').removeClass('hide');
             }
+            else
+            {
+            	this.get('container').one('#admin-btn').remove(true);
+            }
             var sv = new Y.BABE.SearchBoxView();
             this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
             if (!Y.APPCONFIG.notifications_enabled) {
@@ -2150,7 +2156,7 @@ function (Y) {
             } else {
 
                 this.get('container').one("#notification-btn").on("click", function (e) {
-                    AppUI.navigate('/notifications');
+                    Y.fire('navigate',{'action':'/notifications'}); 
                     e.preventDefault();
                 });
                 if (!window.nl && Y.APPCONFIG.push_notifications_enabled) {
@@ -2282,7 +2288,7 @@ function (Y) {
         },
         render: function () {
 
-            if (this.get('model').get("label").length <= 12) {
+            if (this.get('model').get("label").length <= 20) {
                 this.get('container').setContent(this.get('model').get("label"));
             } else {
                 this.get('container').setContent(this.get('model').get("label").substr(0, 10) + "..");
@@ -2594,12 +2600,35 @@ function (Y) {
             u.load({
                 'id': m.get('source_user')
             }, function () {
-                c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
-                    SOURCE_USER: u.get('fullname')
-                }));
+            	if(!Y.one('#notification-row-' + m.get('notification_action'))){ return;}
+            	
+            	
+                
                 if (m.get('notification_action') == 'friend' || m.get('notification_action') == 'friend_request' || m.get('notification_action') == 'follow') {
+                    c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
+                    		SOURCE_USER: u.get('fullname'),
+                    		SOURCE_ID:u.get('_id')
+                	}));
+                    
                     c.one('.visit').on('click', function () {
-                        AppUI.navigate('/user/' + m.get('source_user'));
+                       
+                        Y.fire('navigate',{
+                        	action:'/user/'+m.get('source_user')
+                        });
+                    });
+                }
+                else if (m.get('notification_action') == 'group_add') {
+                    c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
+                    		SOURCE_USER: u.get('fullname'),
+                    		GROUP_NAME:m.get('group_name'),
+                    		SOURCE_ID:u.get('_id')
+                	}));
+                    
+                    c.one('.visit').on('click', function () { 
+                       
+                        Y.fire('navigate',{
+                        	action:'/group/'+m.get('group_name')+'/'+m.get('linked_resource')
+                        });
                     });
                 }
                 c.one('.close').on('click', function () {
@@ -3814,7 +3843,6 @@ function (Y) {
 							response.setAttrs(r);
 							that.set('response',response);
 							response.set('_id',r['_id']);
-							response.set('current','rt');
 							response.save();
 							start = response.get('created_at')*1000; 
 							
@@ -3830,31 +3858,38 @@ function (Y) {
 				}));
 				
 				timer = setInterval(function(){
-					
-					var now = Date.now(),total=m.get('time')*60*1000,pec=0,remaining;
-					pec = ((now-start)/total)*100;
-					remaining = Math.ceil(((start+total)-now)/60000);
-					
-					
-					if(remaining<=0)
-					{
-						if(that.get('response'))
-						{
-							that.get('response').set('finished',true);
-							that.get('response').save();
+					Y.io(baseURL+'in/remaining_time',{
+						method:'POST',
+						data:{ quiz_id: m.get('_id') },
+						on:{
+							success:function(i,o,a){
+								var total=m.get('time')*60,pec=0,remaining = parseInt(o.responseText,10);
+								pec = (remaining/total)*100;
+								if(remaining<=0)
+								{
+									if(that.get('response'))
+									{
+										that.get('response').set('finished',true);
+										that.get('response').save();
+									}
+									remaining = 0;
+									clearInterval(timer);
+									that.freezeQuiz();
+									return;
+								}
+								if(pec>99.99){ pec = 100; }
+								if(pec<1){ pec = 0; }
+								pec = Math.ceil(pec);
+								pec = 100-pec;
+								c.one('.bar').setStyle('width',pec+'%');
+								c.one('.badge-inverse').setHTML(Math.floor(remaining/60)+":"+(remaining%60)); 
+								count++;
+								
+							}
 						}
-						remaining = 0;
-						clearInterval(timer);
-						that.freezeQuiz();
-						return;
-					}
-					if(pec>99.99){ pec = 100; }
-					if(pec<1){ pec = 0; }
-					pec = Math.ceil(pec);
-					pec = 100-pec;
-					c.one('.bar').setStyle('width',pec+'%');
-					c.one('.badge-inverse').setHTML(remaining); 
-					count++;
+					});
+					
+					
 				},1000);
 				
 			
@@ -3874,9 +3909,6 @@ function (Y) {
 					action:'quiz_questions',
 					id:m.get('_id')
 				});
-				c.one('.save-btn').on('click',function(){
-					
-				},this);
 				
 				Y.on('answerblock:change',function(e){
 					
