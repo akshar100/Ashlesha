@@ -6,6 +6,7 @@
 	        <ul class="dropdown-menu">
 	          <li ><a href="/admin/search_user">User Management</a></li>
 	          <li><a href="/admin/mass_mail">Email All</a></li>
+	           <li><a href="/admin/invite_users">Invite</a></li>
 	        </ul>
 	      </li>
 	      <li class="dropdown">
@@ -565,6 +566,44 @@ United States of America|USA|0.5
 	<div class="row-fluid">
 		<div class="span12">
 			<h3>Create a Page</h3>
+		</div>
+	</div>
+</script>
+
+<script id="invite-users" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<h3>Invite Users</h3>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			 <div class="alert alert-info">
+			 	You need to enter email addresses in the following textare and system will send email invitations to all those users. 
+			 	If you have configured the system for "invitation-only" signups then only those people will be able to signup.
+			 </div>
+		</div>
+	</div>
+	<div class="row-fluid">
+		
+		<textarea rows="5" cols="50" class="input span8 emails" placeholder="email addresses separated by comma.."></textarea>
+		
+	</div>
+	<div class="row-fluid">
+		
+		<div class="span8"><label>Add a Personalized message</label></div>
+		
+	</div>
+	<div class="row-fluid">
+		
+		<textarea rows="5" cols="50" class="input span8 message" placeholder="personalized message...."></textarea>
+		
+	</div>
+	<div class="row-fluid">
+		<div class="span8">
+			<div class="pull-right">
+				<button type="button" class="btn btn-primary send">Invite</button>
+			</div>
 		</div>
 	</div>
 </script>

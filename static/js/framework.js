@@ -3016,6 +3016,9 @@ function (Y) {
                 case "mass_mail":
                 	this.massMail();
                 	break;
+                case "invite_users":
+                	this.inviteUsers();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -3023,6 +3026,10 @@ function (Y) {
                 this.showStats();
             }
             return this;
+        },
+        inviteUsers:function(){
+        	var qc = new InviteUsersView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         updateCharts: function () {
             this.render();
@@ -3060,6 +3067,42 @@ function (Y) {
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
+    });
+    var InviteUsersView = Y.Base.create('massmailview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		this.get('container').setHTML(Y.one('#invite-users').getHTML());
+    		
+    		this.get('container').one(".send").on("click",function(){
+    			this.get('container').one(".send").removeClass('btn-primary').addClass('btn-warning');
+    			this.get('container').one(".send").set("innerHTML","Sending......");
+    			var emails = this.get('container').one("textarea.emails").get("value"),message=this.get('container').one("textarea.message").get("value");
+    			Y.io(baseURL+'io/invite_users',{
+    				method:'POST',
+    				context:this,
+    				data:{
+    					emails:emails,
+    					message:message 
+    				},
+    				on:{
+    					success:function(i,o,a){
+    						var c = this.get('container');
+    						c.one("textarea.emails").set("value","");
+    						c.one(".send").removeClass('btn-warning').addClass('btn-success');
+    						c.one(".send").set("innerHTML","Sent Successfully");
+    						setTimeout(function(){
+    							c.one(".send").removeClass('btn-success').addClass('btn-primary');
+    							c.one(".send").set("innerHTML","Invite");
+    						},2000);
+    					}
+    				}
+    			});
+    		},this);
+    		 
+    	},
+    	render:function(){
+    		return this;
+    	}
     });
     var MassMailView = Y.Base.create('massmailview', Y.View, [], {
     	containerTemplate:'<div/>',
@@ -4383,11 +4426,15 @@ YUI.add('babe-user',function(Y){
             }
         },
         initializer: function () {
-
+			
             this.render();
         },
         render: function () {
             this.template = Y.one('#signupform-template').getContent();
+            if(Y.APPCONFIG && Y.APPCONFIG.sign_up_enabled==false)
+			{
+				//What message to show if this is an invitation only website ?
+			}
             this.get('container').setContent(this.template);
             var container = this.get('container');
             this.get('container').one("form").on("submit", function (e) {

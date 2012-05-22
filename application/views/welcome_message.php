@@ -126,7 +126,7 @@ $this->load->view("common/header");
 					this.get('container').setHTML('');
 					if(viewObj.list.size()>0)
 					{
-						viewObj.get('container').append("<hr/>");
+						viewObj.get('container').append("<hr/><br/>");
 					}
 					viewObj.list.each(function(item,index){
 						viewObj.addComment({model:item});

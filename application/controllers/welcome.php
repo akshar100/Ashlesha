@@ -27,13 +27,8 @@ class Welcome extends CI_Controller {
 	{
 		$this->load->library("facebook");
 		$user = $this->user->get_current();
-		if(empty($user))
-		{
-			$this->load->view('homepage');
-		}
-		else
-		{
-			$config = array(
+		
+		$config = array(
 				'group_enabled'=> $this->config->item('group_enabled'),
 				'question_enabled'=> $this->config->item('question_enabled'),
 				'event_enabled' => $this->config->item('event_enabled'),
@@ -42,8 +37,18 @@ class Welcome extends CI_Controller {
 				'post_sector_enabled' =>$this->config->item('post_sector_enabled'), 
 				'notifications_enabled' =>$this->config->item('notifications_enabled'),
 				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled'),
-				'supported_roles'=>$this->config->item('supported_roles')
+				'supported_roles'=>$this->config->item('supported_roles'),
+				'sign_up_enabled'=>$this->config->item('sign_up_enabled')
 			);
+		if(empty($user))
+		{
+			$this->load->view('homepage',array(
+				'config'=>$config
+			));
+		}
+		else
+		{
+			
 			$this->user->force_sign_in($this->user->get_current());
 			$this->load->view('welcome_message',array(
 				'config'=>$config
@@ -84,7 +89,7 @@ class Welcome extends CI_Controller {
 			else
 			{
 				$this->user->force_sign_in($user['_id']);
-				redirect("");
+				redirect(""); 
 			}
 			redirect("");
 		}	

@@ -123,7 +123,8 @@ class IO extends CI_Controller {
 			"get_all_quizes"=>array("map"=>read_file("./application/views/json/all_quizes.js")),
 			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js")),
 			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js")),
-			"get_groups_by_allowed_emails"=>array("map"=>read_file("./application/views/json/get_groups_by_allowed_emails.js"))
+			"get_groups_by_allowed_emails"=>array("map"=>read_file("./application/views/json/get_groups_by_allowed_emails.js")),
+			"get_invitations"=>array("map"=>read_file("./application/views/json/get_invitations.js"))
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -566,6 +567,28 @@ class IO extends CI_Controller {
 		
 		echo json_encode(array("success"=>true));
 	}
+
+	function invite_users()
+	{
+		$emails = $this->input->post('emails');
+		$message = $this->input->post('message');
+		$e = array();
+		$elist = explode("\n",$emails);
+		foreach($elist as $v)
+		{
+			$line = explode(",",$v);
+			foreach($line as $k)
+			{
+				$e[]=$k;
+			}
+		}
+		$e = array_unique($e);
+		foreach($e as $v)
+		{
+			$this->user->invite_user($v,$message); 
+		}
+		
+	} 
 }
 
 /* End of file welcome.php */

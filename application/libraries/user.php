@@ -162,9 +162,19 @@ class User
 		$this->ci->dba->update($user);
 	}
 	
-	function send_invite($email)
+	function invite_user($email,$message='')
 	{
 		
+		$text  = $this->ci->load->view('email/site_invitation',array(
+			"url"=>base_url(),
+			"message"=>$message
+		),true);
+		$this->ci->dba->create(array(
+			"type"=>"invitation",
+			"email"=>$email,
+			"message"=>$message
+		));
+		$this->send_email($email,'Invitation' , $text);
 	}
 	
 	function invite_to_group($email,$group,$source_id=null,$existing_user=false)

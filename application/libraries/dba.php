@@ -332,6 +332,14 @@ class DBA
 					{
 						$output[$k] = "$k is already in use.";
 					}
+					if($this->ci->config->item('sign_up_enabled')==FALSE)
+					{
+						$r = $this->getview('get_invitations',array("key"=>strtolower($v)));
+						if(empty($r) or !isset($r[0]))
+						{
+							$output[$k] = "This email does not have an invitation to join this site.";
+						}
+					}
 				}
 				if($k=="fullname")
 				{
