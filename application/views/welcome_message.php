@@ -539,6 +539,7 @@ $this->load->view("common/header");
 					},this);
 					
 				this.get('relation').on(['load','save'],function(){
+						Y.fire("sidebar:refresh");
 						if(this.get('relation').get('relationship')==="")
 						{
 							this.get('container').one('.join-btn').removeClass('hide');
@@ -570,6 +571,7 @@ $this->load->view("common/header");
 						}
 						if(this.get('model').get('author_id')===window.current_user)
 						{
+							
 							this.get('container').one('.join-btn').addClass('hide');
 							this.get('container').one('.unjoin-btn').addClass('hide');
 							this.get('container').one('.leave-btn').addClass('hide');

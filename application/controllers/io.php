@@ -122,7 +122,8 @@ class IO extends CI_Controller {
 			"get_all_questions"=>array("map"=>read_file("./application/views/json/get_all_questions.js")),
 			"get_all_quizes"=>array("map"=>read_file("./application/views/json/all_quizes.js")),
 			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js")),
-			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js"))  
+			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js")),
+			"get_groups_by_allowed_emails"=>array("map"=>read_file("./application/views/json/get_groups_by_allowed_emails.js"))
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -537,13 +538,14 @@ class IO extends CI_Controller {
 						'group_name'=>$group['title']
 					);
 					$this->dba->create_notification($post);
-					$this->user->invite_to_group($user['email'],$group,$this->user->get_current(),true);
+					$this->user->invite_to_group($user['email'],$group,$this->user->get_current(),'true');
 				}
 				else
 				{
 					if(!empty($group['allowed_emails']))
 					{
 						$group['allowed_emails'][]=$email;
+						$group['allowed_emails'] = array_unique($group['allowed_emails']);
 					}
 					else
 					{

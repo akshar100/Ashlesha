@@ -28,7 +28,7 @@ class DBA
 	{
 		
 		$group = $this->get($group_id);
-		if($group['visibility']=='open')
+		if(!isset($group['visibility']) || $group['visibility']=='open')
 		{
 			$response = $this->chill->getView("posts","groupposts",$group_id,array(
 			"descending"=>true,

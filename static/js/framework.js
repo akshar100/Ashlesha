@@ -400,7 +400,7 @@ function (Y) {
                             if (!response.error && response.data) {
                                 model.setAttrs(response.data);
                             }
-                            callback(null, data);
+                            callback(null, model.toJSON());
                         }
                     }
                 });
@@ -766,6 +766,7 @@ function (Y) {
         },
         initializer: function () {
             this.get('container').setHTML(Y.one('#wall').getHTML());
+           
             var wall = new Y.BABE.PostList();
             if (this.get('list')) {
                 wall = this.get('list');
@@ -793,9 +794,16 @@ function (Y) {
                 user_id: this.get('user_id') || window.current_user,
                 group_id: this.get('group_id') || ''
             });
-
+			Y.on("wall:refresh",function(e){
+				this.get('container').setHTML(Y.one('#wall').getHTML());
+            	wall.load({
+	                name: this.get('loadCommand'),
+	                user_id: this.get('user_id') || window.current_user,
+	                group_id: this.get('group_id') || ''
+	            });
+            },this);
             this.set('wall', wall); 
-
+			
         },
         prepend: function (e) {
 
@@ -1759,19 +1767,19 @@ function (Y) {
         sync: modelSync,
         idAttribute: '_id',
         validate: function (attributes) {
-            if (!attributes.title || !attributes.title.trim()) {
+            if (!attributes.title || !Y.Lang.trim(attributes.title)) {
                 return {
                     "field": 'title',
                     "error": "You must give your group a title"
                 }
             }
-            if (!attributes.description || !attributes.description.trim()) {
+            if (!attributes.description || !Y.Lang.trim(attributes.description)) {
                 return {
                     "field": 'title',
-                    "error": "A Group must have a title"
+                    "error": "A Group must have description"
                 }
             }
-            if (!attributes.tags || !attributes.tags.trim()) {
+            if (!attributes.tags || !Y.Lang.trim(attributes.tags)) {
                 return {
                     "field": 'title',
                     "error": "A Group must have some tags"
@@ -1841,6 +1849,7 @@ function (Y) {
                     } else {
                         showAlert("Done!", "Your group is created!");
 						Y.fire("sidebar:refresh");
+						Y.log(g.toJSON()); 
 						Y.fire('navigate',{
 							action:'/group/'+g.get('title')+'/'+g.get('_id')
 						})
@@ -2032,7 +2041,7 @@ function (Y) {
 
                 var c = this.get('container');
                 post.save(function (err, response) {
-
+					Y.fire("wall:refresh");
                     if (err) {
                         showAlert("Ooops!", err);
                     } else {
@@ -2086,7 +2095,7 @@ function (Y) {
                 });
                 var c = this.get('container');
                 post.save(function (err, response) {
-
+					Y.fire("wall:refresh");
                     if (err && err.error) {
                         Y.showAlert("Ooops!", err.error);
                     } else {

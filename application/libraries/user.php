@@ -172,7 +172,7 @@ class User
 		
 		$source = $this->ci->dba->get($source_id);
 		$text  = $this->ci->load->view('email/group_invitation',array(
-			"url"=>base_url()."/group/".$group['title']."/".$group['_id'],
+			"url"=>base_url()."group/".md5($group['title'])."/".$group['_id'],
 			"user"=>$source['fullname'],
 			"title"=>$group['title'],
 			"existing"=>$existing_user
@@ -191,5 +191,21 @@ class User
 		$this->ci->email->send();
 		
 		//echo $this->ci->email->print_debugger();
+	}
+	
+	function run_signup_errands($id)
+	{
+		$user = $this->ci->dba->get($id);
+		$groups = $this->ci->dba->getview('get_groups_by_allowed_emails',array(
+					"key"=>$user['email']
+		));
+		if(is_array($groups))
+		{
+			foreach($groups as $row)
+			{
+				$row['relations'][$id] = 'member';
+				$this->ci->dba->update($row);
+			}
+		}
 	}
 }

@@ -162,7 +162,7 @@ class In extends CI_Controller {
 		$userdata["created_at"] = time();
 		$response = $this->dba->add_user($userdata);
 		if($response["success"]){
-			//$this->user->run_signup_errands($response["data"]["id"]);
+			$this->user->run_signup_errands($response["data"]["id"]);
 			$this->user->force_sign_in($response["data"]["id"]);
 		}
 		echo json_encode($response);
