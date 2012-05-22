@@ -537,6 +537,7 @@ class IO extends CI_Controller {
 						'group_name'=>$group['title']
 					);
 					$this->dba->create_notification($post);
+					$this->user->invite_to_group($user['email'],$group,$this->user->get_current(),true);
 				}
 				else
 				{

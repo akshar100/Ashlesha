@@ -25,7 +25,7 @@ class Welcome extends CI_Controller {
 	
 	public function index()
 	{
-		
+		$this->load->library("facebook");
 		$user = $this->user->get_current();
 		if(empty($user))
 		{

@@ -812,6 +812,7 @@ $this->load->view("common/header");
 		
 		
 		Y.AdminView = Y.BABE.AdminView;
+		Y.CampaignView = Y.BABE.CampaignView;
 		
 		var AppUI =  new Y.App({
 		    views: {
@@ -824,7 +825,8 @@ $this->load->view("common/header");
 		        notificationpage:{type:'NotificationListView',preserve:false},
 		        searchpage:{type:'SearchPageView',preserve:false},
 		        adminview:{type:'AdminPageView',preserve:false},
-		        quizview:{type:'AnswerQuizPageView',preserve:false}
+		        quizview:{type:'AnswerQuizPageView',preserve:false},
+		        campaignview:{type:'CampaignView'}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -929,6 +931,14 @@ $this->load->view("common/header");
 						quiz_id:req.params.id
 					});
 		});
+		
+		AppUI.route('/admin/fb',function(req){
+			
+			this.showView('campaignview',{
+						userModel:Y.userModel,
+					});
+		});
+		
 		AppUI.route('/admin/share_quiz/:id',function(req){
 			
 			this.showView('adminview',{
@@ -985,6 +995,32 @@ $this->load->view("common/header");
     
     
 <?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?> 
+
+<!--
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '<?php echo $this->config->item('facebook_appid');?>', // App ID
+      channelUrl : '//<?php echo base_url();?>channel.html', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      xfbml      : true  // parse XFBML
+    });
+
+    // Additional initialization code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document));
+</script>
+-->
 </body>
 </html>
 

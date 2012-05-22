@@ -167,27 +167,29 @@ class User
 		
 	}
 	
-	function invite_to_group($email,$group,$source_id=null)
+	function invite_to_group($email,$group,$source_id=null,$existing_user=false)
 	{
 		
 		$source = $this->ci->dba->get($source_id);
-		$email  = $this->ci->load->view('email/group_invitation',array(
+		$text  = $this->ci->load->view('email/group_invitation',array(
 			"url"=>base_url()."/group/".$group['title']."/".$group['_id'],
-			"user"=>$source['fullname']
+			"user"=>$source['fullname'],
+			"title"=>$group['title'],
+			"existing"=>$existing_user
 		),true);
 		
-		$this->send_email($email,$source['fullname']." has invited you to join ".$group['title'], $email);
+		$this->send_email($email,$source['fullname']." has invited you to join ".$group['title'], $text);
 	}
 	
 	function send_email($to,$subject,$text)
 	{
 		$this->ci->load->library('email');
-				
-			
 		$this->ci->email->from($this->ci->config->item('from_email'),$this->ci->config->item('from_name'));
 		$this->ci->email->to($to);
 		$this->ci->email->subject($subject);
 		$this->ci->email->message($text);		
 		$this->ci->email->send();
+		
+		//echo $this->ci->email->print_debugger();
 	}
 }

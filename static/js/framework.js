@@ -1091,12 +1091,12 @@ function (Y) {
         },
         validate: function (attributes) {
 
-            attributes.text = attributes.text.trim();
-            attributes.tags = attributes.tags.trim();
-            if (!attributes.text || !attributes.text.trim() || !Y.Lang.isString(attributes.text)) {
+            attributes.text = Y.Lang.trim(attributes.text);
+            attributes.tags = Y.Lang.trim(attributes.tags);
+            if (!attributes.text || !Y.Lang.trim(attributes.text) || !Y.Lang.isString(attributes.text)) {
                 return "Text cannot be empty";
             }
-            if (!attributes.tags || !attributes.tags.trim() || !Y.Lang.isString(attributes.tags)) {
+            if (!attributes.tags || !Y.Lang.trim(attributes.tags) || !Y.Lang.isString(attributes.tags)) {
                 return "Please provide brand,product,service names separated by comma";
             }
             var tags = attributes.tags.split(",");
@@ -1458,7 +1458,7 @@ function (Y) {
             this.get('container').set('id', m.get('_id'));
             var tags = m.get("tags").split(",");
             for (var i in tags) {
-                if (tags[i].trim()) {
+                if (Y.Lang.trim(tags[i])) {
                     c.one(".tagzone").append(Y.Lang.sub('<span class="label notice">{TAG}</span>&nbsp;', {
                         TAG: tags[i]
                     }));
@@ -1502,22 +1502,22 @@ function (Y) {
         sync: modelSync,
         idAttribute: '_id',
         validate: function (attributes) {
-            attributes.text = attributes.text.trim();
-            attributes.tags = attributes.tags.trim();
-            if (!attributes.text || !attributes.text.trim() || !Y.Lang.isString(attributes.text)) {
+            attributes.text = Y.Lang.trim(attributes.text);
+            attributes.tags = Y.Lang.trim(attributes.tags);
+            if (!attributes.text || !Y.Lang.isString(attributes.text)) {
                 return {
                     'field': 'text',
                     'error': 'Text cannot be empty!'
                 };
             }
 
-            if (!attributes.title || !attributes.title.trim() || !Y.Lang.isString(attributes.title)) {
+            if (!attributes.title || !Y.Lang.isString(attributes.title)) {
                 return {
                     'field': 'text',
                     'error': 'Title cannot be empty!'
                 };
             }
-            if (!attributes.tags || !attributes.tags.trim() || !Y.Lang.isString(attributes.tags)) {
+            if (!attributes.tags || !Y.Lang.isString(attributes.tags)) {
 
                 return {
                     'field': 'tags',
@@ -3131,7 +3131,7 @@ function (Y) {
     			});
     		},this);
     		c.one('.all-btn').on('click',function(){
-    			var q = c.one('.search-box').get('value').trim();
+    			var q = Y.Lang.trim(c.one('.search-box').get('value'));
     			c.one(".search-users").setHTML(Y.BABE.LOADER);
     			Y.io(baseURL+'in/all_users',{
     				method:'POST',
@@ -3193,7 +3193,7 @@ function (Y) {
         	var qs= this.get('questions').split(",");
         	for(var i in qs)
         	{
-        		if(qs[i].trim()==id)
+        		if(Y.Lang.trim(qs[i])==id)
         		{
         			return true;
         		}
@@ -3941,7 +3941,19 @@ function (Y) {
 			
 		}
 	});
-	
+	var CampaignView = Y.Base.create('CreatePageView',Y.View,[],{
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var that = this;
+			Y.BABE.loadTemplate('facebook',function(){
+				that.get('container').append(Y.one('#fb-init').getHTML());
+			});
+		},
+		render:function(){
+			return this;
+		}
+		
+	});
     Y.BABE = {
         male_image:'/static/images/male_profile.png',
         female_image:'/static/images/female_profile.png',
@@ -4070,7 +4082,8 @@ function (Y) {
         SearchBoxView: SearchBoxView,
         SearchView: SearchView,
         AdminView: AdminView,
-        AnswerQuizView: AnswerQuizView
+        AnswerQuizView: AnswerQuizView,
+        CampaignView:CampaignView
 
     };
 }, '0.0.1', {
@@ -4139,7 +4152,7 @@ YUI.add('babe-user',function(Y){
         hasRole: function (role) {
             var roles = this.get('roles').split("|");
             for (var i in roles) {
-                if (roles[i].trim().toLowerCase() === role.trim().toLowerCase()) {
+                if (Y.Lang.trim(roles[i]).toLowerCase() === Y.Lang.trim(role).toLowerCase()) {
                     return true;
                 }
             }

@@ -47,6 +47,7 @@ footer{
 	background-image: -webkit-linear-gradient(top,  #ffffff, #eeeeee);
 	background-image: -o-linear-gradient(top,  #ffffff, #eeeeee);
 	background-image: linear-gradient(top,  #ffffff, #eeeeee);
+	filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 ); BORDER-LEFT: #e5e5e5 1px solid
 }
 #maincontainer
 {
