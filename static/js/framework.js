@@ -2329,11 +2329,10 @@ function (Y) {
             Y.on('sidebar:refresh',this.render,this);
         },
         toggleList: function (sectionContainer) {
-            var max_item = 2;
-            var items = this.get('items');
+            var max_item = 2,items = this.get('items'),hide;
             if (items.size() > max_item && (sectionContainer.one("a.more").hasClass('hide') || sectionContainer.one("a.more").hasClass('dropped'))) {
 
-                var hide = 0;
+                hide = 0;
                 items.each(function (item, index) {
                     if (hide < max_item) {
                         item.set('hide', false);
