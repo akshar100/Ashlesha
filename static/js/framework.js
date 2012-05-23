@@ -2979,6 +2979,10 @@ function (Y) {
         },
         initializer: function () {
             this.get('container').setHTML(Y.one('#admin-view').getHTML());
+            if(!this.ger('usermodel').hasRole('administrator'))
+            {
+            	this.get('container').setHTML('You dont have permission to access this content.');
+            }
 
         },
         showCreateQuestion:function(){
