@@ -1,0 +1,36 @@
+# Turn on URL rewriting
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^{DOMAIN}\.{TLD}
+RewriteRule ^(.*)$ http://{SUBDOMAIN}.{DOMAIN}.{TLD}/$1 [R=permanent,L]
+# Installation directory 
+RewriteBase /
+
+# Protect hidden files from being viewed
+<Files .*>
+	Order Deny,Allow
+	Deny From All
+</Files>
+
+# Protect application and system files from being viewed
+RewriteRule ^(?:application|modules|system)\b.* index.php/$0 [L]
+
+# Allow any files or directories that exist to be displayed directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite all other URLs to index.php/URL
+RewriteRule .* index.php/$0 [PT]
+
+#ExpiresDefault "access plus 1 month"
+ExpiresActive On
+ExpiresByType text/css "access plus 1 day"
+ExpiresByType text/javascript "access plus 5 day"
+ExpiresByType image/gif "access plus 5 day"
+ExpiresByType image/jpg "access plus 5 day"
+ExpiresByType image/jpeg "access plus 5 day"
+ExpiresByType image/png "access plus 5 day"
+ExpiresByType application/javascript "access plus 5 day"
+ExpiresByType image/x-icon "access plus 5 day"
+
+
+
