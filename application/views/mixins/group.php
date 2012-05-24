@@ -93,6 +93,10 @@
 	<div class="row-fluid">
 		<div class="span12">
 			<H5>Group Type: {VISIBILITY}</H5>
+			<p>
+			<button type="button" class="btn btn-info members">Members</button>
+			<button type="button" class="btn btn-info hide home">Back</button>
+			</p>
 		</div>
 	</div>
 	<div class="row-fluid">
@@ -176,5 +180,12 @@
 			
 		</div>
 		
+	</div>
+</script>
+<script type="text/x-template" id="group-member-list">
+	<div class="row-fluid">
+		<div class="span6 member-list">
+			
+		</div>
 	</div>
 </script>

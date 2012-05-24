@@ -93,7 +93,7 @@ $this->load->view("common/header");
 		
 		Y.hs = new Y.History();
 		 Y.on('io:failure', function(){
-		 	Y.BABE.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");
+		 //	Y.BABE.showAlert("Its the connection","We are unable to contact the server. May be something is down at our end or your connection just bombed.");
 		 }, Y);
 		 
 		Y.requestList = Y.BABE.requestList;
@@ -436,16 +436,19 @@ $this->load->view("common/header");
 		Y.GroupPageView = Y.Base.create('GroupPage',Y.View,[],{
 			containerTemplate:'<div/>',
 			initializer:function(){
-				
+				var con = this.get('container'),main=Y.Node.create("<DIV/>");
 				this.set('sidebar',Y.Node.create('<div/>')); 
 				this.set('relation',new Y.BABE.RelationshipModel());
+				con.setHTML(Y.one("#outer").getHTML());
+				con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				
-				
+				con.one('.centercolumn').setHTML(main);
 				var r = this.get('relation'),m=this.get('model'),c=this.get('container');
 				
 				
 				this.get('model').on(['load','save'],function(){
-					
+					con.one(".leftbar").setHTML(this.getSidebar());
+					con.one(".topbar").append(Y.topbar.render().get('container'));
 					this.set('wall',new Y.BABE.WallView({loadCommand:'groupposts',usermodel:this.get('usermodel'),group_id:this.get('model').get('_id')}));
 					r.on('save',function(){
 						this.get('wall').loadWall('groupposts');
@@ -453,7 +456,7 @@ $this->load->view("common/header");
 					this.set('statusbar',new Y.BABE.StatusBlockView({
 						ownership: this.get('model').get('_id')
 					}));
-					this.get('container').setHTML(Y.Lang.sub(Y.one('#group-page-main').getHTML('#group-page-main'),{
+					main.setHTML(Y.Lang.sub(Y.one('#group-page-main').getHTML(),{
 						'GROUP_TITLE':m.get('title'),
 						'GROUP_DESCRIPTION':m.get('description'),
 						'MEMBERS_COUNT':m.get('count') || '0',
@@ -469,8 +472,21 @@ $this->load->view("common/header");
 						'VISIBILITY':m.get('visibility')
 						
 					}));
-					this.get('container').one(".status-block").setHTML(this.get('statusbar').render().get('container'));
-					this.get('container').one(".wall").setHTML(this.get('wall').render().get('container'));
+					this.get('sidebar').one('.members').on('click',function(e){
+						this.set('mainContainer',main);
+ 						con.one(".centercolumn").setHTML(this.getMembersView());
+ 						con.one(".leftbar").one('button.members').addClass('hide');
+ 						con.one(".leftbar").one('button.home').removeClass('hide');
+	 				},this);
+	 				
+	 				this.get('sidebar').one('.home').on('click',function(e){
+	 					con.one(".centercolumn").setHTML(this.get('mainContainer'));
+	 					con.one(".leftbar").one('button.home').addClass('hide');
+	 					con.one(".leftbar").one('button.members').removeClass('hide');
+	 				},this);
+	 				
+					main.one(".status-block").setHTML(this.get('statusbar').render().get('container'));
+					main.one(".wall").setHTML(this.get('wall').render().get('container'));
 					this.get('sidebar').one('#invite').addClass('hide');
 					this.get('sidebar').one('#invite').on('click',function(){
 							var emails;
@@ -510,7 +526,7 @@ $this->load->view("common/header");
 							});
 						
 					},this);
-					this.get('container').one('.join-btn').on('click',function(){
+					main.one('.join-btn').on('click',function(){
 							if(this.get('model').get('visibility')==='closed')
 							{
 								r.set('relationship','requested');
@@ -522,15 +538,15 @@ $this->load->view("common/header");
 							
 							r.save();
 						},this);
-						this.get('container').one('.unjoin-btn').on('click',function(){
+						main.one('.unjoin-btn').on('click',function(){
 							r.set('relationship','');
 							r.save();
 						},this);
-						this.get('container').one('.leave-btn').on('click',function(){
+						main.one('.leave-btn').on('click',function(){
 							r.set('relationship','');
 							r.save();
 						},this);
-						this.get('container').one('.delete-btn').on('click',function(){
+						main.one('.delete-btn').on('click',function(){
 							this.get('model').destroy({remove:true});
 							Y.fire("sidebar:refresh");
 							Y.fire('navigate',{action:"/"});
@@ -542,9 +558,9 @@ $this->load->view("common/header");
 						Y.fire("sidebar:refresh");
 						if(this.get('relation').get('relationship')==="")
 						{
-							this.get('container').one('.join-btn').removeClass('hide');
-							this.get('container').one('.leave-btn').addClass('hide');
-							this.get('container').one('.unjoin-btn').addClass('hide');
+							main.one('.join-btn').removeClass('hide');
+							main.one('.leave-btn').addClass('hide');
+							main.one('.unjoin-btn').addClass('hide');
 							if(m.get('visibility')=='hidden' && this.get('usermodel').get('_id')!=m.get('author_id'))
 							{
 								
@@ -557,25 +573,25 @@ $this->load->view("common/header");
 						else if(this.get('relation').get('relationship')==="member")
 						{
 							
-							this.get('container').one('.join-btn').addClass('hide');
-							this.get('container').one('.leave-btn').addClass('hide');
-							this.get('container').one('.unjoin-btn').removeClass('hide');
+							main.one('.join-btn').addClass('hide');
+							main.one('.leave-btn').addClass('hide');
+							main.one('.unjoin-btn').removeClass('hide');
 							
 						}
 						else if(this.get('relation').get('relationship')==="requested")
 						{
 							
-							this.get('container').one('.join-btn').addClass('hide');
-							this.get('container').one('.leave-btn').removeClass('hide');
+							main.one('.join-btn').addClass('hide');
+							main.one('.leave-btn').removeClass('hide');
 							
 						}
 						if(this.get('model').get('author_id')===window.current_user)
 						{
 							
-							this.get('container').one('.join-btn').addClass('hide');
-							this.get('container').one('.unjoin-btn').addClass('hide');
-							this.get('container').one('.leave-btn').addClass('hide');
-							this.get('container').one('.delete-btn').removeClass('hide'); 
+							main.one('.join-btn').addClass('hide');
+							main.one('.unjoin-btn').addClass('hide');
+							main.one('.leave-btn').addClass('hide');
+							main.one('.delete-btn').removeClass('hide'); 
 							this.get('sidebar').one('#invite').removeClass('hide');
 							Y.io(baseURL+'in/pending_members',{
 								method:'POST',
@@ -635,8 +651,35 @@ $this->load->view("common/header");
 				
 				
 			},
-			getSidebar:function(){
+			getMembersView:function(){
+				var node = Y.Node.create(Y.one("#group-member-list").getHTML());
 				
+				node.one(".member-list").setHTML(Y.BABE.LOADER);
+				Y.io(baseURL+'in/group_members',{
+					method:'POST',
+					data:{
+						group_id:this.get('model').get('_id')
+					},
+					on:{
+						success:function(i,o,a){
+							var response = Y.JSON.parse(o.responseText),model;
+							node.one(".member-list").setHTML('');
+	                        for (var i in response) {
+	                            model = new Y.BABE.UserModel(response[i]);
+	                            uv = new Y.BABE.UserBlockView({
+	                                model: model,
+	                                adminView:true,
+	                                disableRoles:true
+	                            });
+	                            var user = uv.render().get('container');
+	                            node.one(".member-list").append(user);
+	                        }
+						}
+					}
+				});
+				return node;
+			},
+			getSidebar:function(){
 				return this.get('sidebar');
 			},
 			render:function(){
@@ -651,14 +694,12 @@ $this->load->view("common/header");
 				var that= this,con = this.get('container'),group = new Y.BABE.GroupModel({
 						"_id":that.get("group_id")
 					});
-		        con.setHTML(Y.one("#outer").getHTML());
-		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+		        
 				var grp =  new Y.GroupPageView({model:group,usermodel:this.get('usermodel')});
- 				con.one(".leftbar").setHTML(grp.getSidebar());
-				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+ 				
+ 				con.setHTML(grp.render().get('container'));
+ 				
 				
-				
-				con.one(".centercolumn").setContent(grp.render().get('container'));
 				
 				
 				

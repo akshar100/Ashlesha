@@ -12,18 +12,18 @@
 	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Groups <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
-	          <li ><a href="#buttonGroups">Create Groups</a></li>
+	        <!--  <li ><a href="#buttonGroups">Create Groups</a></li> -->
 	          <li><a href="#buttonGroups">Manage Groups</a></li>
-	          <li><a href="#buttonGroups">Group Settings</a></li>
+	       <!--   <li><a href="#buttonGroups">Group Settings</a></li> -->
 	        </ul>
 	      </li>
-	      <li class="dropdown">
+	    <!--  <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Pages <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
 	          <li ><a href="#buttonGroups">Create Page</a></li>
 	          <li><a href="#buttonGroups">Manage Pages</a></li>
 	        </ul>
-	      </li>
+	    </li> -->
 	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Question Bank<b class="caret"></b></a>
 	        <ul class="dropdown-menu">
@@ -34,7 +34,7 @@
 	        </ul>
 	      </li>
 	      <li class='stats'><a  href="/admin/stats">Stats</a></li>
-	      <li class="dropdown">
+	  <!--    <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Settings <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
 	          <li class=""><a href="#navs">Components</a></li>
@@ -42,7 +42,7 @@
 	          <li><a href="#breadcrumbs">Site Parameters</a></li>
 	        </ul>
 	      </li>
-	      <li class='stats'><a  href="/admin/fb">Facebook Campaign</a></li>
+	      <li class='stats'><a  href="/admin/fb">Facebook Campaign</a></li> -->
 	    </ul>
    </div>
    <div class="row-fluid">

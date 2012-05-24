@@ -14,6 +14,45 @@ class IO extends CI_Controller {
 		$data['author_id'] = $this->user->get_current(); 
 		$data['author'] = $this->user->get_username($this->user->get_current()); 
 		$response = $this->dba->create_post($data);
+		if(!empty($data['ownership']) && $data['ownership']!=="public")
+		{
+			$group = $this->dba->get($data['ownership']);
+			if(!empty($group) && isset($group['relations']) && is_array($group['relations']))
+			{
+				foreach($group['relations'] as $user=>$val)
+				{
+					if($user!==$this->user->get_current() && ($val=="member" || $val=="subscribed" || $val=="owner"))
+					{
+						$post = array(
+							"type"=>"notification",
+							"source_user"=>$this->user->get_current(),
+							"notification_action"=>"group_post",
+							"target_user"=>$user,
+							"linked_resource"=>$group['_id'],
+							"secondary_resource"=>$response['data']['_id'],
+							"group_name"=>$group['title'],
+							"send_email"=>true
+						);
+						$this->dba->create_notification($post);
+					}
+				}
+			}
+			if($group['author_id']!==$this->user->get_current()){
+				$post = array(
+							"type"=>"notification",
+							"source_user"=>$this->user->get_current(),
+							"notification_action"=>"group_post",
+							"target_user"=>$group['author_id'],
+							"linked_resource"=>$group['_id'],
+							"secondary_resource"=>$response['data']['_id'],
+							"group_name"=>$group['title'],
+							"send_email"=>true
+						);
+						$this->dba->create_notification($post);
+			}
+			
+			
+		}
 		echo json_encode($response);
 	}
 	
@@ -124,7 +163,9 @@ class IO extends CI_Controller {
 			"get_users_by_role"=>array("map"=>read_file("./application/views/json/get_users_by_roles.js")),
 			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js")),
 			"get_groups_by_allowed_emails"=>array("map"=>read_file("./application/views/json/get_groups_by_allowed_emails.js")),
-			"get_invitations"=>array("map"=>read_file("./application/views/json/get_invitations.js"))
+			"get_invitations"=>array("map"=>read_file("./application/views/json/get_invitations.js")),
+			"get_group_members"=>array("map"=>read_file("./application/views/json/get_group_members.js"))
+			
 		);
 		$doc["lists"] = array(
 			"top_tags"=>read_file("./application/views/json/top_tags_list.js")
@@ -565,7 +606,7 @@ class IO extends CI_Controller {
 		}
 		
 		
-		echo json_encode(array("success"=>true));
+		echo json_encode(array("success"=>true,"group"=>$group['title']));
 	}
 
 	function invite_users()

@@ -6,6 +6,7 @@ class DBA
 		$this->ci = &get_instance();
 		
 		$this->ci->load->library('chill');
+		$this->ci->load->library('user');
 		$this->chill = $this->ci->chill; 
 	}
 	
@@ -818,6 +819,7 @@ class DBA
 	{
 		$post['type'] = 'notification';
 		$post['created_at'] = time();
+		
 		if(empty($post['_id']) or $post['_id']=='null')
 		{
 			unset($post['_id']);
@@ -827,7 +829,10 @@ class DBA
 		{
 			$response = $this->update($post);
 		}
-		
+		if(isset($post['send_email']) && $post['send_email']==True)
+		{
+			$this->ci->user->notify($post);
+		}
 		return $response;
 	}
 	

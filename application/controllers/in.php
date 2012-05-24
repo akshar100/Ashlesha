@@ -367,6 +367,33 @@ class In extends CI_Controller {
 		echo json_encode($output);
 	}
 	
+	function group_members()
+	{
+		$group = $this->input->post('group_id');
+		$rows = $this->dba->getview("get_group_members",array(
+			"key"=>$group
+		));
+		$output = array();
+		//print_r($rows);
+		foreach($rows as $row)
+		{
+			
+			$u = $this->dba->get($row);
+			unset($u['password']);
+			if(!$this->user->has_role('administrator'))
+			{
+				unset($u['email']);
+				unset($u['mobile']);  
+			}
+			
+			unset($u['connections']);
+			unset($u['relationships']);
+			  
+			$output[]= $u;
+		}
+		echo json_encode($output);
+	}
+	
 	function all_users()
 	{
 		$term = $this->input->post('search');

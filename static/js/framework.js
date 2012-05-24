@@ -2625,7 +2625,8 @@ function (Y) {
                         });
                     });
                 }
-                else if (m.get('notification_action') == 'group_add') {
+                else if (m.get('notification_action') == 'group_add' || m.get('notification_action') == 'group_post') {
+                	
                     c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
                     		SOURCE_USER: u.get('fullname'),
                     		GROUP_NAME:m.get('group_name'),
@@ -2639,6 +2640,7 @@ function (Y) {
                         });
                     });
                 }
+                
                 c.one('.close').on('click', function () {
                     m.set('mark_read', 'true');
                     m.save();
@@ -2743,62 +2745,66 @@ function (Y) {
 	                EMAIL:this.get('model').get('email')
 	            }));
 	            
-	            this.get('container').one('.disable').on('click',function(e){
+	            
+	             if(!this.get('disableRoles'))
+	             {
+	             	this.get('container').one('.disable').on('click',function(e){
 	            	this.get('model').set('disabled',true);
 	            	this.get('model').save();
 	            	this.get('container').remove(true);
 	            	e.halt();
-	            },this);
-	             this.get('container').one('.delete').on('click',function(e){
-	             	this.get('model').destroy({
-	             		remove:true
-	             	});
-	             	this.get('container').remove(true);
-	             	e.halt();
-	             },this);
-	             available_roles = Y.APPCONFIG.supported_roles.split("|");
-	             roles = this.get('model').get('roles').split("|");
-	             for(var i in available_roles)
-	             {
-	             	node = Y.Node.create('<button type="button" class="btn btn-mini" rel="'+available_roles[i]+'">'+available_roles[i]+'</button>');
-	             	for(var j in roles)
-	             	{
-	             		if(available_roles[i]==roles[j])
-	             		{
-	             			node.addClass('btn-success');
-	             		}
+	           		 },this);
+		             this.get('container').one('.delete').on('click',function(e){
+		             	this.get('model').destroy({
+		             		remove:true
+		             	});
+		             	this.get('container').remove(true);
+		             	e.halt();
+		             },this);
+		             available_roles = Y.APPCONFIG.supported_roles.split("|");
+		             roles = this.get('model').get('roles').split("|");
+		             for(var i in available_roles)
+		             {
+		             	node = Y.Node.create('<button type="button" class="btn btn-mini" rel="'+available_roles[i]+'">'+available_roles[i]+'</button>');
+		             	for(var j in roles)
+		             	{
+		             		if(available_roles[i]==roles[j])
+		             		{
+		             			node.addClass('btn-success');
+		             		}
+		             	}
+		             	node.on('click',function(e){
+		             		if(e.target.hasClass('btn-success'))
+		             		{
+		             			e.target.removeClass('btn-success');
+		             			roles = Y.Array.filter(roles,function(o){
+		             				if(e.target.getAttribute('rel')==o){ return false;}
+		             				return true;
+		             			});
+		             			that.get('model').set("roles",roles.join("|"));
+		             			that.get('model').save();
+		             			Y.log(roles);
+		             		}
+		             		else
+		             		{
+		             			e.target.addClass('btn-success');
+		             			roles.push(e.target.getAttribute('rel'));
+		             			Y.log(roles);
+		             			roles = Y.Array.unique(roles);
+		             			that.get('model').set("roles",roles.join("|"));
+		             			that.get('model').save();
+		             		}
+		             		
+		             	});
+		             	this.get('container').one('.actions').append("&nbsp;");
+		             	this.get('container').one('.actions').append(node);
 	             	}
-	             	node.on('click',function(e){
-	             		if(e.target.hasClass('btn-success'))
-	             		{
-	             			e.target.removeClass('btn-success');
-	             			roles = Y.Array.filter(roles,function(o){
-	             				if(e.target.getAttribute('rel')==o){ return false;}
-	             				return true;
-	             			});
-	             			that.get('model').set("roles",roles.join("|"));
-	             			that.get('model').save();
-	             			Y.log(roles);
-	             		}
-	             		else
-	             		{
-	             			e.target.addClass('btn-success');
-	             			roles.push(e.target.getAttribute('rel'));
-	             			Y.log(roles);
-	             			roles = Y.Array.unique(roles);
-	             			that.get('model').set("roles",roles.join("|"));
-	             			that.get('model').save();
-	             		}
-	             		
-	             	});
-	             	this.get('container').one('.actions').append("&nbsp;");
-	             	this.get('container').one('.actions').append(node);
+	             
 	             }
-	             if(this.get('model').get('roles'))
+	             else
 	             {
-	             	
-	             	
-	             	
+	             	this.get('container').one('.disable').remove(true);
+	             	this.get('container').one('.delete').remove(true);
 	             }
 			}
            
@@ -2979,7 +2985,7 @@ function (Y) {
         },
         initializer: function () {
             this.get('container').setHTML(Y.one('#admin-view').getHTML());
-            if(!this.ger('usermodel').hasRole('administrator'))
+            if(!this.get('user').hasRole('administrator'))
             {
             	this.get('container').setHTML('You dont have permission to access this content.');
             }
@@ -4138,7 +4144,8 @@ function (Y) {
         SearchView: SearchView,
         AdminView: AdminView,
         AnswerQuizView: AnswerQuizView,
-        CampaignView:CampaignView
+        CampaignView:CampaignView,
+        UserBlockView:UserBlockView
 
     };
 }, '0.0.1', {

@@ -50,6 +50,19 @@
 		
 	</div>
 </script>
+<script type="text/x-template" id="notification-row-group_post">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="alert alert-info">
+		       <button data-dismiss="alert" class="close">×</button>
+		        <div class="row-fluid">
+		        	<img src="<?php echo base_url();?>in/profile_pic/{SOURCE_ID}" class="span1" style="max-width:40px;"/> 
+		        	<div class="span10">{SOURCE_USER} has posted in group {GROUP_NAME}. <button type='button' class='btn btn-primary visit'>Visit group</button> </div></div>
+		      </div>
+		</div>
+		
+	</div>
+</script>
 <script type="text/x-template" id="clear-all-btn">
 	<div class='row-fluid'><div class='span5 well'><button type='button' class='btn btn-primary clear'>Clear All</button></div></div>
 </script>
