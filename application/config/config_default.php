@@ -360,7 +360,7 @@ $config['proxy_ips'] = '';
 $config['global_xss_filtering'] = TRUE;
 
 $config['facebook_appid'] = '{FBAPPID}';
-$config['facebook_appsecret'] = "FBAPP_SECRET";
+$config['facebook_appsecret'] = "{FBAPP_SECRET}";
 
 $config['couchdb_host'] = '{COUCHHOST}'; //Do not provide any port here.
 $config['couchdb_database'] = '{COUCHDB_NAME}';
@@ -370,7 +370,7 @@ $config['language_pack'] = 'default';
 $config['open_id_yahoo'] = FALSE;
 $config['open_id_google'] = FALSE;
 $config['open_id_facebook'] = TRUE; 
-$config['password_salt'] = '$%^#$%^234SDFSA23423TWE342342T4352rfqw34523634tgfdsgvs';
+$config['password_salt'] = '{SALT}';
 $config['from_email'] = 'admin@{SUBDOMAIN}.{DOMAIN}.{TLD}';
 $config['from_name'] = '{SUBDOMAIN}.{DOMAIN}.{TLD}'; 
 
