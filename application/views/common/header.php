@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="<?php echo base_url();?>/static/bootstrap2/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="<?php echo base_url();?>/static/css/override.css">
+    <link rel="stylesheet" href="<?php echo base_url();?>/static/css/editor.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" ></script>
 	<script src="<?php echo base_url();?>/static/bootstrap2/bootstrap/js/bootstrap.js" ></script>
 	

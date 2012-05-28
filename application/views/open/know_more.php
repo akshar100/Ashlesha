@@ -41,9 +41,9 @@ $this->load->view("common/header");
   				<?php echo $this->lang->line('about_text'); ?>
   			
   				<h3><?php echo $this->lang->line('tos_title'); ?></h3><a name="terms"></a>
-<pre>		
-<?php echo $this->lang->line('tos_text'); ?>
-</pre>			
+		
+				<div class="well"><?php echo $this->lang->line('tos_text'); ?></div>
+	
 
 
   		

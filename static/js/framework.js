@@ -663,23 +663,24 @@ function (Y) {
 
     }
     var autoExpand = function (r) {
-
-            r.on("change|keyup", function () {
-                c = Y.Node.create("<div/>");
-                c.addClass("textarea");
-                c.setStyle("width", r.getComputedStyle("width"));
-                c.setStyle("display", "block");
-                c.setContent("<pre>" + r.get("value") + "</pre>");
-                c.setStyle("position", "absolute");
-                c.setStyle("z-index", "-20");
-                Y.one("body").append(c);
-                var targetHeight = c.getComputedStyle('height');
-                r.setStyle("height", targetHeight);
-                c.setStyle("display", "none");
-                c.remove();
-
-            });
-        };
+			var f = function () {
+	                c = Y.Node.create("<div/>");
+	                c.addClass("textarea");
+	                c.setStyle("width", r.getComputedStyle("width"));
+	                c.setStyle("display", "block");
+	                c.setContent("<pre>" + r.get("value") + "</pre>");
+	                c.setStyle("position", "absolute");
+	                c.setStyle("z-index", "-20");
+	                Y.one("body").append(c);
+	                var targetHeight = c.getComputedStyle('height');
+	                r.setStyle("height", targetHeight);
+	                c.setStyle("display", "none");
+	                c.remove();
+	
+	           };
+            r.on(["change","keyup"], f); 
+            f();
+          };
     var ConnectionModel = Y.Base.create('ConnectionModel', Y.Model, [], {
         sync: modelSync,
         idAttribute: '_id',
@@ -998,12 +999,17 @@ function (Y) {
             this.uploadedCallback = config && config.uploadedCallback;
             var viewObj = this;
             if (!Y.one("#imageUploaderModal")) {
-                this.get('container').setContent(Y.one("#image_uploader").getContent());
+                this.get('container').setContent(Y.Lang.sub(Y.one("#image_uploader").getContent(),{
+                	SIZE: this.get('size') || '1024x748'
+                }));
                 Y.one("body").append(this.get('container'));
 
                 Y.one("#upload-img-btn").on("click", function () {
                     var cfg = {
                         method: 'POST',
+                        data:{
+                        	param:this.get('param')
+                        },
                         form: {
                             id: Y.one("#imageuploader"),
                             upload: true
@@ -1025,11 +1031,15 @@ function (Y) {
                                     if (viewObj.uploadedCallback && Y.Lang.isFunction(viewObj.uploadedCallback)) {
                                         viewObj.uploadedCallback(r.image_url);
                                     }
-                                    Y.one(viewObj.display).setContent("<img src='" + baseURL + viewObj.image + "' class='span11 thumbnail'/><p class='pull-right'><a href='#' class='remove'>Remove</a></p>");
-                                    Y.one(viewObj.display).one(".remove").on("click", function (e) {
-                                        e.preventDefault();
-                                        Y.one(viewObj.display).setContent("");
-                                    });
+                                    if(viewObj.display)
+                                    {
+                                    	Y.one(viewObj.display).setContent("<img src='" + baseURL + viewObj.image + "' class='span11 thumbnail'/><p class='pull-right'><a href='#' class='remove'>Remove</a></p>");
+	                                    Y.one(viewObj.display).one(".remove").on("click", function (e) {
+	                                        e.preventDefault();
+	                                        Y.one(viewObj.display).setContent("");
+	                                    }); 
+                                    }
+                                    
                                 } else {
 
                                     Y.one("#image-loading").setContent(Y.Lang.sub(
@@ -1044,7 +1054,7 @@ function (Y) {
                         }
                     };
                     var request = Y.io(baseURL + 'io/image_upload', cfg);
-                });
+                },this);
 
             }
 
@@ -2929,6 +2939,44 @@ function (Y) {
             return this;
         }
     });
+    var SiteSettingsView = Y.Base.create('searchboxview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		var model = new GenericModel({'_id':'language_english'});
+    		this.set('model',model);
+    		this.get('container').setHTML(Y.one("#site-parameters").getHTML());
+    		this.get('container').one('.params').setHTML(Y.BABE.LOADER);
+    		this.get('model').on(['load','save'],function(e){
+    			var data = this.get('model').toJSON();
+    			this.get('container').one('.params').setHTML('');
+    			for(var i in data)
+    			{
+    				if(Y.Array.indexOf(["_id","_rev","author_id","created_at","updated_at"],i.toLowerCase())===-1)
+    				{
+    					this.get('container').one('.params').append(Y.Lang.sub(Y.one('#site-parameters-item').getHTML(),{
+	    					TITLE:i.toUpperCase(),
+	    					VAL:data[i],
+	    					KEY:i
+    					}));
+    					autoExpand(this.get('container').one('.params').one('textarea#'+i)); 
+    					jQuery('#'+this.get('container').one('.params').one('textarea#'+i).generateID()).wysihtml5({
+    						image:false
+    					});
+    				}
+    				
+    			}
+    		},this);
+    		this.get('model').load();
+    		this.get('container').one(".save-btn").on('click',function(){
+    			
+    			 this.get('container').one('.params').all("textarea").each(function(item){
+    			 	this.get('model').set(item.getAttribute('id'),item.get('value'));
+    			 },this);
+    			 this.get('container').one('.params').setHTML(Y.BABE.LOADER);
+    			 this.get('model').save();
+    		},this);
+    	}
+    });
     var AdminView = Y.Base.create('searchboxview', Y.View, [], {
         containerTemplate: '<div/>',
         showStats: function () {
@@ -3028,6 +3076,12 @@ function (Y) {
                 case "invite_users":
                 	this.inviteUsers();
                 	break;
+                case "site_parameters":
+                	this.siteParameters();
+                	break;
+                case "logo":
+                	this.siteLogo();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -3035,6 +3089,10 @@ function (Y) {
                 this.showStats();
             }
             return this;
+        },
+        siteParameters:function(){
+        	var qc = new SiteSettingsView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         inviteUsers:function(){
         	var qc = new InviteUsersView();
@@ -3074,9 +3132,47 @@ function (Y) {
         massMail:function(){
         	var qc = new MassMailView()
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        siteLogo:function(){
+        	var qc = new SiteLogoView()
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
     });
+    var SiteLogoView = Y.Base.create('massmailview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		
+    		this.get('container').setHTML(Y.one('#site-logo-change').getHTML());
+    		var c = this.get('container'),that=this;
+    		this.get('container').one('.img-upload').on('click',function(e){
+    			var displayImage= function(){
+    				c.one('.image_preview').setHTML(Y.Lang.sub('<img src="{IMG}"/>',{IMG:baseURL+that.get('img').getUploadedImage()}));
+    				c.one('.save').removeClass('hide');
+    			};
+    		   this.set("img",new Y.BABE.ImageUploadView({
+                    size:'280x65',
+                    param:'logo',
+                    uploadedCallback:displayImage
+               }));
+               
+    		},this);
+    		c.one('.save').on('click',function(){
+    			Y.io(baseURL+'io/change_logo',{
+    				method:'POST',
+    				data:{
+    					img:that.get('img').getUploadedImage()
+    				},
+    				on:{
+    					success:function(){
+    						window.location.reload(true);
+    					}
+    				}
+    			});
+    		},this);
+    	}
+    });
+    
     var InviteUsersView = Y.Base.create('massmailview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){

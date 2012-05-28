@@ -6,7 +6,7 @@
             </div>
             <div class="modal-body">
               <div class="alert alert-info">
-			    <p><strong>Heads Up!</strong> upload one image with size less than 5 MB and smaller than 1024x748.</p>
+			    <p><strong>Heads Up!</strong> upload one image with size less than 5 MB and smaller than {SIZE}.</p>
 			  </div>
 			  
               <div id="image-loading"></div>

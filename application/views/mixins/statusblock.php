@@ -29,7 +29,7 @@
 			
 			<div class="controls docs-input-sizes">
 				<div class="row-fluid">
-					<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
+					<input type="text" placeholder="<?php echo strip_tags($this->lang->line('tags'));?>" name="tags"  class="span12 autocomplete">
 					<input type="hidden" name="category" value="painpoint"/>
 				
 					<p class="help-block"></p>
@@ -40,7 +40,7 @@
 		<div class="control-group">
 			<div class="controls docs-input-sizes">
 				<div class="row-fluid">
-				<input type="text" placeholder="<?php echo $this->lang->line('categorization');?>" name="sector"  class="span12 ac-sector" disabled="">
+				<input type="text" placeholder="<?php echo strip_tags($this->lang->line('categorization'));?>" name="sector"  class="span12 ac-sector" disabled="">
 				<p class="help-block"></p>
 				</div>
 			</div>
@@ -78,7 +78,7 @@
 					<div class="control-group">
 						<div class="controls">
 							<div class="row-fluid">
-							<input type="text" placeholder="<?php echo $this->lang->line('tags');?>" name="tags"  class="span12 autocomplete">
+							<input type="text" placeholder="<?php echo strip_tags($this->lang->line('tags'));?>" name="tags"  class="span12 autocomplete">
 							<input type="hidden" name="category" value="event"/>
 							<p class="help-block"></p>
 							</div>

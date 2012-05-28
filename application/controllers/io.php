@@ -199,7 +199,27 @@ class IO extends CI_Controller {
 			$doc['configuration'] = read_file("./application/views/json/config/app_configuration.js");
 			$this->dba->update($doc);
 		}
-
+		
+		$doc = $this->dba->get('language_english');
+		if(empty($doc))
+		{
+			
+			$doc = $this->lang->language;
+			$doc['_id'] = 'language_english';
+			$this->dba->create($doc);
+		}
+		else
+		{
+			foreach($this->lang->language as $k=>$v)
+			{
+				if(!isset($doc[$k]))
+				{
+					$doc[$k] = $v;
+				}
+			}
+			$this->dba->update($doc);
+		}
+		
 		
 		echo "updated";
 		
@@ -222,7 +242,17 @@ class IO extends CI_Controller {
 		$config['max_size']	= '5000';
 		$config['max_width']  = '1024';
 		$config['max_height']  = '768';
-
+		
+		$param = $this->input->post('param');
+		if(!empty($param))
+		{
+			switch($param)
+			{
+				case "logo":
+				 	$config['allowed_types'] = 'png';
+				 	break;
+			}
+		}
 		$this->load->library('upload', $config);
 		if ( ! $this->upload->do_upload("fileInput"))
 		{
@@ -392,14 +422,32 @@ class IO extends CI_Controller {
 	
 	function update_model()
 	{
+		
+		$this->load->helper("file");
 		$data = $this->input->post();
-		if($data['type']!='post')
+		
+		if(isset( $data['type']) && $data['type']!='post')
 		{
 			$data['author_id'] = $this->user->get_current();
 		}
 		
 		$data['updated_at'] = time();
 		echo json_encode($this->dba->update($data));
+		
+		if($data['_id']==="language_english")
+		{
+			$content = "<?php";
+			foreach($data as $k=>$v)
+			{
+				
+				if(!in_array($k,array("_id","updated_at","_rev","created_at","author_id")))
+				{
+					$content .= "\n".'$lang[\''.$k.'\']="'.$v.'";';
+				}
+			}
+		
+			write_file("application/language/english/default_lang.php",$content); 
+		}
 	}
 
 	function create_notification()
@@ -630,6 +678,14 @@ class IO extends CI_Controller {
 		}
 		
 	} 
+	
+	function change_logo()
+	{
+		$this->load->helper('file');
+		$image = $this->input->post('img');
+		$file = read_file($image);
+		write_file("static/images/logo.png",$file);
+	}
 }
 
 /* End of file welcome.php */

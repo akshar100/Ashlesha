@@ -65,6 +65,7 @@ $this->load->view("common/header");
 
 
 <script src="<?php echo base_url();?>/static/js/framework.js?<?php echo time();?>"></script>
+<script src="<?php echo base_url();?>/static/js/editor.js?<?php echo time();?>"></script>
 
 <script>
 	

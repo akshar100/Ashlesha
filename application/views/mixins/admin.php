@@ -34,15 +34,16 @@
 	        </ul>
 	      </li>
 	      <li class='stats'><a  href="/admin/stats">Stats</a></li>
-	  <!--    <li class="dropdown">
+	     <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Settings <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
-	          <li class=""><a href="#navs">Components</a></li>
-	          <li class=""><a href="#navbar">Functionality</a></li>
-	          <li><a href="#breadcrumbs">Site Parameters</a></li>
+	         <!-- <li class=""><a href="#navs">Components</a></li>
+	          <li class=""><a href="#navbar">Functionality</a></li> -->
+	          <li><a href="/admin/site_parameters">Site Parameters</a></li>
+	          <li><a href="/admin/logo">Logo Image</a></li>
 	        </ul>
 	      </li>
-	      <li class='stats'><a  href="/admin/fb">Facebook Campaign</a></li> -->
+	    <!--  <li class='stats'><a  href="/admin/fb">Facebook Campaign</a></li> -->
 	    </ul>
    </div>
    <div class="row-fluid">
@@ -604,6 +605,69 @@ United States of America|USA|0.5
 			<div class="pull-right">
 				<button type="button" class="btn btn-primary send">Invite</button>
 			</div>
+		</div>
+	</div>
+</script>
+<script id="site-parameters" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Site Parameters</h3>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 params">
+			
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<button type="button" class="btn btn-primary save-btn">Save</button>
+		</div>
+	</div>
+</script>
+<script id="site-parameters-item" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span12">
+			<label>{TITLE}</label>
+			<div class="row-fluid">
+				<textarea id="{KEY}" class="input span8" rows="1">{VAL}</textarea>
+				<hr/>
+			</div>
+		</div>
+	</div>
+	
+</script>
+<script id="site-logo-change" type="text/x-template">
+	<div class="row-fluid">
+		<div class="span8">
+			<p>&nbsp;</p>
+			<h3>Change Site Logo</h3>
+			<p>&nbsp;</p>
+			<p class="alert alert-info">
+				We recommend that your logo should be 280x65 but for your convinience we will just accept any image you provide us. 
+				Please do not embarrass yourself by putting an ugly image.
+				The only supported format is <stronng>PNG</stronng>.
+			</p>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span8">
+			<div class="thumbnail">
+				<img src="<?php echo base_url();?>static/images/logo.png"/>
+			</div>
+			<p>&nbsp;</p>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span8">
+			
+			<div class="image_preview" style="width:280px;">
+				
+			</div>
+		</div>
+		<div class="span4">
+			<button type="button" class="btn btn-default img-upload">Change Logo</button><button type="button" class="btn btn-primary save hide">Save</button>
 		</div>
 	</div>
 </script>
