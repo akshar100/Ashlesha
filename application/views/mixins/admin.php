@@ -4,9 +4,10 @@
 	      <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Users <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
-	          <li ><a href="/admin/search_user">User Management</a></li>
+	          <li><a href="/admin/additional_profile_info">User Profile Fields</a></li>
+	          <li><a href="/admin/search_user">User Management</a></li>
 	          <li><a href="/admin/mass_mail">Email All</a></li>
-	           <li><a href="/admin/invite_users">Invite</a></li>
+	          <li><a href="/admin/invite_users">Invite</a></li>
 	        </ul>
 	      </li>
 	      <li class="dropdown">
@@ -33,7 +34,7 @@
 	          <li><a href="/admin/manage_quiz">Manage Question List</a></li>
 	        </ul>
 	      </li>
-	      <li class='stats'><a  href="/admin/stats">Stats</a></li>
+	     <li class='stats'><a  href="/admin/stats">Stats</a></li>
 	     <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Settings <b class="caret"></b></a>
 	        <ul class="dropdown-menu">
@@ -669,5 +670,70 @@ United States of America|USA|0.5
 		<div class="span4">
 			<button type="button" class="btn btn-default img-upload">Change Logo</button><button type="button" class="btn btn-primary save hide">Save</button>
 		</div>
+	</div>
+</script>
+<script type="text/x-template" id="profile_fields">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>If you want your users to fill up additional information besides the standard one during signup, add it here. </h3>
+			
+			<hr/>
+			<div class="row-fluid">
+				<div class="span18 alert alert-info">
+					All the additional profile fields are modelled as <strong>Questions</strong>. 
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="well">
+						<button type="button" class="btn btn-default add-text">Textfield</button>
+						<button type="button" class="btn btn-default add-dropdown">Drop Down</button>
+					</div>
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span12 profile-field-area">
+					
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span12">
+					<button type="button" class="btn btn-primary save">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="text-profile-field">
+	<div class="row-fluid"><div class="span12"><h5>Textbox</h5></div></div>
+	<div class="row-fluid">
+		<div data-type="text" class="component border well">
+			<div class="row-fluid">
+				<input type="text" class='label span12' placeholder="type a label for textbox" value="{LABEL}">
+				<input type="hidden" class='type span12' value="text">
+			</div>
+			<div class="row-fluid"><textarea class='expected span12' placeholder="default value if any">{VALUE}</textarea></div>
+			<div class="row-fluid">
+				<div class="span12"><input type="checkbox" class='required'> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
+			</div>
+		</div>
+		
+	</div>
+</script>
+<script type="text/x-template" id="dropdown-profile-field">
+	<div class="row-fluid"><div class="span12"><h5>Combobox</h5></div></div>
+	<div class="row-fluid field">
+		<div data-type="text" class="component border well">
+			<div class="row-fluid">
+				<input type="text" class='label span12' placeholder="type a label for textbox" value="{LABEL}">
+				<input type="hidden" class='type span12' value="dropdown">
+			</div>
+			<div class="row-fluid"><textarea class='expected span12' placeholder="value|label" >{VALUE}</textarea></div>
+			<div class="row-fluid">
+				<div class="span12"><input type="checkbox" class='required'> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
+			</div>
+		</div>
+		
 	</div>
 </script>

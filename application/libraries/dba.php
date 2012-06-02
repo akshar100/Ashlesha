@@ -136,7 +136,7 @@ class DBA
 		return $post;
 	}
 	
-	 function get_profile_pic($user)
+	function get_profile_pic($user)
 	 {
 	 	if(empty($user))
 		{

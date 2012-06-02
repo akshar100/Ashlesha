@@ -13,7 +13,7 @@ $this->load->view("common/header");
 	</div> <!-- /container -->
 </script>
     
- <script type="text/x-template" id="main">
+<script type="text/x-template" id="main">
 	      <div class="content">
 	      	<div class="page-header hide">
 	          <h1><?php echo $this->session->userdata('user_roles');?></h1>

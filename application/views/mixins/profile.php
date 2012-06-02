@@ -118,3 +118,10 @@
 		
 	
 </script>
+<script type="text/x-template" id="extra-profile-fields">
+	<div class="row-fluid">
+		<div class="span12">
+			
+		</div>
+	</div>
+</script>

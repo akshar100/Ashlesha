@@ -686,6 +686,43 @@ class IO extends CI_Controller {
 		$file = read_file($image);
 		write_file("static/images/logo.png",$file);
 	}
+	
+	function get_additional_profile_fields()
+	{
+		$item = $this->dba->get("additional_profile_fields");
+		if(!empty($item))
+		{
+			echo json_encode($item['data']);
+		}
+		else
+		{
+			echo json_encode(array());
+		}
+	}
+	
+	function save_profile_fields()
+	{
+		$data = json_decode($this->input->post('data'));
+		$item = $this->dba->get("additional_profile_fields");
+		
+		if(!empty($item))
+		{
+			$this->dba->update(array(
+				"_rev"=>$item["_rev"],
+				"_id"=>"additional_profile_fields",
+				"data"=>$data
+			));
+		}
+		else
+		{
+			$this->dba->create(array(
+				"_id"=>"additional_profile_fields",
+				"data"=>$data
+			));
+		}
+		
+		
+	}
 }
 
 /* End of file welcome.php */
