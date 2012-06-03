@@ -681,6 +681,73 @@ function (Y) {
             r.on(["change","keyup"], f); 
             f();
           };
+    
+    var FormOnFlyView = Y.Base.create('FormOnFlyView', Y.View, [], {
+    	containerTemplate:'</div>',
+    	labelToName:function(label){
+    		return label.replace(" ","").replace("\"","").toLowerCase();
+    	},
+    	initializer:function(){
+    		
+    		var c=this.get('container'),data=this.get('data'),n;
+    		c.setHTML(Y.Lang.sub(Y.one("#forms-on-fly").getHTML(),{
+    			TITLE:this.get('title') || "TITLE"
+    		}));
+    		Y.log("test");
+    		return;
+    		if(data)
+    		{
+    			for(var f in data)
+    			{
+    				Y.log(data[f]);
+    				var d = data[f];
+    				if(d.type=="text")
+	    			{
+	    				n = Y.Node.create(Y.sub(Y.one('#form-item-text').getHTML(),{
+	    					NAME:this.labelToName(d.label),
+	    					VALUE: d.real_value || d.value,
+	    					LABEL:d.label
+	    				}));
+	    				if(d.required)
+	    				{
+	    					n.one('input').addClass('required');
+	    				}
+	    			}
+	    			if(d.type=="dropdown")
+	    			{
+	    				n = Y.Node.create(Y.sub(Y.one('#form-item-dropdown').getHTML(),{
+	    					NAME:this.labelToName(d.label),
+	    					LABEL:d.label
+	    				}));
+	    				if(d.required)
+	    				{
+	    					n.one('select').addClass('required');
+	    				}
+	    				var values = d.value.split("\n");
+	    				for(var i in values)
+	    				{
+	    					Y.log(values[i]);
+	    					var v = values[i].split("|");
+	    					if(!d.real_value || d.real_value!==v[0])
+	    					{
+	    						n.one("select").append("<option value='"+v[0]+"'>"+v[1]+"</option>");
+	    					}
+	    					else
+	    					{
+	    						n.one("select").append("<option value='"+v[0]+"' selected>"+v[1]+"</option>");
+	    					}
+	    				}
+	    			}
+	    			c.one('.form-area').append(n);
+    			}
+    			
+    		}
+    	},
+    	render:function(){
+    		return this;
+    	}
+    });
+    
     var ConnectionModel = Y.Base.create('ConnectionModel', Y.Model, [], {
         sync: modelSync,
         idAttribute: '_id',
@@ -3082,6 +3149,9 @@ function (Y) {
                 case "logo":
                 	this.siteLogo();
                 	break;
+                case "additional_profile_info":
+                	this.extraProfileDetails();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -3114,7 +3184,7 @@ function (Y) {
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         manageQuiz:function(id){
-        	var qc = new ManageQuizesView()
+        	var qc = new ManageQuizesView();
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         shareQuiz:function(id){
@@ -3126,18 +3196,116 @@ function (Y) {
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         searchUser:function(id){
-        	var qc = new SearchUserView()
+        	var qc = new SearchUserView();
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         massMail:function(){
-        	var qc = new MassMailView()
+        	var qc = new MassMailView();
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         siteLogo:function(){
-        	var qc = new SiteLogoView()
+        	var qc = new SiteLogoView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
+        extraProfileDetails:function(){
+        	var qc = new ExtraProfileView();
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         }
         
+    });
+    var ExtraProfileView = Y.Base.create('massmailview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		var c = this.get('container'),flag=false,that=this;
+    		c.setHTML(Y.one('#profile_fields').getHTML());
+    		c.one('.add-text').on('click',function(){
+    			this.addField({
+    				type:"text",
+    				label:'',
+    				value:''
+    			});
+    		},this);
+    		c.one('.add-dropdown').on('click',function(){
+    			this.addField({
+    				type:"dropdown",
+    				label:'',
+    				value:''
+    			});
+    		},this);
+    		c.one(".save").on('click',function(){
+    			var list=[];
+    			c.all('.component').each(function(item){
+    				if(!item.one('.label').get('value'))
+    				{
+    					flag = true; return;
+    				}
+    				list.push({
+    					type:item.one('.type').get('value'),
+    					label:item.one('.label').get('value'),
+    					value:item.one('.expected').get('value'),
+    					required:item.one('.required').get('checked')
+    				})
+    			});
+    			
+    			if(!flag)
+    			{
+    				Y.io(baseURL+'io/save_profile_fields',{
+    					method:'POST',
+    					data:{
+    						data:Y.JSON.stringify(list)
+    					}
+    					,on:{
+    						success:function(){
+    							showAlert("Success!","The additional field were successfully saved.");
+    						}
+    					}
+    				});
+    			}
+    			else
+    			{
+    				showAlert("Oops!","Please make sure that none of the label fields are empty.");
+    			}
+    		});
+			Y.io(baseURL+'io/get_additional_profile_fields',{
+    					method:'POST',
+    					on:{
+    						success:function(i,o,a){
+    							var list = Y.JSON.parse(o.responseText);
+    							for(var i in list)
+    							{
+    								that.addField(list[i]);
+    							}
+    						}
+    					}
+    				});
+			
+    	},
+    	addField:function(obj){
+    		var c = this.get('container'),n;
+    		
+    		if(obj.type=="text")
+    		{
+    			n = Y.Node.create(Y.Lang.sub(Y.one("#text-profile-field").getHTML(),{
+    				LABEL:obj.label, 
+    				VALUE:obj.value
+    			}));
+    		}
+    		if(obj.type=="dropdown")
+    		{
+    			n = Y.Node.create(Y.Lang.sub(Y.one("#dropdown-profile-field").getHTML(),{
+    				LABEL:obj.label,
+    				VALUE:obj.value
+    			}));
+    		}
+    		if(obj.required)
+    		{
+    			n.one('.required').set('checked','true');
+    		}
+    		n.one('.close-btn').on('click',function(){
+    			n.remove();
+    		});
+    		c.one('.profile-field-area').append(n);
+    	}
     });
     var SiteLogoView = Y.Base.create('massmailview', Y.View, [], {
     	containerTemplate:'<div/>',
@@ -4088,7 +4256,7 @@ function (Y) {
 	var UserModel = Y.BABEUSER.UserModel;
 	var ProfileView = Y.BABEUSER.ProfileView;
 	var SignUpView = Y.BABEUSER.SignUpView;
-	
+
 	var CreatePageView = Y.Base.create('CreatePageView',Y.View,[],{
 		containerTemplate:'<div/>',
 		initializer:function(){
@@ -4098,7 +4266,7 @@ function (Y) {
 			
 		}
 	});
-	var CampaignView = Y.Base.create('CreatePageView',Y.View,[],{
+	var CampaignView = Y.Base.create('CampaignView',Y.View,[],{
 		containerTemplate:'<div/>',
 		initializer:function(){
 			var that = this;
@@ -4241,7 +4409,8 @@ function (Y) {
         AdminView: AdminView,
         AnswerQuizView: AnswerQuizView,
         CampaignView:CampaignView,
-        UserBlockView:UserBlockView
+        UserBlockView:UserBlockView,
+        FormOnFlyView:FormOnFlyView
 
     };
 }, '0.0.1', {
@@ -4421,6 +4590,53 @@ YUI.add('babe-user',function(Y){
                 $(node.getDOMNode()).popover();
             });
             this.updateVals();
+            container.one('button.basic-info').on('click',function(){
+            	if(container.one('.basic-info-row').hasClass('hide'))
+            	{
+            		container.one('.basic-info-row').removeClass('hide')
+            		container.one('button.basic-info').one('i.icon-chevron-down').removeClass("icon-chevron-down").addClass("icon-chevron-up");
+            	}
+            	else
+            	{
+            		container.one('.basic-info-row').addClass('hide');
+            		container.one('button.basic-info').one('i.icon-chevron-up').removeClass("icon-chevron-up").addClass("icon-chevron-down");
+            	}
+            });
+            
+            container.one('button.extra-info').on('click',function(){
+            	if(container.one('.extra-info-row').hasClass('hide'))
+            	{
+            		container.one('.extra-info-row').removeClass('hide')
+            		container.one('button.extra-info').one('i.icon-chevron-down').removeClass("icon-chevron-down").addClass("icon-chevron-up");
+            	}
+            	else
+            	{
+            		container.one('.extra-info-row').addClass('hide');
+            		container.one('button.extra-info').one('i.icon-chevron-up').removeClass("icon-chevron-up").addClass("icon-chevron-down");
+            	}
+            });
+            
+            Y.io(baseURL+'io/user_extra_profiles',{
+            	method:'POST',
+            	on:{
+            		success:function(i,o,a){
+            			var r = Y.JSON.parse(o.responseText);
+            			if(r.success)
+            			{
+            				
+            				container.one(".extra-info-row").setHTML(new Y.BABE.FormOnFlyView({
+            					items:r.data,
+            					save_url:baseURL+'io/save_extra_profile_fields'
+            				}).render().get('container'));
+            				
+            			}
+            			else
+            			{
+            				container.one(".additional-fields").remove(true);
+            			}
+            		}
+            	}
+            });
             if (this.get('model')) {
                 this.get('model').on('change', function () {
                     this.updateVals();

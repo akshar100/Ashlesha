@@ -1,9 +1,22 @@
 
 <script type="text/x-template" id="profileview-template">
 	<div id="profileview">
+		
 		<div class="row-fluid">
 			<div class="span6">
-				<form id="profileviewform" class="form-horizontal" style="padding-left:0px;">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="pull-right">
+							<button type="button" class="btn basic-info"><i class="icon-chevron-down"></i> Basic Info</button>
+							<hr/>
+						</div>
+					</div>
+				</div>
+				<div class="row-fluid basic-info-row hide">
+					<div class="span12">
+						
+					
+					<form id="profileviewform" class="form-horizontal" style="padding-left:0px;">
 			        <fieldset>
 			          <legend><h3>Profile</h3></legend>
 			             <div class="alert alert-info">
@@ -73,6 +86,25 @@
 			          </div>
 			        </fieldset>
 			    </form>
+			    </div>
+			   </div>
+			   <div class="row-fluid additional-fields ">
+					<div class="span12">
+							<div class="row-fluid">
+								<div class="span12">
+									<div class="pull-right">
+										<button type="button" class="btn extra-info"><i class="icon-chevron-down"></i> Additional Fields</button>
+										<hr/>
+									</div>
+								</div>
+							</div>
+							<div class="row-fluid">
+								<div class="span12 extra-fields hide extra-info-row">
+									
+								</div>
+							</div>
+					</div>
+				</div>
 			</div>
 			<div class="span4">
 				<fieldset>
@@ -118,10 +150,34 @@
 		
 	
 </script>
-<script type="text/x-template" id="extra-profile-fields">
+<script type="text/x-template" id="forms-on-fly">
 	<div class="row-fluid">
 		<div class="span12">
-			
+			 <fieldset>
+			          <legend><h3>{TITLE}</h3></legend>
+			             <div class="alert alert-info hide">
+			             	<p><strong>Heads Up!</strong> Tell us more about you.
+		   				 </div>
+			          <hr/>
+			          <div class="form-area">
+			          </div>
+			  </fieldset>
 		</div>
 	</div>
+</script>
+<script type="text/x-template" id="form-item-text">
+	<div class="control-group">
+            <label class="control-label">{LABEL}</label>
+            <div class="controls">
+            	<input type="text" name="{NAME}" value="{VALUE}" class="input"/>
+            </div>
+	</div><!-- /control-group -->
+</script>
+<script type="text/x-template" id="form-item-dropdown">
+	<div class="control-group">
+            <label class="control-label">{LABEL}</label>
+            <div class="controls">
+            	<select type="text" name="{NAME}" class="input"></select>
+            </div>
+	</div><!-- /control-group -->
 </script>

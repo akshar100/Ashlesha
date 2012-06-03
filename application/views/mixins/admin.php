@@ -715,7 +715,7 @@ United States of America|USA|0.5
 			</div>
 			<div class="row-fluid"><textarea class='expected span12' placeholder="default value if any">{VALUE}</textarea></div>
 			<div class="row-fluid">
-				<div class="span12"><input type="checkbox" class='required'> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
+				<div class="span12"><input type="checkbox" class='required' name="required"> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
 			</div>
 		</div>
 		
@@ -731,7 +731,7 @@ United States of America|USA|0.5
 			</div>
 			<div class="row-fluid"><textarea class='expected span12' placeholder="value|label" >{VALUE}</textarea></div>
 			<div class="row-fluid">
-				<div class="span12"><input type="checkbox" class='required'> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
+				<div class="span12"><input type="checkbox" class='required' name="required"> Required <div class="pull-right"><button type="button" class="btn close-btn">close</button></div></div>
 			</div>
 		</div>
 		

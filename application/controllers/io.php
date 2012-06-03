@@ -723,6 +723,29 @@ class IO extends CI_Controller {
 		
 		
 	}
+	
+	function user_extra_profiles()
+	{
+		$item = $this->dba->get("additional_profile_fields");
+		if(empty($item))
+		{
+			echo json_encode(array("success"=>false));
+			exit;	
+		}
+		else
+		{
+			$user = $this->dba->get($this->user->get_current());
+			if(isset($user['extra_fields']))
+			{
+				echo json_encode(array("success"=>true,"data"=>$user['extra_fields']));
+			}
+			else
+			{
+				echo json_encode(array("success"=>true,"data"=>$item['data']));
+			}
+			
+		}
+	}
 }
 
 /* End of file welcome.php */
