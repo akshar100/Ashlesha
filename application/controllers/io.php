@@ -744,11 +744,11 @@ class IO extends CI_Controller {
 					{
 						if($v2['label']==$v1['label'])
 						{
-							$v2['value'] = $v1['value']; 
+							$v1['real_value'] = $v2['real_value']; 
 						}
 					}
 				}
-				echo json_encode(array("success"=>true,"data"=>$user['extra_fields']));
+				echo json_encode(array("success"=>true,"data"=>$item['data']));
 			}
 			else
 			{

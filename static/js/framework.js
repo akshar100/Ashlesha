@@ -3333,7 +3333,7 @@ function (Y) {
 			
     	},
     	addField:function(obj){
-    		var c = this.get('container'),n;
+    		var c = this.get('container'),n,id;
     		
     		if(obj.type=="text")
     		{
@@ -3349,14 +3349,17 @@ function (Y) {
     				VALUE:obj.value
     			}));
     		}
+    		n.addClass('hello');
     		if(obj.required)
     		{
     			n.one('.required').set('checked','true');
     		}
     		n.one('.close-btn').on('click',function(){
-    			n.remove();
+    			n.remove(true);
     		});
     		c.one('.profile-field-area').append(n);
+    		
+    		
     	}
     });
     var SiteLogoView = Y.Base.create('massmailview', Y.View, [], {

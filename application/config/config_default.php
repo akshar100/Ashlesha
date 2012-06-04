@@ -390,6 +390,7 @@ $config['supported_roles'] = 'user|administrator'; //This is besides user and ad
 $config['default_role'] = 'user';
 $config['classification'] = "Good|Bad|Worse"; 
 $config['sign_up_enabled'] = TRUE;
+$config['force_profile_details'] = TRUE;
 /* End of file config.php */
 /* Location: ./application/config/config.php */
 

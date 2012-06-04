@@ -38,7 +38,8 @@ class Welcome extends CI_Controller {
 				'notifications_enabled' =>$this->config->item('notifications_enabled'),
 				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled'),
 				'supported_roles'=>$this->config->item('supported_roles'),
-				'sign_up_enabled'=>$this->config->item('sign_up_enabled')
+				'sign_up_enabled'=>$this->config->item('sign_up_enabled'),
+				'force_profile_details'=>$this->config->item('force_profile_details')
 			);
 		if(empty($user))
 		{

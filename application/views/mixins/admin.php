@@ -706,6 +706,7 @@ United States of America|USA|0.5
 	</div>
 </script>
 <script type="text/x-template" id="text-profile-field">
+	<div>
 	<div class="row-fluid"><div class="span12"><h5>Textbox</h5></div></div>
 	<div class="row-fluid">
 		<div data-type="text" class="component border well">
@@ -720,8 +721,10 @@ United States of America|USA|0.5
 		</div>
 		
 	</div>
+	</div>
 </script>
 <script type="text/x-template" id="dropdown-profile-field">
+	<div>
 	<div class="row-fluid"><div class="span12"><h5>Combobox</h5></div></div>
 	<div class="row-fluid field">
 		<div data-type="text" class="component border well">
@@ -735,5 +738,6 @@ United States of America|USA|0.5
 			</div>
 		</div>
 		
+	</div>
 	</div>
 </script>
