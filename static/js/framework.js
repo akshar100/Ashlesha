@@ -712,6 +712,7 @@ function (Y) {
 	    					n.one('input').addClass('required');
 	    				}
 	    				n.one('input').addClass('component');
+	    				n.one('input').setAttribute("rel",d.label);
 	    			}
 	    			if(d.type=="dropdown")
 	    			{
@@ -727,7 +728,7 @@ function (Y) {
 	    				var values = d.value.split("\n");
 	    				for(var i in values)
 	    				{
-	    					Y.log(values[i]);
+	    					
 	    					var v = values[i].split("|");
 	    					if(!d.real_value || d.real_value!==v[0])
 	    					{
@@ -738,8 +739,9 @@ function (Y) {
 	    						n.one("select").append("<option value='"+v[0]+"' selected>"+v[1]+"</option>");
 	    					}
 	    				}
+	    				n.one('select').setAttribute("rel",d.label);
 	    			}
-	    			n.setAttribute("rel",d.label);
+	    			
 	    			
 	    			c.one('.form-area').append(n);
     			}
@@ -1978,7 +1980,7 @@ function (Y) {
                     } else {
                         showAlert("Done!", "Your group is created!");
 						Y.fire("sidebar:refresh");
-						Y.log(g.toJSON()); 
+						
 						Y.fire('navigate',{
 							action:'/group/'+g.get('title')+'/'+g.get('_id')
 						})
@@ -2912,13 +2914,13 @@ function (Y) {
 		             			});
 		             			that.get('model').set("roles",roles.join("|"));
 		             			that.get('model').save();
-		             			Y.log(roles);
+		             			
 		             		}
 		             		else
 		             		{
 		             			e.target.addClass('btn-success');
 		             			roles.push(e.target.getAttribute('rel'));
-		             			Y.log(roles);
+		             			
 		             			roles = Y.Array.unique(roles);
 		             			that.get('model').set("roles",roles.join("|"));
 		             			that.get('model').save();
@@ -4118,7 +4120,7 @@ function (Y) {
     		return this;
     	},
     	getMarkup:function(config){
-    		Y.log(config['_id']);
+    		
     		var markup = '',node,expected,items=config.data.items;
     		for(var i in items)
     		{
@@ -4599,6 +4601,9 @@ YUI.add('babe-user',function(Y){
             },
             roles:{
             	value:'user|student'
+            },
+            profile_complete:{
+            	value:''
             }
         }
     });

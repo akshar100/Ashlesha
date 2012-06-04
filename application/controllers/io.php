@@ -738,13 +738,15 @@ class IO extends CI_Controller {
 			if(isset($user['extra_fields']))
 			{
 				$fields = $item['data'];
+				
 				foreach($item['data'] as &$v1)
 				{
 					foreach($user['extra_fields'] as &$v2)
 					{
 						if($v2['label']==$v1['label'])
 						{
-							$v1['real_value'] = $v2['real_value']; 
+							$v1['real_value'] = $v2['real_value'];
+							
 						}
 					}
 				}
@@ -762,6 +764,7 @@ class IO extends CI_Controller {
 	{
 		$data = json_decode($this->input->post('data'));
 		$user = $this->dba->get($this->user->get_current());
+		$user['profile_complete'] = TRUE;
 		$user['extra_fields'] = $data; 
 		$this->dba->update($user);
 		echo json_encode(array(

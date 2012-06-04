@@ -1031,8 +1031,15 @@ $this->load->view("common/header");
 		});
 		AppUI.render().dispatch(); //.save('/');
 		Y.loadTemplate("messagebox",function(){}); 
-		
-
+		<?php
+			$user = $this->dba->get($this->user->get_current());
+			if($this->config->item('force_profile_details')==TRUE && (!isset($user['profile_complete']) || $user['profile_complete']!=TRUE))
+			{
+				?>
+				AppUI.navigate('/me');
+				<?php
+			}
+		?>
 	});
 </script>    
     
