@@ -737,6 +737,17 @@ class IO extends CI_Controller {
 			$user = $this->dba->get($this->user->get_current());
 			if(isset($user['extra_fields']))
 			{
+				$fields = $item['data'];
+				foreach($item['data'] as &$v1)
+				{
+					foreach($user['extra_fields'] as &$v2)
+					{
+						if($v2['label']==$v1['label'])
+						{
+							$v2['value'] = $v1['value']; 
+						}
+					}
+				}
 				echo json_encode(array("success"=>true,"data"=>$user['extra_fields']));
 			}
 			else
@@ -745,6 +756,17 @@ class IO extends CI_Controller {
 			}
 			
 		}
+	}
+	
+	function save_extra_profile_fields()
+	{
+		$data = json_decode($this->input->post('data'));
+		$user = $this->dba->get($this->user->get_current());
+		$user['extra_fields'] = $data; 
+		$this->dba->update($user);
+		echo json_encode(array(
+			"success"=>true
+		));
 	}
 }
 

@@ -93,13 +93,13 @@
 							<div class="row-fluid">
 								<div class="span12">
 									<div class="pull-right">
-										<button type="button" class="btn extra-info"><i class="icon-chevron-down"></i> Additional Fields</button>
+										<button type="button" class="btn extra-info"><i class="icon-chevron-up"></i> Additional Fields</button>
 										<hr/>
 									</div>
 								</div>
 							</div>
 							<div class="row-fluid">
-								<div class="span12 extra-fields hide extra-info-row">
+								<div class="span12 extra-fields extra-info-row">
 									
 								</div>
 							</div>
@@ -158,8 +158,10 @@
 			             <div class="alert alert-info hide">
 			             	<p><strong>Heads Up!</strong> Tell us more about you.
 		   				 </div>
-			          <hr/>
 			          <div class="form-area">
+			          </div>
+			          <div class="form-actions">
+			            <button type="submit" value="Save" class="btn btn-primary save">Save</button>
 			          </div>
 			  </fieldset>
 		</div>

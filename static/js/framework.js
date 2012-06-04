@@ -683,27 +683,26 @@ function (Y) {
           };
     
     var FormOnFlyView = Y.Base.create('FormOnFlyView', Y.View, [], {
-    	containerTemplate:'</div>',
+    	containerTemplate:'<div/>',
     	labelToName:function(label){
-    		return label.replace(" ","").replace("\"","").toLowerCase();
+    		return label.replace(" ","").toLowerCase();
     	},
     	initializer:function(){
     		
-    		var c=this.get('container'),data=this.get('data'),n;
+    		var c=this.get('container'),data=this.get('items'),n;
     		c.setHTML(Y.Lang.sub(Y.one("#forms-on-fly").getHTML(),{
     			TITLE:this.get('title') || "TITLE"
     		}));
-    		Y.log("test");
-    		return;
+    		
     		if(data)
     		{
     			for(var f in data)
     			{
-    				Y.log(data[f]);
+    				
     				var d = data[f];
     				if(d.type=="text")
 	    			{
-	    				n = Y.Node.create(Y.sub(Y.one('#form-item-text').getHTML(),{
+	    				n = Y.Node.create(Y.Lang.sub(Y.one('#form-item-text').getHTML(),{
 	    					NAME:this.labelToName(d.label),
 	    					VALUE: d.real_value || d.value,
 	    					LABEL:d.label
@@ -712,10 +711,11 @@ function (Y) {
 	    				{
 	    					n.one('input').addClass('required');
 	    				}
+	    				n.one('input').addClass('component');
 	    			}
 	    			if(d.type=="dropdown")
 	    			{
-	    				n = Y.Node.create(Y.sub(Y.one('#form-item-dropdown').getHTML(),{
+	    				n = Y.Node.create(Y.Lang.sub(Y.one('#form-item-dropdown').getHTML(),{
 	    					NAME:this.labelToName(d.label),
 	    					LABEL:d.label
 	    				}));
@@ -723,6 +723,7 @@ function (Y) {
 	    				{
 	    					n.one('select').addClass('required');
 	    				}
+	    				n.one('select').addClass('component');
 	    				var values = d.value.split("\n");
 	    				for(var i in values)
 	    				{
@@ -738,9 +739,60 @@ function (Y) {
 	    					}
 	    				}
 	    			}
+	    			n.setAttribute("rel",d.label);
+	    			
 	    			c.one('.form-area').append(n);
     			}
-    			
+    			c.one(".save").on('click',function(){
+    				var data = [],flag=false;
+    				
+    				c.all(".control-group").removeClass('error');
+    				c.all('.component').each(function(item){
+    					
+    					if(item.hasClass('required') && !item.get("value"))
+    					{
+    						item.ancestor(".control-group").addClass("error");
+    						item.focus();
+    						flag=true; 
+    						return;
+    					}
+    					if(item.get("tagName")=="INPUT")
+    					{
+    						data.push({
+    							type:'text',
+    							real_value:item.get("value"),
+    							label:item.getAttribute("rel")
+    						});
+    					}
+    					if(item.get("tagName")=="SELECT")
+    					{
+    						data.push({
+    							type:'dropdown',
+    							real_value:item.get("value"),
+    							label:item.getAttribute("rel")
+    						});
+    					}
+    				});
+    				if(!flag)
+    				{
+    					Y.io(this.get("save_url"),{
+    						method:'POST',
+    						data:{
+    							data:Y.JSON.stringify(data)
+    						},
+    						on:{
+    							success:function(i,o,a){
+    								var r = Y.JSON.parse(o.responseText);
+    								if(r.success)
+    								{
+    									showAlert("Success","Saved successfully!");
+    								}
+    	
+    							}
+    						}
+    					})
+    				}
+    			},this);
     		}
     	},
     	render:function(){
@@ -4623,11 +4675,12 @@ YUI.add('babe-user',function(Y){
             			var r = Y.JSON.parse(o.responseText);
             			if(r.success)
             			{
-            				
-            				container.one(".extra-info-row").setHTML(new Y.BABE.FormOnFlyView({
+            				var f = new Y.BABE.FormOnFlyView({
             					items:r.data,
-            					save_url:baseURL+'io/save_extra_profile_fields'
-            				}).render().get('container'));
+            					save_url:baseURL+'io/save_extra_profile_fields',
+            					title:"Detailed Profile"
+            				});
+            				container.one(".extra-info-row").setHTML(f.render().get('container'));
             				
             			}
             			else
