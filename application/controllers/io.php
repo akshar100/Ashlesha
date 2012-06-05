@@ -612,7 +612,7 @@ class IO extends CI_Controller {
 			{
 				
 				$user = $this->dba->getview("users_by_email",array("key"=>strtolower(trim($email))));
-				
+				$group = $this->dba->get($request['group_id']);
 				
 				if(!empty($user[0]) &&!empty($user))
 				{
@@ -632,6 +632,7 @@ class IO extends CI_Controller {
 				}
 				else
 				{
+					$group = $this->dba->get($request['group_id']);
 					if(!empty($group['allowed_emails']))
 					{
 						$group['allowed_emails'][]=$email;
@@ -641,7 +642,8 @@ class IO extends CI_Controller {
 					{
 						$group['allowed_emails'] = array($email);
 					}
-					$group = $this->dba->update($group);
+					
+					
 					$group = $this->dba->get($request['group_id']);
 					
 					$this->user->invite_to_group($email,$group,$this->user->get_current());
