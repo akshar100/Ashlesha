@@ -231,7 +231,9 @@ class In extends CI_Controller {
 		$user = $this->facebook->getUser();
 		if(empty($user))
 		{
-			header("Location: ".$this->facebook->getLoginUrl());
+			header("Location: ".$this->facebook->getLoginUrl(array(
+			 'scope' => 'read_stream, friends_likes, email',
+			)));
 		}
 		else
 		{
