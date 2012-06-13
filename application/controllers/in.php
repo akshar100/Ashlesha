@@ -231,13 +231,23 @@ class In extends CI_Controller {
 		$user = $this->facebook->getUser();
 		if(empty($user))
 		{
-			header("Location: ".$this->facebook->getLoginUrl());
+			header("Location: ".$this->facebook->getLoginUrl(array(
+				"email"
+			)));
 		}
 		else
 		{
 			
 			$user_profile = $this->facebook->api('/me','GET');
-       		$user = @$this->user->get_by_email($user_profile['email']);
+			
+			if(isset($user_profile['email']))
+			{
+				$user = $this->user->get_by_email($user_profile['email']);
+			}
+			else
+			{
+				$user = "";
+			}
 			if(!empty($user) && !empty($user['_id']) && isset($user_profile['email'])) //Make sure the FB profile has email in it.
 			{
 				if(isset($user['disabled']) && $user['disabled']!==false)
