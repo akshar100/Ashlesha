@@ -11,6 +11,11 @@ $this->load->view("common/header");
 	<div id="maincontainer" class="container-fluid">
 		
 	</div> <!-- /container -->
+	
+
+   
+
+
 </script>
     
 <script type="text/x-template" id="main">
@@ -1072,6 +1077,9 @@ $this->load->view("common/header");
    }(document));
 </script>
 -->
+ <div class="chatbar navbar navbar-fixed-bottom">
+			Test
+ </div>
 </body>
 </html>
 

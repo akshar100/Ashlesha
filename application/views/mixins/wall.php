@@ -113,8 +113,9 @@
 				
 			</div>
 		</div>
-		<div class="row-fluid"><div class="span12">
-			<blockquote><p>{TEXT}</p><small>{AUTHOR}</small></blockquote></div>
+		<div class="row-fluid"><div class="span11">
+			<blockquote><p>{TEXT}</p><div class="postBody"></div><small>{AUTHOR}</small></blockquote></div>
+			
 			<div class="row-fluid"><div class="span1"></div><div class="metapost span11 "><span class="toolbar"></span></div></div>
 		</div>
 		</div>
