@@ -232,7 +232,9 @@ class In extends CI_Controller {
 		if(empty($user))
 		{
 			header("Location: ".$this->facebook->getLoginUrl(array(
-				"email"
+
+			 'scope' => 'read_stream, friends_likes, email',
+
 			)));
 		}
 		else
