@@ -133,6 +133,7 @@ class DBA
 		$post['dislikes'] = count($this->get_dislikes($post["_id"]));
 		$post['like'] = $this->is_liked($post["_id"],$user);
 		$post['dislike'] = $this->is_disliked($post["_id"],$user);
+		unset($post['relations']);
 		return $post;
 	}
 	
@@ -829,10 +830,12 @@ class DBA
 		{
 			$response = $this->update($post);
 		}
-		if(isset($post['send_email']) && $post['send_email']==True)
+		if(!empty($post['send_mail'])) //when do we decide to send email ? when the 
 		{
 			$this->ci->user->notify($post);
+			
 		}
+		
 		return $response;
 	}
 	

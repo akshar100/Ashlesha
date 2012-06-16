@@ -39,10 +39,12 @@ class Welcome extends CI_Controller {
 				'push_notifications_enabled'=>$this->config->item('push_notifications_enabled'),
 				'supported_roles'=>$this->config->item('supported_roles'),
 				'sign_up_enabled'=>$this->config->item('sign_up_enabled'),
-				'force_profile_details'=>$this->config->item('force_profile_details')
+				'force_profile_details'=>$this->config->item('force_profile_details'),
+				'pages_enabled'=>$this->config->item('pages_enabled')
 			);
 		if(empty($user))
 		{
+			$this->session->set_userdata("redirect_url",$this->uri->uri_string);
 			$this->load->view('homepage',array(
 				'config'=>$config
 			));
@@ -51,6 +53,13 @@ class Welcome extends CI_Controller {
 		{
 			
 			$this->user->force_sign_in($this->user->get_current());
+			if($this->session->userdata("redirect_url")!=="")
+			{
+				$redirect = $this->session->userdata("redirect_url");
+				$this->session->set_userdata("redirect_url","");
+				redirect($this->session->userdata($redirect));
+				exit;
+			}
 			$this->load->view('welcome_message',array(
 				'config'=>$config
 			));

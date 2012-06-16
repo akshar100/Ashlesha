@@ -1,6 +1,7 @@
 YUI.add('babe', 
 function (Y) {
     window.Y = Y;
+    Y.kLINK_DETECTION_REGEX = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
     var cache = new Y.CacheOffline({
         max: 200
     });
@@ -16,10 +17,12 @@ function (Y) {
 						});
 		}
     function genericModelSync(action, options, callback){
+    		
         	var model = this;
         	if(action=='read'){
         		if(model.get('_id'))
         		{
+        			
         			Y.io(baseURL+'io/get_model',{
         			method:'POST',
         			data:model.toJSON(),
@@ -681,7 +684,14 @@ function (Y) {
             r.on(["change","keyup"], f); 
             f();
           };
-    
+     var GenericModel = Y.Base.create('GenericModel', Y.Model, [], {
+        sync: genericModelSync
+        ,idAttribute:'_id'
+      });
+    var GenericList = Y.Base.create('groupList', Y.ModelList, [], {
+    	sync:genericListSync,
+    	model:GenericModel
+    });
     var FormOnFlyView = Y.Base.create('FormOnFlyView', Y.View, [], {
     	containerTemplate:'<div/>',
     	labelToName:function(label){
@@ -788,6 +798,9 @@ function (Y) {
     								if(r.success)
     								{
     									showAlert("Success","Saved successfully!");
+    									Y.fire("navigate",{
+    										action:'/'
+    									});
     								}
     	
     							}
@@ -1022,30 +1035,38 @@ function (Y) {
 
             this.get('container').one("#connect_user").on('click', function () {
 
-                if (this.connection.requestedFriend()) {
-                    var notify = new NotificationModel({
-                        source_user: window.current_user,
-                        target_user: this.get('model').get('_id'),
-                        notification_action: 'friend_request',
-                        linked_resource: '',
-                        mark_read: ''
-                    });
-                    notify.save();
-                }
-                if (this.connection.requestPending()) {
-
+                var old = this.connection.get('source_connects_target');
+                this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
+                
+                Y.log(this.connection.get('source_connects_target'),this.connection.get('target_connects_source'));
+                
+                 if (this.connection.get('source_connects_target') && this.connection.get('target_connects_source')) {
                     var notify = new NotificationModel({
                         source_user: window.current_user,
                         target_user: this.get('model').get('_id'),
                         notification_action: 'friend',
                         linked_resource: '',
-                        mark_read: ''
+                        mark_read: '',
+                        send_mail:true,
+                        
+                    });
+                    notify.save();
+                }
+                
+                if (this.connection.get('source_connects_target') && !this.connection.get('target_connects_source')) {
+
+                    var notify = new NotificationModel({
+                        source_user: window.current_user,
+                        target_user: this.get('model').get('_id'),
+                        notification_action: 'friend_request',
+                        linked_resource: '',
+                        mark_read: '',
+                        send_mail:true
                     });
                     notify.save();
 
 
                 }
-                this.connection.set('source_connects_target', !this.connection.get('source_connects_target'));
                 this.connection.save();
 
             }, this);
@@ -1059,7 +1080,8 @@ function (Y) {
                         target_user: this.get('model').get('_id'),
                         notification_action: 'follow',
                         linked_resource: '',
-                        mark_read: ''
+                        mark_read: '',
+                        send_mail:true
                     });
                     notify.save();
                 }
@@ -1329,11 +1351,44 @@ function (Y) {
                 this.get('container').addClass('hide');
             }, this);
         },
+        appendVideos:function(videos){
+        	videos = Y.Array.unique(videos);
+        	for(var v in videos)
+        	{
+        		this.get('container').one(".postBody").append(new Y.YouTubeView({
+        			v_id:videos[v]
+        		}).render().get('container'));
+        	}	
+        },
         processURLs: function (text) {
 
-            var that = this;
-            var m = this.get('model');
+            var that = this, m = this.get('model'),urls,videos=[],qstrings,param;
+           	
             if (text.match(/https?:\/\//)) {
+            	try{
+            	urls = text.match(Y.kLINK_DETECTION_REGEX);
+            	for(var i in urls)
+            	{
+            		if(urls[i].match('www.youtube.com'))
+            		{
+            			qstrings = urls[i].split("?").pop().split("&");
+            			for(var j in qstrings)
+            			{
+            				param = qstrings[i].split("=");
+            				
+            				if(param.length==2)
+            				{
+            					if(param[0]=="v")
+            					{
+            						videos.push(param[1]);
+            					}
+            				}
+            			}
+            		}
+            	}
+            	}catch(ex){
+            		Y.log(ex);
+            	}
                 Y.io(baseURL + "in/url_encode", {
                     method: 'POST',
                     data: {
@@ -1342,14 +1397,25 @@ function (Y) {
                     on: {
                         success: function (i, o, a) {
 
-                            that.render({
+                            if(videos && videos.length>0)
+                            {
+                            	that.render({
+                                	text: o.responseText,
+                                	videos:videos
+                            	});
+                            }
+                            else
+                            {
+                            	that.render({
                                 text: o.responseText
-                            });
+                            	});
+                            }
                         }
                     }
 
                 });
             }
+           
 
         },
         addImages: function () {
@@ -1453,7 +1519,14 @@ function (Y) {
 
                     if (err) {
                         
-                        showAlert("Ooops!", err.error);
+                        if(err.error)
+                        {
+                        	showAlert("Ooops!", err.error);
+                        }
+                        else
+                        {
+                        	showAlert("Ooops!", "You can not edit this.");
+                        }
                     } else {
                         showAlert("Done!", "Your changes are saved successfully!");
                         viewObj.render();
@@ -1622,16 +1695,17 @@ function (Y) {
 
             if (this.get('model').get("type") == "post") {
 
-
-
-                this.get('container').setContent(Y.Lang.sub(this.template, {
+                this.get('container').setHTML(Y.Lang.sub(this.template, {
                     TEXT: (config && config.text) || this.get('model').get("text"),
                     AUTHOR: this.get('model').get("author"),
                     IMG: "http://placehold.it/40x40",
                     ID: this.get('model').get("author_id")
                 }));
             }
-
+			if(config && config.videos)
+			{
+				this.appendVideos(config.videos)
+			}
             this.sanitize(config);
             return this;
         }
@@ -2316,7 +2390,7 @@ function (Y) {
 
                             }
                         });
-                    }, 5000);
+                    }, 100000);
                     this.on('destroy', function () {
                         clearInterval(sr);
                     });
@@ -2574,7 +2648,7 @@ function (Y) {
                 }));
 
                 that.get('container').append(new SideBarMenuView().render().get('container'));
-
+				
 
             });
         },
@@ -2774,6 +2848,7 @@ function (Y) {
                 
                 c.one('.close').on('click', function () {
                     m.set('mark_read', 'true');
+                    m.set('send_mail', '');
                     m.save();
                 });
             });
@@ -2847,10 +2922,28 @@ function (Y) {
     var UserBlockView = Y.Base.create('searchboxview', Y.View, [], {
         containerTemplate: '<div/>',
         initializer: function () {
-
+			if(!this.get('model')){ //if model is not provided look for the id
+				this.set('model',new UserModel({
+					'id':this.get('user_id'),
+					'_id':this.get('user_id')
+				}));
+				this.get('model').on('load',this.update,this);
+				this.get('model').load();
+			}
+			this.update();
         },
-        render: function () {
-			var available_roles,roles,node,that=this;
+        update:function(){
+        	
+        	var available_roles,roles,node,that=this;
+        	 if(!this.get('model').get('username')){
+	        		this.get('container').addClass('hide');
+	        		
+        	 }
+        	 else
+        	 {
+        	 	this.get('container').removeClass('hide');
+        	 }
+        	
 			if(!this.get('adminView'))
 			{
 				 this.get('container').setHTML(Y.Lang.sub(Y.one('#user_block').getHTML(), {
@@ -2862,6 +2955,7 @@ function (Y) {
 	                GENDER: this.get('model').get('gender'),
 	                USERID: this.get('model').get('_id')
 	            }));
+	           
 			}
 			else
 			{
@@ -2938,8 +3032,6 @@ function (Y) {
 	             	this.get('container').one('.delete').remove(true);
 	             }
 			}
-           
-            return this;
         }
     });
     var SearchBoxView = Y.Base.create('searchboxview', Y.View, [], {
@@ -3063,7 +3155,7 @@ function (Y) {
     var SiteSettingsView = Y.Base.create('searchboxview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){
-    		var model = new GenericModel({'_id':'language_english'});
+    		var model = new GenericModel({'_id':'language_english','id':'language_english'});
     		this.set('model',model);
     		this.get('container').setHTML(Y.one("#site-parameters").getHTML());
     		this.get('container').one('.params').setHTML(Y.BABE.LOADER);
@@ -3081,7 +3173,9 @@ function (Y) {
     					}));
     					autoExpand(this.get('container').one('.params').one('textarea#'+i)); 
     					jQuery('#'+this.get('container').one('.params').one('textarea#'+i).generateID()).wysihtml5({
-    						image:false
+    						image:false,
+    						link:false,
+    						html:true
     					});
     				}
     				
@@ -3096,6 +3190,9 @@ function (Y) {
     			 this.get('container').one('.params').setHTML(Y.BABE.LOADER);
     			 this.get('model').save();
     		},this);
+    	},
+    	render:function(){
+    		return this;
     	}
     });
     var AdminView = Y.Base.create('searchboxview', Y.View, [], {
@@ -3152,7 +3249,8 @@ function (Y) {
 
 
         },
-        initializer: function () {
+        initializer: function (config) {
+        	Y.log(config);
             this.get('container').setHTML(Y.one('#admin-view').getHTML());
             if(!this.get('user').hasRole('administrator'))
             {
@@ -3206,6 +3304,15 @@ function (Y) {
                 case "additional_profile_info":
                 	this.extraProfileDetails();
                 	break;
+                case "create_page":
+                	this.createPage();
+                	break;
+                case "page":
+                	this.createPage(this.get("page_id"));
+                	break; 
+                case "manage_pages":
+                	this.managePages();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -3214,8 +3321,21 @@ function (Y) {
             }
             return this;
         },
+        createPage:function(page){
+        	Y.log("page_id"+page);
+        	var qc = new CreatePageView({
+        		page_id:page
+        	});
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+	    	qc.fire("rendered");
+        },
+        managePages:function(){
+        	var qc = new ManagePagesView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+        },
         siteParameters:function(){
         	var qc = new SiteSettingsView();
+        	
 	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
         },
         inviteUsers:function(){
@@ -3267,6 +3387,149 @@ function (Y) {
         }
         
     });
+    var PageList = Y.Base.create('pagelist', Y.ModelList, [], {
+            sync: function(action, options, callback){
+            	Y.io(baseURL+'in/pagelist',{
+            		method:'POST',
+            		on:{
+            			complete:function(i,o,a){
+            				callback(null,Y.JSON.parse(o.responseText))
+            			}
+            		}
+            	});
+            },
+           model:GenericModel
+
+       });
+    var ManagePagesView = Y.Base.create('managepagesview', Y.View, [], {
+    	 containerTemplate:'<div/>',
+    	 initializer:function(){
+    	 	var list = new PageList(),c=this.get('container');
+    	 	this.get('container').setHTML(Y.one('#manage-pages').getHTML());
+    	 	list.on('load',function(){
+    	 		c.one('.pagelist').setHTML('');
+    	 		var that = this;
+    	 		list.each(function(item){
+    	 			that.append(item);
+    	 			item.on('change',function(){
+    	 				list.load();
+    	 			});
+    	 		});
+    	 	},this);
+    	 	list.load();
+    	 	this.set('list',list);
+    	 },
+    	 render:function(){ 
+    	 	return this;
+    	 },
+    	 append:function(item)
+    	 {
+    	 	var c=this.get('container'),node=Y.Node.create(Y.Lang.sub(Y.one('#page-row').getHTML(),{
+    	 		TITLE:item.get('title')
+    	 	}));
+    	 	
+    	 	if(item.get('published') && (item.get('published')=="true" || item.get('published')==true) )
+    	 	{
+    	 		node.one('.publish').addClass('hide');
+    	 		node.one('.unpublish').removeClass('hide');
+    	 	}
+    	 	else
+    	 	{
+    	 		node.one('.publish').removeClass('hide');
+    	 		node.one('.unpublish').addClass('hide');
+    	 	}
+    	 	node.one('.view').on('click',function(){
+    	 		Y.fire('navigate',{
+    	 			action:'/page/'+item.get('_id')
+    	 		})
+    	 	});
+    	 	node.one('.edit').on('click',function(){
+    	 		Y.fire('navigate',{
+    	 			action:'/admin/page/'+item.get('_id')
+    	 		})
+    	 	});
+    	 	node.one('.delete').on('click',function(){
+    	 		item.destroy({
+    	 			remove:true
+    	 		});
+    	 		node.remove(true);
+    	 	});
+    	 	node.one('.publish').on('click',function(){
+    	 		item.set("published",true);
+    	 		item.save();
+    	 		
+    	 	},this);
+    	 	node.one('.unpublish').on('click',function(){
+    	 		item.set("published",false);
+    	 		item.save();
+    	 		
+    	 	},this);
+    	 	
+    	 	c.one('.pagelist').append(node);
+    	 }
+    });
+    var CreatePageView = Y.Base.create('createpageview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		var c = this.get('container'),model = new GenericModel(),editor,that=this;
+    		c.setHTML(Y.one('#create_page').getHTML());
+		    this.set("model",model);
+    		c.one(".save").on("click",function(){
+    			if(!c.one(".content").get("value"))
+    			{
+    				showAlert("Oops!","Plese provide some content");
+    				return;
+    			}
+    			if(!c.one(".title").get("value"))
+    			{
+    				showAlert("Oops!","Plese provide some title");
+    				return;
+    			}
+    			model.set("title",c.one(".title").get("value"));
+    			model.set("float",c.one(".float").get("value"));
+    			model.set("content",c.one(".content").get("value"));
+    			model.set("type","page");
+    			model.save();
+    			
+    		});
+    		model.on("load",function(){
+    			c.one(".title").set("value",model.get("title"));
+    			c.one(".float").set("value",model.get("float"));
+    			c.one(".content").set("value",model.get("content"));
+    			c.one(".content").focus();
+    		});
+    		model.on("save",function(){
+    			Y.fire("navigate",{
+    				action:"/admin/page/"+model.get("_id")
+    			});
+    		});
+    		
+    		if(that.get("page_id"))
+    		{
+    			model.set("id",that.get("page_id"));
+    			model.set("type","page");
+    			model.load({
+    				"_id":that.get("page_id"),
+    				"id":that.get("page_id"),
+    				"type":"page"
+    			},function(){});
+    		}
+    		
+    	},
+    	render:function(){
+    		
+    		var that = this;
+    		setTimeout(function(){
+    			editor = new wysihtml5.Editor(that.get('container').one(".content").generateID(), { // id of textarea element
+				  toolbar:      "wysihtml5-toolbar" // id of toolbar element
+				  ,parserRules:  wysihtml5ParserRules // defined in parser rules set 
+				});
+				that.set('editor',editor);
+    		},1000);
+    		
+    		return this;
+    	}
+    });
     var ExtraProfileView = Y.Base.create('massmailview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(){
@@ -3311,6 +3574,9 @@ function (Y) {
     					,on:{
     						success:function(){
     							showAlert("Success!","The additional field were successfully saved.");
+    							Y.fire("navigate",{
+    								action:"/" 
+    							});
     						}
     					}
     				});
@@ -4091,14 +4357,7 @@ function (Y) {
         getMarkup: createMarkup
 
     });
-    var GenericModel = Y.Base.create('GenericModel', Y.Model, [], {
-        sync: genericModelSync
-        ,idAttribute:'_id'
-      });
-    var GenericList = Y.Base.create('groupList', Y.ModelList, [], {
-    	sync:genericListSync,
-    	model:GenericModel
-    });
+   
     var AnswerBlock = Y.Base.create('searchboxview', Y.View, [], {
     	containerTemplate:'<div/>',
     	initializer:function(config)
@@ -4314,15 +4573,7 @@ function (Y) {
 	var ProfileView = Y.BABEUSER.ProfileView;
 	var SignUpView = Y.BABEUSER.SignUpView;
 
-	var CreatePageView = Y.Base.create('CreatePageView',Y.View,[],{
-		containerTemplate:'<div/>',
-		initializer:function(){
-			
-		},
-		render:function(){
-			
-		}
-	});
+	
 	var CampaignView = Y.Base.create('CampaignView',Y.View,[],{
 		containerTemplate:'<div/>',
 		initializer:function(){
@@ -4467,11 +4718,12 @@ function (Y) {
         AnswerQuizView: AnswerQuizView,
         CampaignView:CampaignView,
         UserBlockView:UserBlockView,
-        FormOnFlyView:FormOnFlyView
+        FormOnFlyView:FormOnFlyView,
+        GenericModel:GenericModel,
 
     };
 }, '0.0.1', {
-    requires: ['babe-user','calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['editor','youtube-panel','ashlesha-chat','babe-user','calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
 });
 
 YUI.add('babe-user',function(Y){
@@ -4480,9 +4732,10 @@ YUI.add('babe-user',function(Y){
         	
             var model = this;
             if (action == "update") {
-
+					
                 var data = this.toJSON();
                 delete data.connections;
+                delete data.extra_fields;
                 Y.io(baseURL + 'io/update_user', {
                     method: 'POST',
                     data: data,
@@ -4879,4 +5132,88 @@ YUI.add('babe-user',function(Y){
 },'0.0.1',{
 	requires:['app']
 });
-
+YUI.add('ashlesha-chat',function(Y){
+	var ChatBarView = Y.Base.create('chatbar', Y.View, [], {
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var c = this.get('container');
+			c.setHTML(Y.one('#chat-bar').getHTML());
+			c.one('#chat-friend-list').on('click',function(e){
+				e.target.one('.chatbox').toggleClass('hide')
+			});
+		}
+	});
+	Y.ChatBarView = ChatBarView;
+},'0.0.1',{
+	requires:['app']
+});
+YUI.add('youtube-panel',function(Y){
+	var YouTubeView = Y.Base.create('youtubeview', Y.View, [], {
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var c = this.get('container');
+			if(this.get('url'))
+			{
+				c.setHTML(Y.Lang.sub('<iframe width="420" height="315" src="{URL}" frameborder="0" allowfullscreen></iframe>',{
+					URL:this.get('url')
+				}));
+			}
+			if(this.get('v_id'))
+			{
+				c.setHTML(Y.Lang.sub('<div class="video"><img class="thumbnail" src="http://img.youtube.com/vi/{URL}/2.jpg"/><a href="#" class="btn btn-primary"><i class="icon-play"></i></a></div>',{
+					URL:this.get('v_id')
+				}));
+				c.one("a.btn").on('click',function(){
+					var node;
+					Y.BABE.showAlert("Video",
+						Y.Lang.sub('<iframe width="420" height="315" class="youtube-player" src="https://www.youtube-nocookie.com/embed/{URL}?rel=0&autoplay=1" frameborder="1"></iframe>',{
+							URL:this.get('v_id')
+						})
+						
+					);
+					
+				},this);
+			}
+			
+		}
+	});
+	Y.YouTubeView = YouTubeView;
+},'0.0.1',{
+	requires:['app']
+});
+YUI.add('page-box',function(Y){
+	var PageBoxView = Y.Base.create('PageBoxview', Y.View, [], {
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var c = this.get('container');
+			c.setHTML(Y.Lang.sub(Y.one("#page-box").getHTML(),{
+				TITLE:this.get('heading') || 'Pages'
+			}));
+			Y.io(baseURL+'in/published_pagelist',{
+				method:'POST',
+				on:{
+					success:function(i,o,a)
+					{
+						var r = Y.JSON.parse(o.responseText),list = new Y.ModelList();
+						list.add(r);
+						list.comparator = function (model) {
+							  return model.get('float');
+							};
+						list.sort();
+						list.each(function(item){
+							
+							c.one("ul").append("<li><a href='/page/"+item.get("_id")+"'>"+item.get('title')+"<a></li>");
+						});
+					}
+				}
+			});
+			if(this.get('enabled')==false)
+			{
+				c.addClass('hide');
+			}
+		}
+	});
+	Y.PageBoxView = PageBoxView;
+},'0.0.1',{
+	requires:['app','io','json-parse']
+});

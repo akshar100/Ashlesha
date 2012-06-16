@@ -10,7 +10,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="<?php echo base_url(); ?>"><?php echo img(array("src"=>'static/images/logo.png','style'=>"height:47px;"))?></a>
+          <a class="brand" href="<?php echo base_url(); ?>"><?php echo img(array("src"=>'static/images/logo.png','style'=>"height:40px;"))?></a>
           <div class="nav-collapse">
 	          <div class="pull-right">
 		            
@@ -26,12 +26,14 @@
 	          </div>
 	          <div class="pull-right right-pad30">
 		          <div class="btn-group">
+		          			<a class="btn btn-info" href="/"><i class="icon-home icon-white"></i> </a>
 			          		<a id="notification-btn" class="btn btn-info" href="#" rel="popover"><i class="icon-envelope icon-white"></i></a>
 			          		<a id="admin-btn" class="btn btn-info hide" href="/admin" rel="popover">Console</a>
 			      </div>
 			      
 		      </div>
 		      <div class="pull-right topbar-buttons right-pad30">
+		      	
 		      </div>
           </div>
         </div>

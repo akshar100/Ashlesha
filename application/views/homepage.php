@@ -70,8 +70,8 @@ $this->load->view("common/header");
           </div>
         </div>
         <div class="row-fluid">
-          <div class="span7 hidden-phone hidden-tablet chart-area">
-            <?php echo img(array("src"=>'static/loader.gif')); ?>
+          <div id='homepage-widget' class="span7 hidden-phone hidden-tablet chart-area" style="text-align:center;">
+            
           </div>
           <div id="signup" class="span4 well">
             
@@ -101,13 +101,12 @@ $this->load->view("common/header");
   			});
   			
   		});
-  		var chart = new Y.BABE.BarChartView({
-  			parentNode:Y.one('.chart-area')
-  		}); 
-  		chart.render();
+  		
+  		
   		
   	});
   </script>
+  <?php $this->load->view("modules/".$this->config->item('homepage_widget'));?>
   <?php if($this->config->item('ui_test_enabled')){?>
   	<div id="log"></div>
   	<script>

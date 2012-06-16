@@ -391,6 +391,10 @@ $config['default_role'] = 'user';
 $config['classification'] = "Good|Bad|Worse"; 
 $config['sign_up_enabled'] = TRUE;
 $config['force_profile_details'] = TRUE;
+$config['pages_enabled'] = TRUE;
+$config['homepage_widget'] = 'chart';
+$config['twitter_handle'] = 'eyantra_iitb';
+$config['main_video'] = 'http://www.youtube.com/embed/NuqvEJNq9Jc';
 /* End of file config.php */
 /* Location: ./application/config/config.php */
 

@@ -34,6 +34,15 @@
 	          <li><a href="/admin/manage_quiz">Manage Question List</a></li>
 	        </ul>
 	      </li>
+	      <?php if($this->config->item("pages_enabled")){?>
+	      <li class="dropdown">
+	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Pages<b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+	          <li><a href="/admin/create_page">Create Page</a></li>
+	          <li><a href="/admin/manage_pages">Manage Pages</a></li>
+	        </ul>
+	      </li>
+	      <?php }?>
 	     <li class='stats'><a  href="/admin/stats">Stats</a></li>
 	     <li class="dropdown">
 	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Settings <b class="caret"></b></a>
@@ -598,7 +607,7 @@ United States of America|USA|0.5
 	</div>
 	<div class="row-fluid">
 		
-		<textarea rows="5" cols="50" class="input span8 message" placeholder="personalized message...."></textarea>
+<textarea rows="5" cols="50" class="input span8 message" placeholder="personalized message...."></textarea>
 		
 	</div>
 	<div class="row-fluid">
@@ -631,7 +640,7 @@ United States of America|USA|0.5
 	<div class="row-fluid">
 		<div class="span12">
 			<label>{TITLE}</label>
-			<div class="row-fluid">
+			<div class="row-fluid"> 
 				<textarea id="{KEY}" class="input span8" rows="1">{VAL}</textarea>
 				<hr/>
 			</div>
@@ -740,4 +749,110 @@ United States of America|USA|0.5
 		
 	</div>
 	</div>
+</script>
+<script type="text/x-template" id="create_page">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Publish a Page</h3>
+			<p>&nbsp;</p>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12">
+			<form class="form-horizontal">
+        <fieldset>
+         <div class="control-group">
+            <label class="control-label">Title</label>
+            <div class="controls docs-input-sizes">
+              <input type="text" placeholder="Title" class="span12 title">
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Page Content</label>
+            <div class="controls docs-input-sizes">
+            	<form>
+            	<div id="wysihtml5-toolbar" style="display: none;">
+				  <a class="btn btn-small" data-wysihtml5-command="bold">bold</a>
+				  <a class="btn btn-small" data-wysihtml5-command="italic">italic</a>
+				  <a class="btn btn-small" title="Insert an unordered list" data-wysihtml5-command="insertUnorderedList" href="javascript:;" unselectable="on">UL</a>
+				  <a class="btn btn-small" title="Insert an ordered list" data-wysihtml5-command="insertOrderedList" href="javascript:;" unselectable="on">OL</a>
+				  <a class="btn btn-small" title="Insert headline 2" data-wysihtml5-command-value="h2" data-wysihtml5-command="formatBlock" href="javascript:;" unselectable="on">H2</a>
+				  <a class="btn btn-small" data-wysihtml5-action="change_view">switch to html view</a>
+				  
+				  <!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
+				  <a class="btn btn-small" data-wysihtml5-command="createLink">insert link</a>
+				  <div data-wysihtml5-dialog="createLink" style="display: none;">
+				    <label>
+				      Link:
+				      <input data-wysihtml5-dialog-field="href" value="http://" class="text">
+				    </label>
+				    <a data-wysihtml5-dialog-action="save">OK</a> <a data-wysihtml5-dialog-action="cancel">Cancel</a>
+				  </div>
+				</div>
+				<br/>
+              <textarea class="span12 content input" rows="20"></textarea>
+             </form>
+            </div>
+         </div>
+         <div class="control-group">
+            <label class="control-label">Float</label>
+            <div class="controls docs-input-sizes">
+              <input type="text" placeholder="0" class="span12 float" value="1">
+            </div>
+            <div class="help-text">
+            	Float is the rank in which the the page must appear in the menu. 0 will make sure the page comes 1st.
+            </div>
+         </div>
+          <div class="form-actions">
+            <button class="btn btn-primary save" type="button">Save</button>
+          </div>
+        </fieldset>
+      </form>
+		</div>
+		<div id="bootstrap-linkurl" class='bootstrap-wysihtml5-insert-link-modal modal hide fade'>
+			<div class='modal-header'>
+			<a class='close' data-dismiss='modal'>&times;</a>
+			  <h3>Insert Link</h3>
+			</div>
+			<div class='modal-body'>
+			  <input value='http://' class='bootstrap-wysihtml5-insert-link-url input-xlarge'>
+			</div>
+			<div class='modal-footer'>
+			  <a href='#' class='btn' data-dismiss='modal'>Cancel</a>
+			  <a href='#' class='btn btn-primary' data-dismiss='modal'>Insert link</a>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/x-template" id="manage-pages">
+	<div class="row-fluid">
+		<div class="span12">
+			<p>&nbsp;</p>
+			<h3>Manage Pages</h3>
+		<p>&nbsp;</p>
+		<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 pagelist">
+		<p>&nbsp;</p>
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="page-row">
+	<tr>
+		<td>
+			<h4>{TITLE} &nbsp; : </h4>
+		</td>
+		<td>
+			<button type="button" class="btn btn-info view">View</button>&nbsp;
+			<button type="button" class="btn btn-danger delete">Delete</button>
+			<button type="button" class="btn btn-primary edit">Edit</button>
+			<button type="button" class="btn btn-success publish">Publish</button>
+			<button type="button" class="btn btn-warning unpublish">Un-Publish</button>
+			
+		</td>
+	</tr>
 </script>

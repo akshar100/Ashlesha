@@ -207,26 +207,44 @@ class User
 	{
 		$source_user = $this->ci->dba->get($post['source_user']);
 		$target_user = $this->ci->dba->get($post['target_user']);
-		$group = $this->ci->dba->get($post['linked_resource']);
 		
-		if(isset($post['secondary_resource']))
+		
+		if(!empty($post['linked_resource']))
 		{
-			$secondary = $this->ci->dba->get($post['secondary_resource']);
+			$group = $this->ci->dba->get($post['linked_resource']);
+			if(isset($post['secondary_resource']))
+			{
+				$secondary = $this->ci->dba->get($post['secondary_resource']);
+			}
+			else
+			{
+				$secondary = "";
+			}
+			$text  = $this->ci->load->view('email/'.$post['notification_action'],array(
+				"source_user"=>$source_user['fullname'],
+				"target_user"=>$target_user['fullname'],
+				"resource"=>$group,
+				"secondary"=>$secondary
+			),true);
+			if(!empty($text))
+			{
+				$this->send_email($target_user['email'], "Notification: ".$source_user['fullname']." has posted in ".$group['title'], $text);
+			}
 		}
 		else
 		{
-			$secondary = "";
+			$text  = $this->ci->load->view('email/'.$post['notification_action'],array(
+				"user"=>$source_user['fullname'],
+				"target_user"=>$target_user['fullname'],
+				"url"=>base_url()
+			),true);
+			if(!empty($text))
+			{
+				$this->send_email($target_user['email'], "Notification: ".$source_user['fullname'],$text);
+				
+			}
 		}
-		$text  = $this->ci->load->view('email/'.$post['notification_action'],array(
-			"source_user"=>$source_user['fullname'],
-			"target_user"=>$target_user['fullname'],
-			"resource"=>$group,
-			"secondary"=>$secondary
-		),true);
-		if(!empty($text))
-		{
-			$this->send_email($target_user['email'], "Notification: ".$source_user['fullname']." has posted in ".$group['title'], $text);
-		}
+		
 	}
 	
 	function run_signup_errands($id)

@@ -25,10 +25,19 @@ $this->load->view("common/header");
 	        </div>
 	        <div class="row-fluid">
 	          <div class="span2">
-	          	<div class="leftbar sidebar-nav well">
+	          	<div class="row-fluid">
+	          		<div class="span12">
+	          			<div class="leftbar sidebar-nav well">
 	          		
-	          	</div>
-	            
+	          			</div>
+	          		</div>
+	           </div>
+	           <div class="row-fluid">
+	          		<div class="span12 pagebox">
+	          			
+	          		</div>
+	           </div>
+	           
 	          </div>
 	          <div class="span10 centercolumn">
 	            <div class='status-bar-area'></div>
@@ -51,6 +60,8 @@ $this->load->view("common/header");
 <?php $this->load->view("mixins/search");?>
 <?php $this->load->view("mixins/user_page");?>
 <?php $this->load->view("mixins/admin");?>
+<?php $this->load->view("mixins/chat");?>
+<?php $this->load->view("mixins/page");?>
 <script type="text/x-template" id="error-alert">
 	<div class="alert alert-block alert-error fade in">
 	            <a href="#" data-dismiss="alert" class="close">×</a>
@@ -77,7 +88,7 @@ $this->load->view("common/header");
 
 
 	var baseURL = "<?php echo base_url();?>";
-	YUI().use('app','babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
+	YUI().use('page-box','app','babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
 		Y.user = new Y.Model({ authenticated:false , user_id:null, name:null });
 		<?php
 			$current_user = $this->user->get_current();
@@ -226,7 +237,7 @@ $this->load->view("common/header");
 			},
 			changeAction:function(){
 				
-				
+				var c = this.get('container');
 				if(!this.relmodel.get('relationship'))
 				{
 					this.get('container').one(".event-actions").setHTML(Y.one('#wall-event-actions').getHTML());
@@ -265,7 +276,49 @@ $this->load->view("common/header");
 						this.relmodel.save();
 					},this);
 				}
+				this.get('container').one('.showjoinees').on('click',function(){
+					this.get('container').one('.showjoinees').addClass('hide'); 
+					this.get('container').one('.hidejoinees').removeClass('hide');
+					this.get('container').one('.joinees').removeClass('hide');
+					c.one('.joinees').setHTML(Y.BABE.LOADER);
+					this.updateAttendees(true);
+				},this);
+				this.get('container').one('.hidejoinees').on('click',function(){
+					this.get('container').one('.hidejoinees').addClass('hide'); 
+					this.get('container').one('.showjoinees').removeClass('hide');
+					this.get('container').one('.joinees').addClass('hide');
 					
+				},this);
+			}
+			,updateAttendees:function(show_users){
+				var c = this.get('container');
+				Y.io(baseURL+'in/event_attendees',{
+					method:'POST',
+					data:{
+						event_id:this.get('model').get('_id')
+					},
+					on:{
+						success:function(i,o,a){
+							var r = Y.JSON.parse(o.responseText),count=0;
+							c.one('.joinees').setHTML('');
+							for(var i in r)
+							{
+								if(r[i]=="attending")
+								{
+									count++;
+									if(show_users){
+										c.one('.joinees').append(new Y.BABE.UserBlockView({
+											user_id:i
+										}).render().get('container'));
+									}
+									
+								}
+							}
+							c.one('.count').setHTML(count);
+							
+						}
+					}
+				});
 			}
 			,render:function(config){
 				var month=new Array();
@@ -307,6 +360,8 @@ $this->load->view("common/header");
 						this.sanitize();
 						this.changeAction();
 						this.relmodel.on('load|change',this.changeAction,this);
+						this.relmodel.on('save',this.updateAttendees,this);
+						this.updateAttendees();
 						this.relmodel.load();
 					}
 					return this;
@@ -323,7 +378,9 @@ $this->load->view("common/header");
 		Y.topbar= new Y.TopBarView({
 			usermodel:Y.userModel
 		});			
-		
+		Y.pagebox = new Y.PageBoxView({
+			enabled:Y.APPCONFIG.pages_enabled
+		});
 		
 		
 		
@@ -352,7 +409,8 @@ $this->load->view("common/header");
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
+				Y.one('body').append(new Y.ChatBarView().render().get('container'));
 				
 				
 				Y.loadTemplate("statusblock",function(){
@@ -382,6 +440,8 @@ $this->load->view("common/header");
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 				Y.loadTemplate("profile",function(){ 
 					var user = new Y.BABE.UserModel({
 						'_id':window.current_user
@@ -407,7 +467,8 @@ $this->load->view("common/header");
 		        con.setHTML(Y.one("#outer").getHTML());
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
-				con.one(".leftbar").setHTML(Y.sidebar.render().get('container')); 				
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 				 
 				Y.BABE.loadTemplate('user_page',function(){
 		    		var UserView = new Y.BABE.UserView({user_id:that.get('user_id'),usermodel:Y.userModel});
@@ -426,7 +487,7 @@ $this->load->view("common/header");
 		        con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 				 
 				Y.loadTemplate("group",function(){ 
 					var group = new Y.BABE.GroupModel({
@@ -727,7 +788,7 @@ $this->load->view("common/header");
 				
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 				Y.loadTemplate("wall",function(){ 
 					
 					var id = that.get('post_id');
@@ -763,7 +824,7 @@ $this->load->view("common/header");
 				
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 		    	var nlist = new Y.BABE.NotificationList();
 		    	
 		    	nlist.on('load',function(){
@@ -812,12 +873,38 @@ $this->load->view("common/header");
 		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 				var searchView = new Y.BABE.SearchView({
 					search:this.get('search'),
 					usermodel:this.get('usermodel')
 				});
 				con.one('.centercolumn').setHTML(searchView.render().get('container'));
 		    
+		    	return this;
+		    }
+		});
+		
+		var PageView = Y.Base.create('PageView', Y.View, [], {
+			containerTemplate:'<div/>',
+		    render: function () {
+		    	var con = this.get('container'),model= new Y.BABE.GenericModel({
+		    		'id':this.get('page_id'),
+		    		'_id':this.get('page_id')
+		    	});
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
+				con.one('.centercolumn').setHTML(Y.BABE.LOADER);
+				model.on('load',function(){
+					con.one('.centercolumn').setHTML(Y.Lang.sub(Y.one('#page-content').getHTML(),{
+						TITLE:model.get('title'),
+						CONTENT:model.get('content')
+					}));
+				});
+				model.load();
+				
 		    	return this;
 		    }
 		});
@@ -830,7 +917,8 @@ $this->load->view("common/header");
 		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action'),quiz_id:this.get('quiz_id')});
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
+				var adminView = new Y.BABE.AdminView({user:Y.userModel,action:this.get('action'),quiz_id:this.get('quiz_id'),page_id:this.get("pageid")});
 				con.one('.centercolumn').setHTML(adminView.render().get('container'));
 		    	return this;
 		    }
@@ -848,7 +936,7 @@ $this->load->view("common/header");
 				
 				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
 				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
-				
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
 		    	con.one('.centercolumn').setHTML(aq.render().get('container'));
 		    	return this;
 		    }
@@ -862,7 +950,7 @@ $this->load->view("common/header");
 		
 		Y.AdminView = Y.BABE.AdminView;
 		Y.CampaignView = Y.BABE.CampaignView;
-		
+		Y.PageView = PageView;
 		var AppUI =  new Y.App({
 		    views: {
 		        homepage: {type: 'MainAppView', preserve:false },
@@ -875,7 +963,8 @@ $this->load->view("common/header");
 		        searchpage:{type:'SearchPageView',preserve:false},
 		        adminview:{type:'AdminPageView',preserve:false},
 		        quizview:{type:'AnswerQuizPageView',preserve:false},
-		        campaignview:{type:'CampaignView'}
+		        campaignview:{type:'CampaignView'},
+		        pageview:{type:'PageView'}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -971,7 +1060,11 @@ $this->load->view("common/header");
 				AppUI.navigate("/");
 			}
 		});
-		
+		AppUI.route('/page/:id',function(req){
+			this.showView('pageview',{
+				page_id:req.params.id
+			})
+		});
 		AppUI.route('/admin/quiz/:id',function(req){
 			
 			this.showView('adminview',{
@@ -987,7 +1080,15 @@ $this->load->view("common/header");
 						userModel:Y.userModel,
 					});
 		});
-		
+		AppUI.route('/admin/page/:id',function(req){
+			
+			this.showView('adminview',{
+				userModel:Y.userModel,
+				action:'page',
+				pageid:req.params.id,
+				test:"test"
+			});
+		});
 		AppUI.route('/admin/share_quiz/:id',function(req){
 			
 			this.showView('adminview',{
@@ -1026,7 +1127,7 @@ $this->load->view("common/header");
 			}
 		});
 		
-		
+	
 		Y.on('search-init',function(e){ 
 			AppUI.navigate('/search/'+e.search);
 		});
@@ -1077,9 +1178,7 @@ $this->load->view("common/header");
    }(document));
 </script>
 -->
- <div class="chatbar navbar navbar-fixed-bottom">
-			Test
- </div>
+ 
 </body>
 </html>
 

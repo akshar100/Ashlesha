@@ -164,7 +164,9 @@ class IO extends CI_Controller {
 			"groupposts"=>array("map"=>read_file("./application/views/json/groupposts.js")),
 			"get_groups_by_allowed_emails"=>array("map"=>read_file("./application/views/json/get_groups_by_allowed_emails.js")),
 			"get_invitations"=>array("map"=>read_file("./application/views/json/get_invitations.js")),
-			"get_group_members"=>array("map"=>read_file("./application/views/json/get_group_members.js"))
+			"get_group_members"=>array("map"=>read_file("./application/views/json/get_group_members.js")),
+			"get_all_pages"=>array("map"=>read_file("./application/views/json/get_all_pages.js")),
+			"get_published_pages"=>array("map"=>read_file("./application/views/json/get_published_pages.js"))
 			
 		);
 		$doc["lists"] = array(
@@ -452,7 +454,7 @@ class IO extends CI_Controller {
 
 	function create_notification()
 	{
-		$post = $this->input->post();
+		$post = $this->input->post(); 
 		$response = $this->dba->create_notification($post);
 		echo json_encode($response);
 	}
@@ -737,7 +739,7 @@ class IO extends CI_Controller {
 		else
 		{
 			$user = $this->dba->get($this->user->get_current());
-			if(isset($user['extra_fields']))
+			if(isset($user['extra_fields']) && is_array($user['extra_fields']))
 			{
 				$fields = $item['data'];
 				

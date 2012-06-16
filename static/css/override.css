@@ -246,7 +246,69 @@ img.profile-image
     left: 50%;
     list-style-type: none;
     margin: 0 0 0 -47.5%;
-    padding: 0;
+    padding: ;
     position: fixed;
     width: 95%;
+}
+
+ul.chat-nav > li
+{
+	height:25px;
+	padding:5px 10px 5px 10px;
+	font-size: 12px;
+	border-left: 1px solid #CECECE;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #FFFFFF;
+    width:200px;
+}
+ul.chat-nav  .btn-group
+{
+	margin-top:0px;
+}
+.chatbox
+{
+	width:220px;
+	height:300px;
+	border: 1px solid #CECECE;
+}
+ul.chat-nav .chatbox
+{
+	position:relative;
+	top:-325px;
+	left:-10px;
+}
+.width20
+{
+	width:20px !important;
+}
+a.brand img
+{
+	height:40px;
+}
+.z {
+    position: relative;
+    width: 90%;
+    margin: 0 auto 15px;
+}
+.z-1 {
+    z-index: -1;
+    background: orange;
+    color: white;
+}
+.z3 {z-index: 3;}
+.video { position: relative; }
+
+.video a {
+   position: absolute;
+   display: block;
+   top: 36px;
+   left: 45px;
+   cursor:pointer;
+}
+.richtexteditor
+{
+	border: 1px solid #CCCCCC;
+	height:400px;
+	margin-left:0px;
+	padding:10px;
 }

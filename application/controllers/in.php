@@ -460,6 +460,21 @@ class In extends CI_Controller {
 		echo json_encode($this->dba->getview('get_all_quizes'));
 	}
 	
+	function pagelist()
+	{
+		echo json_encode($this->dba->getview('get_all_pages'));
+	}
+	
+	function event_attendees(){
+		$item = $this->dba->get($this->input->post('event_id'));
+		echo json_encode($item['relations']);
+	}
+	
+	function published_pagelist()
+	{
+		echo json_encode($this->dba->getview('get_published_pages'));
+	}
+	
 	function available_roles()
 	{
 		echo json_encode($this->dba->get_all_roles('get_available_roles'));

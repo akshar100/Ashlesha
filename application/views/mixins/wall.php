@@ -113,6 +113,19 @@
 				
 			</div>
 		</div>
+		<div class="row-fluid">
+			<div class="span12">
+				Attended by : <span class="badge badge-success count">0</span>
+				<button type="button" class="btn btn-mini btn-info btnj showjoinees">Show</button>
+				<button type="button" class="btn btn-mini btn-info hide btnj hidejoinees">Hide</button>
+				<hr/>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="span10 joinees hide">
+				
+			</div>
+		</div>
 		<div class="row-fluid"><div class="span11">
 			<blockquote><p>{TEXT}</p><div class="postBody"></div><small>{AUTHOR}</small></blockquote></div>
 			
