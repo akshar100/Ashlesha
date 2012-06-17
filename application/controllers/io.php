@@ -166,7 +166,8 @@ class IO extends CI_Controller {
 			"get_invitations"=>array("map"=>read_file("./application/views/json/get_invitations.js")),
 			"get_group_members"=>array("map"=>read_file("./application/views/json/get_group_members.js")),
 			"get_all_pages"=>array("map"=>read_file("./application/views/json/get_all_pages.js")),
-			"get_published_pages"=>array("map"=>read_file("./application/views/json/get_published_pages.js"))
+			"get_published_pages"=>array("map"=>read_file("./application/views/json/get_published_pages.js")),
+			"get_open_groups"=>array("map"=>read_file("./application/views/json/get_open_groups.js"))
 			
 		);
 		$doc["lists"] = array(

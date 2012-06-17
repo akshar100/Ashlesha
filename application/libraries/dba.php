@@ -116,11 +116,15 @@ class DBA
 		));
 		
 		$output = array();
-		foreach($response['rows'] as $row)
+		if(isset($response['rows']))
 		{
-			$row["value"]["comment"] = auto_link_text($row["value"]["comment"]);
-			$output[]= $row["value"];
+			foreach($response['rows'] as $row)
+			{
+				$row["value"]["comment"] = auto_link_text($row["value"]["comment"]);
+				$output[]= $row["value"];
+			}
 		}
+		
 		return $output;
 	}
 	
@@ -133,6 +137,7 @@ class DBA
 		$post['dislikes'] = count($this->get_dislikes($post["_id"]));
 		$post['like'] = $this->is_liked($post["_id"],$user);
 		$post['dislike'] = $this->is_disliked($post["_id"],$user);
+		$post['comment_count'] = count($this->get_comments($post['_id']));
 		unset($post['relations']);
 		return $post;
 	}

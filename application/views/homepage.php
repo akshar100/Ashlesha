@@ -116,6 +116,18 @@ $this->load->view("common/header");
   	</script>
   	<script src="<?php echo base_url();?>/static/js/test.js?<?php echo rand();?>"></script>
   <?php }?>
+  <?php
+  	if(!empty($redirect_url))
+	{
+		?>
+		<script>
+			YUI().use('cookie', function (Y) {
+    			Y.Cookie.set("redirect_url", "/grouppage");
+			});
+		</script>
+		<?php
+	}
+  ?>
   </body>
 </html>
 

@@ -25,19 +25,21 @@ $this->load->view("common/header");
 	        </div>
 	        <div class="row-fluid">
 	          <div class="span2">
+	          	
 	          	<div class="row-fluid">
 	          		<div class="span12">
-	          			<div class="leftbar sidebar-nav well">
+	          			<div class="leftbar sidebar-nav well  <?php if(!$this->user->is_authenticated()){ echo "hide"; } ?>">
 	          		
 	          			</div>
 	          		</div>
 	           </div>
+	          
 	           <div class="row-fluid">
 	          		<div class="span12 pagebox">
 	          			
 	          		</div>
 	           </div>
-	           
+	          
 	          </div>
 	          <div class="span10 centercolumn">
 	            <div class='status-bar-area'></div>
@@ -88,8 +90,8 @@ $this->load->view("common/header");
 
 
 	var baseURL = "<?php echo base_url();?>";
-	YUI().use('page-box','app','babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
-		Y.user = new Y.Model({ authenticated:false , user_id:null, name:null });
+	YUI().use('cookie','page-box','app','babe','node-event-simulate','json','event-custom','event-focus', 'model', 'model-list', 'view','transition', 'io-base', 'history','querystring-stringify-simple','autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get','cache', function (Y) {
+		Y.APPCONFIG =  <?php echo json_encode($config);?>;
 		<?php
 			$current_user = $this->user->get_current();
 			if(!empty($current_user))
@@ -98,10 +100,16 @@ $this->load->view("common/header");
 				Y.userModel = new Y.BABE.UserModel(<?php echo json_encode($this->user->get_user($this->user->get_current())); ?>);
 				window.current_user = <?php echo json_encode($this->user->get_current()); ?>;
 				Y.userModel.load();
-				Y.user.set("authenticated",true);
-				Y.user.set("id",<?php echo json_encode($this->user->get_current()); ?>);
-				Y.APPCONFIG =  <?php echo json_encode($config);?>;
+				
 				<?php
+			}
+			else
+			{
+				?> Y.userModel =  new Y.BABE.UserModel({
+					"roles":"guest"
+				}); 
+				window.current_user = "";
+				<?php 
 			}
 		?>
 		
@@ -157,7 +165,7 @@ $this->load->view("common/header");
 					this.get('container').one(".submitComment").on("click",function(e){
 						this.get('container').one('.commentsForm').one('.help-block').setHTML(Y.BABE.LOADER);
 						e.halt();
-						var container = this.get('container'),list = this.list,that=this,comment = new Y.CommentModel({comment:this.get('container').one("textarea.commentText").get("value"),post_id:this.get('model').get("_id"),author_id:Y.user.get('id') });
+						var container = this.get('container'),list = this.list,that=this,comment = new Y.CommentModel({comment:this.get('container').one("textarea.commentText").get("value"),post_id:this.get('model').get("_id"),author_id:Y.userModel.get('id') });
 						if(comment.get('comment'))
 						{
 							comment.save(function(err,response){
@@ -414,7 +422,7 @@ $this->load->view("common/header");
 				
 				
 				Y.loadTemplate("statusblock",function(){
-					var statusblock = new Y.BABE.StatusBlockView({expand:expand}); 
+					var statusblock = new Y.BABE.StatusBlockView({expand:expand,usermodel:Y.userModel}); 
 					con.one('.status-bar-area').setHTML(statusblock.render().get('container'));
 					that.set('statusbar',statusblock); 
 					if(that.get('expand'))
@@ -521,7 +529,8 @@ $this->load->view("common/header");
 						this.get('wall').loadWall('groupposts');
 					},this);
 					this.set('statusbar',new Y.BABE.StatusBlockView({
-						ownership: this.get('model').get('_id')
+						ownership: this.get('model').get('_id'),
+						usermodel:Y.userModel
 					}));
 					main.setHTML(Y.Lang.sub(Y.one('#group-page-main').getHTML(),{
 						'GROUP_TITLE':m.get('title'),
@@ -909,6 +918,23 @@ $this->load->view("common/header");
 		    }
 		});
 		
+		Y.AllGroupMainPage = Y.Base.create('AllGroupMainPage', Y.View, [], {
+			containerTemplate:'<div/>',
+		    initializer: function () {
+		    	var con = this.get('container');
+		    	con.setHTML(Y.one("#outer").getHTML());
+		    	con.one('#maincontainer').setHTML(Y.one('#main').getHTML());
+				con.one(".topbar").setHTML(Y.topbar.render().get('container'));
+				con.one(".leftbar").setHTML(Y.sidebar.render().get('container'));
+				con.one(".pagebox").setHTML(Y.pagebox.render().get('container'));
+				con.one('.centercolumn').setHTML(Y.BABE.LOADER);
+				
+				con.one('.centercolumn').setHTML(new Y.BABE.AllGroupPageView().render().get('container'));
+				
+				
+		    }
+		});
+		
 		Y.AdminPageView = Y.Base.create('AdminPageView', Y.View, [], {
 			containerTemplate:'<div/>',
 		    render: function () {
@@ -964,7 +990,8 @@ $this->load->view("common/header");
 		        adminview:{type:'AdminPageView',preserve:false},
 		        quizview:{type:'AnswerQuizPageView',preserve:false},
 		        campaignview:{type:'CampaignView'},
-		        pageview:{type:'PageView'}
+		        pageview:{type:'PageView'},
+		        allgroup:{type:'AllGroupMainPage'}
 		    },
 		    transitions: {
 		        navigate: 'fade',
@@ -977,7 +1004,16 @@ $this->load->view("common/header");
 				APPCONFIG = Y.APPCONFIG;
 		<?php } ?>
 		AppUI.route('/', function (req) {
+			if(Y.userModel.hasRole("guest"))
+			{
+				window.location = baseURL; return;
+			}
 		    this.showView('homepage',{expand:false,loadCommand:'stream'});
+		});
+		
+		AppUI.route('/grouppage', function (req) {
+			
+		    this.showView('allgroup');
 		});
 		
 		AppUI.route('/me', function (req) {
@@ -1135,15 +1171,30 @@ $this->load->view("common/header");
 		Y.on('navigate',function(e){
 			AppUI.navigate(e.action);
 		});
+		
+		
+		
 		AppUI.render().dispatch(); //.save('/');
+		
+		if(Y.Cookie.get("redirect_url")){
+			var redirect_url = Y.Cookie.get("redirect_url");
+			Y.Cookie.set("redirect_url","");
+			AppUI.navigate(redirect_url);
+		}
+	
+		
+		
 		Y.loadTemplate("messagebox",function(){}); 
 		<?php
 			$user = $this->dba->get($this->user->get_current());
-			if($this->config->item('force_profile_details')==TRUE && (!isset($user['profile_complete']) || $user['profile_complete']!=TRUE))
+			if(!empty($user) && !empty($user["_id"]))
 			{
-				?>
-				AppUI.navigate('/me');
-				<?php
+				if($this->config->item('force_profile_details')==TRUE && (!isset($user['profile_complete']) || $user['profile_complete']!=TRUE))
+				{
+					?>
+					AppUI.navigate('/me');
+					<?php
+				}
 			}
 		?>
 	});
@@ -1152,33 +1203,6 @@ $this->load->view("common/header");
     
     
 <?php if($this->config->item('ui_test_enabled')){?><script src="<?php echo base_url();?>/static/js/test.js"></script><?php }?> 
-
-<!--
-<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '<?php echo $this->config->item('facebook_appid');?>', // App ID
-      channelUrl : '//<?php echo base_url();?>channel.html', // Channel File
-      status     : true, // check login status
-      cookie     : true, // enable cookies to allow the server to access the session
-      xfbml      : true  // parse XFBML
-    });
-
-    // Additional initialization code here
-  };
-
-  // Load the SDK Asynchronously
-  (function(d){
-     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement('script'); js.id = id; js.async = true;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     ref.parentNode.insertBefore(js, ref);
-   }(document));
-</script>
--->
- 
 </body>
 </html>
 

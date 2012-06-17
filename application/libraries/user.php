@@ -13,6 +13,16 @@ class User
 		return $this->ci->session->userdata("user_id");
 	}
 	
+	function is_authenticated()
+	{
+		$user = $this->get_current();
+		if(!empty($user))
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	function get_user($id=null,$password=false)
 	{
 		if(empty($id)){ $id = $this->get_current(); }

@@ -537,6 +537,10 @@ class In extends CI_Controller {
 		} 
 	}
 	
+	function top_open_groups()
+	{
+		echo json_encode($this->dba->getview("get_open_groups"));
+	}
 	
 }
 

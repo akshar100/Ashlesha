@@ -15,6 +15,10 @@ function (Y) {
 							jQuery("#modal-from-dom").modal('hide');
 							Y.one("#modal-from-dom").remove();
 						});
+						Y.one("#modal-from-dom").one(".close").on('click',function(){
+							jQuery("#modal-from-dom").modal('hide');
+							Y.one("#modal-from-dom").remove();
+						});
 		}
     function genericModelSync(action, options, callback){
     		
@@ -1329,6 +1333,9 @@ function (Y) {
             },
             ownership:{
             	value:'public'
+            },
+            comment_count:{
+            	value: 0
             }
 
         }
@@ -1618,7 +1625,9 @@ function (Y) {
                     e.halt();
                 }, this);
             }
-            c.append("<span><a class='comments' href='#'>Comments</a></span>");
+            c.append(Y.Lang.sub("<span><a class='comments' href='#'>Comments ({COUNT})</a></span>",{
+            	COUNT:this.get('model').get("comment_count") || 0 
+            }));
             c.append("<span> <a href='#' class='share'>Share</a></span>")
             c.setStyle("opacity", 0);
             c.transition({
@@ -2363,10 +2372,17 @@ function (Y) {
             {
             	this.get('container').one('#admin-btn').remove(true);
             }
+            
             var sv = new Y.BABE.SearchBoxView();
             this.get('container').one('.topbar-buttons').append(sv.render().get('container'));
-            if (!Y.APPCONFIG.notifications_enabled) {
+            if(this.get('usermodel').hasRole('guest'))
+            {
+            	 this.get('container').one('.topbar-buttons').addClass('hide');
+            	 this.get('container').one(".grouppage").remove();
+            }
+            if (!Y.APPCONFIG.notifications_enabled || this.get('usermodel').hasRole('guest')) {
                 this.get('container').one("#notification-btn").addClass('hide');
+                this.get('container').one("#notification-btn").remove();
             } else {
 
                 this.get('container').one("#notification-btn").on("click", function (e) {
@@ -2398,21 +2414,40 @@ function (Y) {
 
 
             }
+            this.get('container').one('.navbtns').all("a").on("hover",function(e){
+            	if(e.target.getAttribute("title") && e.target.one("span"))
+            	{
+            		e.target.one("span").setHTML("&nbsp;"+e.target.getAttribute("title"));
+            	}
+            },function(e){
+            	if(e.target.getAttribute("title") && e.target.one("span"))
+            	{
+            		e.target.one("span").setHTML('');
+            	}
+            });
             this.get('container').one("a.brand").on("click", function (e) {
-                AppUI.navigate("/");
+               Y.fire("navigate",{
+                	action:"/"
+                });
                 e.preventDefault();
             });
-            this.get('container').one("#edit-profile").on("click", function (e) {
-                AppUI.navigate("/me");
-                e.preventDefault();
-            });
+            if(!this.get('usermodel').hasRole('guest'))
+            {
+            	this.get('container').one("#edit-profile").on("click", function (e) {
+	                Y.fire("navigate",{
+	                	action:"/me"
+	                });
+	                e.preventDefault();
+	            });
+           
+            
 
-            this.get('container').one("a.logout").on('click', function () {
-                window.location = baseURL + 'in/logout?seed=' + Math.random();
-            });
-
-            jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
-
+	            this.get('container').one("a.logout").on('click', function () {
+	                window.location = baseURL + 'in/logout?seed=' + Math.random();
+	            });
+				
+	            jQuery(this.get('container').one('.dropdown-menu').getDOMNode()).dropdown();
+			}
 
         },
         render: function () {
@@ -2529,6 +2564,10 @@ function (Y) {
     var SideBarMenuView = Y.Base.create('sidebarview', Y.View, [], {
         containerTemplate: '<div/>',
         initializer: function () {
+        	if(this.get('usermodel').hasRole("guest"))
+        	{
+        		this.get('container').addClass('hide');
+        	}
             var items = new GroupList();
             this.set('items', items);
             Y.on('sidebar:refresh',this.render,this);
@@ -2570,6 +2609,10 @@ function (Y) {
         	
             var menuContainer = this.get('container'),sections = new MenuSectionList(),that = this;
 			this.get('container').setHTML('');
+			if(this.get('usermodel').hasRole("guest"))
+        	{
+        		return this;
+        	}
             sections.load({
                 name: 'menusectionlist'
             }, function () {
@@ -2631,6 +2674,7 @@ function (Y) {
     var SideBarView = Y.Base.create('sidebarview', Y.View, [], {
         containerTemplate: "<div/>",
         initializer:function(){
+        	
         	var user = new UserModel({
                 '_id': window.current_user
             });
@@ -2647,7 +2691,7 @@ function (Y) {
                     user_id: user.get("_id")
                 }));
 
-                that.get('container').append(new SideBarMenuView().render().get('container'));
+                that.get('container').append(new SideBarMenuView({usermodel:user}).render().get('container'));
 				
 
             });
@@ -2664,7 +2708,37 @@ function (Y) {
     var StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
         containerTemplate: '<div id="statusblock"/>',
         initializer: function () {
+			this.set('container', Y.Node.create('<div id="statusblock"/>'));
 
+            this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(), {
+                user_name: this.get('usermodel').get("username"),
+                user_id: this.get('usermodel').get("_id")
+            }));
+            if (Y.config) {
+                if (!Y.APPCONFIG.post_enabled) {
+                    this.get('container').one('a.post').addClass('hide');
+                }
+                if (!Y.APPCONFIG.event_enabled) {
+                    this.get('container').one('a.event').addClass('hide');
+                }
+                if (!Y.APPCONFIG.survey_enabled) {
+                    this.get('container').one('a.survey').addClass('hide');
+                }
+                if (!Y.APPCONFIG.question_enabled) {
+                    this.get('container').one('a.question').addClass('hide');
+                }
+            }
+
+            this.get('container').one(".pills-status").all("a").on("click", function (e) {
+
+                var val = Y.one(e.target).get("rel");
+
+                this.expandForm(val);
+
+            }, this);
+            if (this.get('expand')) {
+                this.expandForm(this.get('expand'));
+            }
 
 
         },
@@ -2699,42 +2773,6 @@ function (Y) {
                 this.get('container').one(".forms").setContent(q.render().get('container'));
 
             }
-        },
-        render: function () {
-
-
-            this.set('container', Y.Node.create('<div id="statusblock"/>'));
-
-            this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(), {
-                user_name: Y.user.get("name"),
-                user_id: Y.user.get("user_id")
-            }));
-            if (Y.config) {
-                if (!Y.APPCONFIG.post_enabled) {
-                    this.get('container').one('a.post').addClass('hide');
-                }
-                if (!Y.APPCONFIG.event_enabled) {
-                    this.get('container').one('a.event').addClass('hide');
-                }
-                if (!Y.APPCONFIG.survey_enabled) {
-                    this.get('container').one('a.survey').addClass('hide');
-                }
-                if (!Y.APPCONFIG.question_enabled) {
-                    this.get('container').one('a.question').addClass('hide');
-                }
-            }
-
-            this.get('container').one(".pills-status").all("a").on("click", function (e) {
-
-                var val = Y.one(e.target).get("rel");
-
-                this.expandForm(val);
-
-            }, this);
-            if (this.get('expand')) {
-                this.expandForm(this.get('expand'));
-            }
-            return this;
         }
     });
 
@@ -3190,11 +3228,50 @@ function (Y) {
     			 this.get('container').one('.params').setHTML(Y.BABE.LOADER);
     			 this.get('model').save();
     		},this);
-    	},
-    	render:function(){
-    		return this;
     	}
     });
+    var GroupBlock = Y.Base.create('allgroupview', Y.View, [], {
+    	containerTemplate:"<div/>",
+    	initializer:function(){
+    		this.get('container').setHTML(Y.Lang.sub(Y.one("#groupblock").getHTML(),{
+    			URL:"/group/"+this.get('model').get("title")+"/"+this.get('model').get("_id"),
+    			IMG:this.get('model').get("image"),
+    			TITLE:this.get('model').get("title"),
+    			DESC:this.get('model').get("description")
+    		}));
+    	}
+    });
+    
+    var AllGroupPageView = Y.Base.create('allgroupview', Y.View, [], {
+    	containerTemplate:'<div/>',
+    	initializer:function(){
+    		this.get('container').setHTML(Y.one("#group-page").getHTML());
+    		this.loadOpenGroups();
+    	},
+    	loadOpenGroups:function(){
+    		var c = this.get('container');
+    		Y.io(baseURL+'in/top_open_groups',{
+    			method:'POST',
+    			on:{
+    				success:function(i,o,a){
+    					var r = Y.JSON.parse(o.responseText);
+    					for(var i in r)
+    					{
+    						c.one(".open-groups").append("<li><a href='#'>"+r[i]['title']+"</a></li>").one("a").on('click',function(e){
+    							
+    							c.one(".groupinfo").setHTML(new GroupBlock({
+    								model:new Y.Model(r[i])
+    							}).render().get('container'));
+    							e.halt();
+    						});
+    					}
+    				}
+    			}
+    		});
+    	}
+    });
+    
+    
     var AdminView = Y.Base.create('searchboxview', Y.View, [], {
         containerTemplate: '<div/>',
         showStats: function () {
@@ -4720,6 +4797,7 @@ function (Y) {
         UserBlockView:UserBlockView,
         FormOnFlyView:FormOnFlyView,
         GenericModel:GenericModel,
+        AllGroupPageView:AllGroupPageView
 
     };
 }, '0.0.1', {
@@ -5216,4 +5294,4 @@ YUI.add('page-box',function(Y){
 	Y.PageBoxView = PageBoxView;
 },'0.0.1',{
 	requires:['app','io','json-parse']
-});
+});

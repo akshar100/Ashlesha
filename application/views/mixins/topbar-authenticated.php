@@ -12,6 +12,8 @@
           </a>
           <a class="brand" href="<?php echo base_url(); ?>"><?php echo img(array("src"=>'static/images/logo.png','style'=>"height:40px;"))?></a>
           <div class="nav-collapse">
+          	  <?php $user = $this->user->get_current();?>
+          	  <?php if(!empty($user)) {?>
 	          <div class="pull-right">
 		            
 	          		<div class="btn-group">
@@ -24,10 +26,12 @@
 			          </ul>
 			  		</div>
 	          </div>
+	          <?php }?>
 	          <div class="pull-right right-pad30">
-		          <div class="btn-group">
-		          			<a class="btn btn-info" href="/"><i class="icon-home icon-white"></i> </a>
-			          		<a id="notification-btn" class="btn btn-info" href="#" rel="popover"><i class="icon-envelope icon-white"></i></a>
+		          <div class="btn-group navbtns">
+		          			<a rel="tooltip" title="Home" class="btn btn-info" href="/"><i class="icon-home icon-white"></i> <span></span></a>
+		          			<a rel="tooltip" title="Groups" class="btn btn-info grouppage" href="/grouppage"><i class="icon-comment icon-white"></i> <span></span></a>
+			          		<a rel="tooltip" title="Notifications" id="notification-btn" class="btn btn-info" href="#" ><i class="icon-envelope icon-white"></i> <span></span></a>
 			          		<a id="admin-btn" class="btn btn-info hide" href="/admin" rel="popover">Console</a>
 			      </div>
 			      

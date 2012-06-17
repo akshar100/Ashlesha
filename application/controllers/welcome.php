@@ -42,24 +42,27 @@ class Welcome extends CI_Controller {
 				'force_profile_details'=>$this->config->item('force_profile_details'),
 				'pages_enabled'=>$this->config->item('pages_enabled')
 			);
-		if(empty($user))
+		if(empty($user) && !in_array($this->uri->segment(1),array("page")))
 		{
-			$this->session->set_userdata("redirect_url",$this->uri->uri_string);
+			
+			$this->load->helper('cookie');
 			$this->load->view('homepage',array(
-				'config'=>$config
+				'config'=>$config,
+				'redirect_url'=>$this->uri->uri_string
 			));
 		}
 		else
 		{
-			
-			$this->user->force_sign_in($this->user->get_current());
-			if($this->session->userdata("redirect_url")!=="")
+			if(empty($user))
 			{
-				$redirect = $this->session->userdata("redirect_url");
-				$this->session->set_userdata("redirect_url","");
-				redirect($this->session->userdata($redirect));
-				exit;
+				
 			}
+			else
+			{
+				$this->user->force_sign_in($this->user->get_current());
+				
+			}
+			
 			$this->load->view('welcome_message',array(
 				'config'=>$config
 			));

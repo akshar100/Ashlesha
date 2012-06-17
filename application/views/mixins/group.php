@@ -189,3 +189,38 @@
 		</div>
 	</div>
 </script>
+<script type="text/x-template" id="group-page">
+	<div class="row-fluid">
+		<div class="span12">
+			<h3><?php echo $this->lang->line("group")?>s <small>Discover what people are doing!</small></h3>
+			<hr/>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span4">
+			<div class="well">
+				<h4>Open Groups</h4>
+				<hr/>
+				<ul class="unstyled open-groups">
+					
+				</ul>
+			</div>
+			
+		</div>
+		<div class="span5 groupinfo">
+			
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="groupblock">
+	<div class="row-fluid">
+		<div class="span4">
+			<img class="thumbnail" src="{IMG}" width="40" height="40"/>
+		</div>
+		<div class="span8">
+			<h4>{TITLE}</h4>
+			<p>{DESC}</p>
+			<a href="{URL}" class="btn btn-primary">Visit Group</a>
+		</div>
+	</div>
+</script>
