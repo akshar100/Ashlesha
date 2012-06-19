@@ -395,6 +395,7 @@ $config['pages_enabled'] = TRUE;
 $config['homepage_widget'] = 'chart';
 $config['twitter_handle'] = 'eyantra_iitb';
 $config['main_video'] = 'http://www.youtube.com/embed/NuqvEJNq9Jc';
+$config['hero_unit'] = NULL;
 /* End of file config.php */
 /* Location: ./application/config/config.php */
 

@@ -63,6 +63,19 @@
 		
 	</div>
 </script>
+<script type="text/x-template" id="notification-row-comment_thread">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="alert alert-info">
+		       <button data-dismiss="alert" class="close">×</button>
+		        <div class="row-fluid">
+		        	<img src="<?php echo base_url();?>in/profile_pic/{SOURCE_ID}" class="span1" style="max-width:40px;"/> 
+		        	<div class="span10">{SOURCE_USER} has commented on your thread. <a href="/post/painpoint/{RESOURCE}" class='btn btn-primary visit'>Visit Post</a> </div></div>
+		      </div>
+		</div>
+		
+	</div>
+</script>
 <script type="text/x-template" id="clear-all-btn">
 	<div class='row-fluid'><div class='span5 well'><button type='button' class='btn btn-primary clear'>Clear All</button></div></div>
 </script>

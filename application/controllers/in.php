@@ -441,9 +441,9 @@ class In extends CI_Controller {
 		$users = $this->dba->get_user_stats();
 		
 		
+		
 		echo json_encode(array(
-			"users"=>$users
-			
+			"users"=>$users			
 		));
 	}
 	

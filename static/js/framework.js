@@ -1036,7 +1036,11 @@ function (Y) {
 
 
             }
-
+			if(this.get("usermodel").get("_id")==this.get("user_id"))
+			{
+				this.get('container').one("#connect_user").addClass('hide');
+				this.get('container').one("#follow_user").addClass('hide');
+			}
             this.get('container').one("#connect_user").on('click', function () {
 
                 var old = this.connection.get('source_connects_target');
@@ -2858,7 +2862,8 @@ function (Y) {
                 if (m.get('notification_action') == 'friend' || m.get('notification_action') == 'friend_request' || m.get('notification_action') == 'follow') {
                     c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
                     		SOURCE_USER: u.get('fullname'),
-                    		SOURCE_ID:u.get('_id')
+                    		SOURCE_ID:u.get('_id'),
+                    		
                 	}));
                     
                     c.one('.visit').on('click', function () {
@@ -2883,7 +2888,15 @@ function (Y) {
                         });
                     });
                 }
-                
+                else
+                {
+                	
+                	c.setHTML(Y.Lang.sub(Y.one('#notification-row-' + m.get('notification_action')).getHTML(), {
+                    		SOURCE_USER: u.get('fullname'),
+                    		SOURCE_ID:u.get('_id'),
+                    		RESOURCE: m.get('linked_resource') || ''
+                	}));
+                }
                 c.one('.close').on('click', function () {
                     m.set('mark_read', 'true');
                     m.set('send_mail', '');
@@ -3319,6 +3332,7 @@ function (Y) {
                                 }
                             }
                         });
+                         
                     }
                 }
             });
@@ -4649,7 +4663,6 @@ function (Y) {
 	var UserModel = Y.BABEUSER.UserModel;
 	var ProfileView = Y.BABEUSER.ProfileView;
 	var SignUpView = Y.BABEUSER.SignUpView;
-
 	
 	var CampaignView = Y.Base.create('CampaignView',Y.View,[],{
 		containerTemplate:'<div/>',
@@ -5265,7 +5278,7 @@ YUI.add('page-box',function(Y){
 		initializer:function(){
 			var c = this.get('container');
 			c.setHTML(Y.Lang.sub(Y.one("#page-box").getHTML(),{
-				TITLE:this.get('heading') || 'Pages'
+				TITLE:this.get('title') || 'Pages'
 			}));
 			Y.io(baseURL+'in/published_pagelist',{
 				method:'POST',
@@ -5294,4 +5307,4 @@ YUI.add('page-box',function(Y){
 	Y.PageBoxView = PageBoxView;
 },'0.0.1',{
 	requires:['app','io','json-parse']
-});
+});

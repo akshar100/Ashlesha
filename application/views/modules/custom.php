@@ -7,7 +7,7 @@ YUI().use('youtube-panel','page-box',function(Y){
   		}); 
   	Y.one('.chart-area').setHTML("<div class='row-fluid'><div class='span7 video'></div><div id='twt' class='span3'></div></div>");
 	Y.one('.chart-area').one('.video').setHTML(chart.render().get('container'));
-	Y.one('.chart-area').one('#twt').setHTML(new Y.PageBoxView().render().get('container'));
+	Y.one('.chart-area').one('#twt').setHTML(new Y.PageBoxView({title:"Know More"}).render().get('container'));
 	Y.one('.chart-area').one('#twt').setStyle("text-align","left");
 	/*(function(){
 

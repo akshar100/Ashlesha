@@ -16,11 +16,18 @@ $this->load->view("common/header");
         
         <div class="row-fluid">
           <div class="span7">
+          	<?php if($this->config->item("hero_unit")==NULL){ ?>
 			<div class="hero-unit">
-            <h1><?php echo $this->lang->line('hero_unit_title');?></h1>
-            <p><?php echo $this->lang->line('site_description');?></p>
-            <p><a href="<?php echo base_url();?>welcome/know_more" class="btn btn-primary btn-large">Know More »</a></p>
-          </div>
+	            <h1><?php echo $this->lang->line('hero_unit_title');?></h1>
+	            <p><?php echo $this->lang->line('site_description');?></p>
+	            <p><a href="<?php echo base_url();?>welcome/know_more" class="btn btn-primary btn-large">Know More »</a></p>
+          	</div>
+          	<?php }
+				  else
+				  {
+				  	$this->load->view("modules/".$this->config->item("hero_unit"));
+				  }				
+			?>
           </div>
           <div class="span4 well">
           	

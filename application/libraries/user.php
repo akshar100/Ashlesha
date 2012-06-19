@@ -213,6 +213,10 @@ class User
 		//echo $this->ci->email->print_debugger();
 	}
 	
+	/***
+	 * This is one of the worst code i have ever written I myself dont understand.
+	 * This needs to be cleaned up.
+	 */
 	function notify($post)
 	{
 		$source_user = $this->ci->dba->get($post['source_user']);
@@ -238,7 +242,16 @@ class User
 			),true);
 			if(!empty($text))
 			{
-				$this->send_email($target_user['email'], "Notification: ".$source_user['fullname']." has posted in ".$group['title'], $text);
+				if($post['notification_action']=="comment_thread")
+				{
+					$this->send_email($target_user['email'], "Notification: ".$source_user['fullname']." has commented on your thread", $text);
+					
+				}
+				else
+				{
+					$this->send_email($target_user['email'], "Notification: ".$source_user['fullname']." has posted in ".$group['title'], $text);
+				}
+				
 			}
 		}
 		else

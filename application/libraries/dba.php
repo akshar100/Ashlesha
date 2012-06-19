@@ -105,6 +105,34 @@ class DBA
 		$data = $this->chill->get($response['_id']);
 		$data['id'] = $data['_id'];
 		$response['data'] = $data;
+		
+		// creating a notification for post owner and the other people who have commented on it
+		$old_comments = $this->get_comments($data['post_id']);
+		$authors = array();
+		$post = $this->get($data['post_id']);
+		foreach($old_comments as $c)
+		{
+			if($c['author_id']!==$data['author_id'] && $c['author_id']!==$post['author_id']) //dont send notification for the current user and the owner of the post
+			{
+				$authors[]= $c['author_id'];
+			}
+			
+		}
+		
+		$authors = array_unique($authors);
+		foreach($authors as $a)
+		{
+			$this->create_notification(array(
+				"source_user"=>$data['author_id'],
+				"target_user"=>$a,
+				"notification_action"=>"comment_thread",  //Somebody replied to your comment thread
+				"linked_resource"=>$post["_id"],
+				"mark_read"=>"",
+				"send_mail"=>true
+			));
+			
+		}
+		
 		return $response;
 	}
 	
@@ -834,6 +862,7 @@ class DBA
 		else
 		{
 			$response = $this->update($post);
+			return;
 		}
 		if(!empty($post['send_mail'])) //when do we decide to send email ? when the 
 		{
@@ -843,6 +872,7 @@ class DBA
 		
 		return $response;
 	}
+	
 	
 	
 }
