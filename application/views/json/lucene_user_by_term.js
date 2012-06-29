@@ -1,5 +1,5 @@
 function(doc) { 
-	var ret=new Document(); 
+	var ret=new Document(),i; 
 	if(doc.type=='user' && !doc.disabled)
 	{
 		ret.add(doc.fullname,{
@@ -12,7 +12,13 @@ function(doc) {
 				boost:2		
 			});
 		}
-		
+		if(doc.extra_fields){
+			for(i in doc.extra_fields){
+				ret.add(doc.extra_fields[i].real_value,{
+					boost:2
+				});
+			}
+		}
 		return ret; 
 	}
 	

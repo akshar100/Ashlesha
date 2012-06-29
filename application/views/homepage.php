@@ -91,6 +91,7 @@ $this->load->view("common/header");
     </div> <!-- /container -->
     <hr/>
   <?php $this->load->view("common/footer"); ?>
+  <script src="<?php echo base_url();?>/static/js/modules.js"> </script>
   <script src="<?php echo base_url();?>/static/js/framework.js"> </script>
   <script>
   	var baseURL = "<?php echo base_url();?>";

@@ -19,6 +19,17 @@
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
     <script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>google.load('visualization', '1.0', {'packages':['corechart']});</script>
+
+    <?php 
+    $key = $this->config->item('googlemaps_api'); 
+	if(!empty($key)) {
+		?><script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $this->config->item('googlemaps_api'); ?>&sensor=false">
+     <?php
+	}?>
+   	 </script>
+
   </head>
 
 <body>

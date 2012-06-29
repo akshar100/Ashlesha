@@ -362,6 +362,7 @@ $config['global_xss_filtering'] = TRUE;
 $config['facebook_appid'] = '{FBAPPID}';
 $config['facebook_appsecret'] = "{FBAPP_SECRET}";
 
+$config['googlemaps_api'] = "{GMAP_API}";
 $config['couchdb_host'] = '{COUCHHOST}'; //Do not provide any port here.
 $config['couchdb_database'] = '{COUCHDB_NAME}';
 

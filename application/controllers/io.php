@@ -223,7 +223,13 @@ class IO extends CI_Controller {
 			$this->dba->update($doc);
 		}
 		
-		
+		$doc = $this->dba->get("send_sms_list");
+		if(empty($doc))
+		{
+			$this->dba->create(array(
+				"_id"=>"send_sms_list"
+			));
+		}
 		echo "updated";
 		
 	}
@@ -400,18 +406,26 @@ class IO extends CI_Controller {
 	function get_model()
 	{
 		$response = $this->dba->get($this->input->post('_id'));
-		foreach($response as $k=>$v)
+		if(!empty($response))
 		{
-			if(is_object($v))
+			foreach($response as $k=>$v)
 			{
-				$response[$k]=json_encode($v);
+				if(is_object($v))
+				{
+					$response[$k]=json_encode($v);
+				}
 			}
+		}
+		else
+		{
+			$response = array();
 		}
 		echo json_encode($response);
 	}
 	
 	function delete_model()
 	{
+		//need some kind of authorization here.  
 		echo json_encode($this->dba->delete($this->input->post('_id')));
 	}
 

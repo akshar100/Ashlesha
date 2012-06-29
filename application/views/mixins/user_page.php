@@ -10,9 +10,18 @@
 		</div>
 		
 	</div>
+	<div class="row-fluid hide" id="user_profile_details">
+		
+	</div>
 	<div class="row-fluid"><div class="span12"><hr/></div></div>
 	<div class="row-fluid" id="user_wall">
 		
+	</div>
+</script>
+<script type="text/x-template" id="profile_field_row">
+	<div class="row-fluid">
+		<div class="span4"><h4>{LABEL}</h4></div>
+		<div class="span8">{VALUE}</div>
 	</div>
 </script>
 <script type="text/x-template" id="user_block">

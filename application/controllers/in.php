@@ -542,6 +542,51 @@ class In extends CI_Controller {
 		echo json_encode($this->dba->getview("get_open_groups"));
 	}
 	
+	function send_sms_list()
+	{
+		$list = $this->dba->get("send_sms_list");
+		$numbers_text = $list['numbers'];
+		$numbers = preg_split("/[\s,]+/", $numbers_text);
+		//print_r($numbers);
+		$n = array();
+		foreach($numbers as $v)
+		{
+			if(strlen($v)==10)
+			{
+				$n[]=array($v,$list["text"]);
+			}
+		}
+		echo  json_encode($n);
+	}
+	
+	function profile_stats()
+	{
+		$data = $this->input->post();
+		$users = $this->dba->getview("users_by_username");
+		$response = array();
+		foreach($users as $user)
+		{
+			
+			if(isset($user['extra_fields']))
+			{
+				foreach($user['extra_fields'] as $field)
+				{
+					if($field['label'] == $data['label'] && !empty($field['real_value']))
+					{
+						$response[]= $field['real_value'];
+					}
+					
+
+				}
+			}
+			else
+			{
+				//Else default value ? 
+			}
+		}
+		
+		echo json_encode(($response));
+	}
 }
 
 /* End of file welcome.php */

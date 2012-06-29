@@ -8,6 +8,7 @@
 	          <li><a href="/admin/search_user">User Management</a></li>
 	          <li><a href="/admin/mass_mail">Email All</a></li>
 	          <li><a href="/admin/invite_users">Invite</a></li>
+	          <li><a href="/admin/send_sms">Send SMS</a></li>
 	        </ul>
 	      </li>
 	      <li class="dropdown">
@@ -83,6 +84,27 @@
 				</div>
 			</div>
 		</div>
+		
+		<div class="row-fluid"><div class="span12"><h3>User Visualization</h3></div></div>
+		<div class="row-fluid">
+			<div class="span12 user-visualization well">
+				<div class="row-fluid">
+					<div class="span4">
+						<h4>User Profile Fields</h4>
+						<ul class="unstyled field-list">
+							
+						</ul>
+					</div>
+					<div class="span8">
+						<h4>Visualization</h4>
+						<div class="content">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 	</div>
 	<div class="row-fluid">
 		<div class=" well">
@@ -855,4 +877,23 @@ United States of America|USA|0.5
 			
 		</td>
 	</tr>
+</script>
+<script type="text/x-template" id="advancedstats">
+	<div class="row-fluid">
+		<div class="span12">
+			Visualization:<select class="input input-xlarge visual">
+				<option value="maps">Maps</option>
+				<option value="piechart">PieChart</option>
+			</select>
+			Data Type:<select class="input input-xlarge datatype">
+				<option value="zip">Zip/Pincode</option>
+				<option value="count">Categorization</option>
+			</select>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span12 advanced-stats-content">
+			
+		</div>
+	</div>
 </script>

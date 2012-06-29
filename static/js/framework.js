@@ -987,7 +987,7 @@ function (Y) {
     var UserView = Y.Base.create('UserView', Y.View, [], {
         containerTemplate: '<div/>',
         updateContainer: function () {
-
+			var profile_fields;
             this.get('container').setContent(
             Y.Lang.sub(Y.one('#user_page').getHTML(), {
                 USERID: this.get('model').get('_id'),
@@ -1040,6 +1040,24 @@ function (Y) {
 			{
 				this.get('container').one("#connect_user").addClass('hide');
 				this.get('container').one("#follow_user").addClass('hide');
+			}
+			if(this.get("usermodel").hasRole("administrator"))
+			{
+				this.get('container').one('#user_profile_details').removeClass('hide');
+				this.get('container').one('#user_profile_details').setHTML(this.get("usermodel").toJSON());
+				profile_fields = this.get('model').get("extra_fields");
+				
+				if(profile_fields)
+				{
+					Y.Array.each(profile_fields,function(item){
+						this.get('container').one('#user_profile_details').append(Y.Lang.sub(Y.one("#profile_field_row").getHTML(),{
+							LABEL:item.label,
+							VALUE:item.real_value
+						}));
+					},this);
+					
+				}
+				
 			}
             this.get('container').one("#connect_user").on('click', function () {
 
@@ -3284,9 +3302,131 @@ function (Y) {
     	}
     });
     
+    var AdvancedStatsView = Y.Base.create("advancedstats",Y.View,[],{
+    	 containerTemplate: '<div/>',
+    	 initializer:function(){
+    	 	var c = this.get('container');
+    	 	c.setHTML(Y.one("#advancedstats").getHTML()); 
+    	 	Y.on("stats:visualization",function(e){
+    	 		
+    	 		if(!Y.one('.advanced-stats-content'))
+    	 		{
+    	 			Y.log("Maps canvas not found");
+    	 			return;
+    	 		}
+    	 		var visual = c.one(".visual").get("value"), datatype= c.one(".datatype").get("value"),param = e.selected;
+    	 		Y.log(visual); Y.log(datatype);
+    	 		Y.one('.advanced-stats-content').setStyle("width","80%");
+    	 		Y.one('.advanced-stats-content').setStyle("height","400px");
+    	 		if(visual==="maps" && datatype==="zip"){
+    	 			
+    	 			var ll=new google.maps.LatLng(20.397, 77.644), map = new google.maps.Map(Y.one('.advanced-stats-content').getDOMNode(),{
+    	 			center: ll,
+          			zoom: 5,
+          			mapTypeId: google.maps.MapTypeId.ROADMAP
+	    	 		});
+					Y.io(baseURL+'in/profile_stats',{
+						method:'POST',
+						data:param,
+						on:{
+							success:function(i,o,a){
+								var i,r = Y.JSON.parse(o.responseText), gc = new google.maps.Geocoder(),url = "http://ws.geonames.org/postalCodeLookupJSON?&username=eyantra&postalcode={ZIP}&country=IN";
+								r = Y.Array.unique(r);
+								
+								for(i in r)
+								{
+									if(r[i])
+									{
+										Y.jsonp(Y.Lang.sub(url,{ZIP:r[i]}), function(data){
+											if(data && data.postalcodes && data.postalcodes.length>0)
+											{
+												var marker = new google.maps.Marker({
+										            map: map,
+										            position: new google.maps.LatLng(data.postalcodes[0].lat,data.postalcodes[0].lng)
+										        });
+											}
+											
+										});
+									}
+								}
+								
+							}
+						}
+					});
+    	 		}
+    	 		else if(visual==="piechart" && datatype==="count"){
+    	 			Y.io(baseURL+'in/profile_stats',{
+					method:'POST',
+					data:param,
+					context:this,
+					on:{
+						success:function(i,o,a){
+							
+							var r = Y.JSON.parse(o.responseText),i,data,result={},datatable=[],key;
+					       
+							for(i in r)
+							{
+								key = ""+r[i];
+								key = key.trim().toLowerCase();
+								if(result[key])
+								{
+									result[key] +=1;
+								}
+								else
+								{
+									result[key]=1; 
+								}
+							}
+							datatable.push([param.label,'category']);
+							for(i in result)
+							{
+								datatable.push([i,result[i]]);
+							}
+							data = google.visualization.arrayToDataTable(datatable);
+							new google.visualization.PieChart(Y.one('.advanced-stats-content').getDOMNode()).draw(data, {title:param.label});
+						}
+					}
+					});
+    	 		}
+    	 		else
+    	 		{
+    	 			showAlert("Invalid Input","The Combination of Visualization and DataType is incorrect");
+    	 		}
+    	 		
+    	 	},this);
+    	 }
+    });
     
     var AdminView = Y.Base.create('searchboxview', Y.View, [], {
         containerTemplate: '<div/>',
+        showProfileStats:function(){
+        	var c = this.get('container'),extra_fields;
+        	extra_fields = new GenericModel({
+				_id:"additional_profile_fields"
+			});
+			c.one(".content").setHTML(new AdvancedStatsView().render().get('container'));
+			extra_fields.on('load',function(){
+				var fields = extra_fields.toJSON();
+				
+				c.one(".field-list").setHTML('');
+				Y.Array.each(fields.data,function(item){
+					var n = Y.Node.create(Y.Lang.sub("<LI><a href='#'>{LABEL}</li><LI>",{
+						LABEL:item.label
+					}));
+					n.one("a").on("click",function(e){
+						
+						 Y.fire("stats:visualization",{
+						 	model : extra_fields,
+						 	selected : item
+						 });
+						 e.halt();
+					},this);
+					c.one(".field-list").append(n);
+				},this);
+				
+			},this);
+			extra_fields.load();
+        },
         showStats: function () {
             var c = this.get('container');
             if (this.get('container').one("a.stats")) {
@@ -3295,6 +3435,7 @@ function (Y) {
 
             Y.io(baseURL + 'in/site_stats', {
                 method: 'GET',
+                context:this,
                 on: {
                     complete: function (i, o, a) {
                         var response = Y.JSON.parse(o.responseText);
@@ -3332,13 +3473,13 @@ function (Y) {
                                 }
                             }
                         });
-                         
+                        this.showProfileStats();
                     }
                 }
             });
 
-
-
+			
+ 
         },
         initializer: function (config) {
         	Y.log(config);
@@ -3404,6 +3545,9 @@ function (Y) {
                 case "manage_pages":
                 	this.managePages();
                 	break;
+                case "send_sms":
+                	this.sendSMS();
+                	break;
                 default:
                     this.showStats();
                 }
@@ -3412,8 +3556,14 @@ function (Y) {
             }
             return this;
         },
+        sendSMS:function(){
+        	
+        	var qc = new SendSMSView();
+	    	this.get('container').one('.mainarea').setHTML(qc.render().get('container'));
+	    	qc.fire("rendered");
+        },
         createPage:function(page){
-        	Y.log("page_id"+page);
+        	
         	var qc = new CreatePageView({
         		page_id:page
         	});
@@ -4677,6 +4827,31 @@ function (Y) {
 		}
 		
 	});
+	
+	var SendSMSView = Y.Base.create('SendSMSView',Y.View,[],{
+		containerTemplate:'<div/>',
+		initializer:function(){
+			var that = this, m = new GenericModel({
+				"_id":"send_sms_list"
+			}),c=that.get('container');
+			Y.BABE.loadTemplate('sendsms',function(){
+				c.setHTML(Y.one('#send-sms').getHTML()); 
+				c.one(".send").on("click",function(){
+					m.load(function(){
+						m.set("_id","send_sms_list");
+						m.set("id","send_sms_list");
+						m.set("text",c.one(".text").get("value"));
+						m.set("numbers",c.one(".numbers").get("value"));
+						m.save();
+					});
+					
+				});
+				
+			});
+		}
+		
+	});
+	
     Y.BABE = {
         male_image:'/static/images/male_profile.png',
         female_image:'/static/images/female_profile.png',
@@ -4810,11 +4985,12 @@ function (Y) {
         UserBlockView:UserBlockView,
         FormOnFlyView:FormOnFlyView,
         GenericModel:GenericModel,
-        AllGroupPageView:AllGroupPageView
+        AllGroupPageView:AllGroupPageView,
+        SendSMSView:SendSMSView
 
     };
 }, '0.0.1', {
-    requires: ['editor','youtube-panel','ashlesha-chat','babe-user','calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
+    requires: ['jsonp','jsonp-url','editor','youtube-panel','ashlesha-chat','babe-user','calendar','charts', 'router', 'autocomplete', 'autocomplete-highlighters', 'autocomplete-filters', 'datasource-get', 'datatype-date', 'app-base', 'app-transitions', 'node', 'event', 'json', 'cache', 'model', 'model-list', 'querystring-stringify-simple', 'view', 'querystring-stringify-simple', 'io-upload-iframe', 'io-form', 'io-base', 'sortable']
 });
 
 YUI.add('babe-user',function(Y){
