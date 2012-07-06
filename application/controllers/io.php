@@ -110,6 +110,11 @@ class IO extends CI_Controller {
 			{
 				$user[$k] = $v; 
 			}
+			if(strpos($k," "))
+			{
+				unset($user[$k]);
+			}
+			
 			
 		}
 		

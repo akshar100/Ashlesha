@@ -2172,7 +2172,10 @@ function (Y) {
         initializer: function () {
             this.get('container').setContent(Y.one('#create-post').getHTML());
             Y.BABE.autoExpand(this.get('container').one("textarea"));
-
+			if(this.get('post_title'))
+			{
+				this.get('container').one(".post_title").setHTML(this.get('post_title'));
+			}
             this.get('container').one("button.img-upload").on("click", function () {
                 this.set('img', new Y.BABE.ImageUploadView({
                     display: "#" + this.get('container').one('.image_preview').generateID()
@@ -2730,6 +2733,7 @@ function (Y) {
     var StatusBlockView = Y.Base.create('statusblockview', Y.View, [], {
         containerTemplate: '<div id="statusblock"/>',
         initializer: function () {
+        	var post_cats,i;
 			this.set('container', Y.Node.create('<div id="statusblock"/>'));
 
             this.get('container').setContent(Y.Lang.sub(Y.one('#statusblock-authenticated').getContent(), {
@@ -2748,6 +2752,14 @@ function (Y) {
                 }
                 if (!Y.APPCONFIG.question_enabled) {
                     this.get('container').one('a.question').addClass('hide');
+                }
+                if(Y.APPCONFIG.additional_post_categories){
+                	post_cats = Y.APPCONFIG.additional_post_categories;
+                	for(i in post_cats)
+                	{
+                		
+                		this.get('container').one(".pills-status").append('<a class="event" href="#" rel="'+post_cats[i]+'"><i class="icon-plus"></i>'+post_cats[i].replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</a>');
+                	}
                 }
             }
 

@@ -40,7 +40,8 @@ class Welcome extends CI_Controller {
 				'supported_roles'=>$this->config->item('supported_roles'),
 				'sign_up_enabled'=>$this->config->item('sign_up_enabled'),
 				'force_profile_details'=>$this->config->item('force_profile_details'),
-				'pages_enabled'=>$this->config->item('pages_enabled')
+				'pages_enabled'=>$this->config->item('pages_enabled'),
+				'additional_post_categories'=>$this->config->item('additional_post_categories')
 			);
 		if(empty($user) && !in_array($this->uri->segment(1),array("page")))
 		{
