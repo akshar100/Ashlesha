@@ -613,7 +613,9 @@ class IO extends CI_Controller {
 		$this->email->subject($subject);
 		$this->email->message($content);
 			
-		echo $this->email->send();
+		$this->email->send();
+		
+		echo print_r($emails);
 		
 	}
 	
@@ -794,6 +796,94 @@ class IO extends CI_Controller {
 		echo json_encode(array(
 			"success"=>true
 		));
+	}
+	
+	function parser()
+	{
+		$this->load->helper("file");
+		$filecontent = read_file("./addresses.txt");
+		//echo $filecontent;
+		$tokens = preg_split('/"To,"/',$filecontent);
+		$addresses = array();
+		foreach($tokens as $t)
+		{
+			$str ="";
+			$line = explode("\n",$t);
+			foreach($line as $k=>$v)
+			{
+				if(preg_match('/Mob:.*/',trim($v)))
+				{
+					$mobile = preg_split("/[+,-,.,\/,\,]/",$v);
+					foreach($mobile as $m)
+					{
+						$number = preg_replace('/[^0-9]/',"",$m);
+						if(strlen($number)>=10)
+						{
+							//echo substr($number,strlen($number)-10)."|";
+						}
+						
+					}
+					//echo ",";
+				}
+				else if(!empty($v))
+				{
+					 $str .=$v."%";
+				}
+				
+					
+			}
+			
+			echo preg_replace("/Ê/","",$str);
+			echo "\r\n";
+		}
+	}
+	
+	function export_emails()
+	{
+		$response = $this->chill->getView("posts","users_by_email");
+		$emails = array();
+		foreach($response['rows'] as $v)
+		{
+			if(isset($v['value']['email']) && isset($v['value']['fullname']))
+			{
+				$emails[]=$v['value']['email'].",".$v['value']['fullname'];
+			}
+			
+		}
+		echo implode("<br/>",$emails);
+	}
+	function export_users()
+	{
+		$response = $this->chill->getView("posts","users_by_email");
+		$emails = array();
+		echo "Email,Fullname,";
+		$i=0;
+		foreach($response['rows'] as $v)
+		{
+			if(isset($v['value']['email']) && isset($v['value']['fullname']) )
+			{
+				if(isset($v['value']['extra_fields']))
+				{
+					$extra = $v['value']['extra_fields'];
+					$line = array();
+					$title = array();
+					foreach($extra as $v2)
+					{
+						$line[]=$v2['real_value'];
+						
+						$title[]=$v2['label'];
+						
+					}
+					
+					$emails[]=$v['value']['email']."|".$v['value']['fullname']."|".$v['value']['gender']."|".implode("|",$line);
+				}
+				
+				
+			}
+			
+		}
+		//echo implode(",",$title);
+		echo implode("\n",$emails);
 	}
 }
 

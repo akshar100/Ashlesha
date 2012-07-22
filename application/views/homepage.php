@@ -98,7 +98,8 @@ $this->load->view("common/header");
   	YUI().use('babe',function(Y){
   		Y.APPCONFIG =  <?php echo json_encode($config);?>; 
   		Y.BABE.loadTemplate("singupform",function(){ 
-  			var signup = new Y.BABE.SignUpView();
+  			var signup = new Y.BABE.SignUpView(); 
+  			
   			var forgotpassword = new Y.BABE.ForgotPasswordView();
   			Y.one("#signup").setContent(signup.render().get('container'));
   			Y.one("#forgot-password-link").on('click',function(){

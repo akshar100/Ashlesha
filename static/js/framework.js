@@ -5348,6 +5348,8 @@ YUI.add('babe-user',function(Y){
             this.template = Y.one('#signupform-template').getContent();
             if(Y.APPCONFIG && Y.APPCONFIG.sign_up_enabled==false)
 			{
+				this.get('container').setHTML('Registrations are closed');
+				return this;
 				//What message to show if this is an invitation only website ?
 			}
             this.get('container').setContent(this.template);
